@@ -1,5 +1,6 @@
 // data.js — Tourism Guidance Project
-// Updated: May 2026 | Courses: 113 | Revenue: 3.94M | Profit: 1.01M
+// Updated: May 2026 | Courses: 113 | Revenue: 3.94M | Profit: 1.02M
+// Project Start: 30-11-2025 | Ministry-approved courses only
 
 const SUMMARY = {
   "total_courses": 113,
@@ -10,107 +11,117 @@ const SUMMARY = {
   "total_passed": 2888,
   "total_failed": 60,
   "withdrawn_during": 261,
-  "total_expenses": 2923344.19,
+  "total_expenses": 2915638.19,
   "total_revenue": 3936776.0,
-  "total_profit": 1013431.81,
-  "profit_margin": 25.7,
-  "avg_registered": 36.0,
+  "total_profit": 1021137.81,
+  "profit_margin": 25.9,
+  "avg_registered": 26,
   "pass_rate": 70.9,
   "reg_pct_target": 45.2,
   "pass_pct_target": 32.1,
   "loss_courses": 9,
   "revenue_M": "3.94M",
   "expenses_M": "2.92M",
-  "profit_M": "1.01M",
+  "profit_M": "1.02M",
   "last_city": "الباحة",
   "last_date": "2026-05-06",
   "contract_excl_vat": 11739000,
-  "contract_incl_vat": 13499850
+  "contract_incl_vat": 13499850,
+  "project_start": "2025-11-30"
 };
-
+const CONTRACT = {
+  "target_courses": 300,
+  "executed": 113,
+  "remaining": 187,
+  "days_remaining": 597,
+  "completion_pct": 37.7,
+  "target_trainees": 9000,
+  "achieved_trainees": 2888,
+  "remaining_trainees": 6112,
+  "reg_pct": 45.2
+};
 const BUDGET = {
   "المدرب": {
     "total_budget": 1800000,
     "proportional": 678000,
     "actual": 663500,
     "diff": 14500,
-    "pct_used": 97.9,
-    "within_budget": true
+    "within_budget": true,
+    "pct_used": 97.9
   },
   "المنسق": {
     "total_budget": 315000,
     "proportional": 118650,
-    "actual": 115500,
-    "diff": 3150,
-    "pct_used": 97.3,
-    "within_budget": true
+    "actual": 133350,
+    "diff": -14700,
+    "within_budget": false,
+    "pct_used": 112.4
   },
   "الباص": {
     "total_budget": 810000,
     "proportional": 305100,
-    "actual": 310831,
-    "diff": -5731,
-    "pct_used": 101.9,
-    "within_budget": false
+    "actual": 303125,
+    "diff": 1975,
+    "within_budget": true,
+    "pct_used": 99.4
   },
   "الفندق/السناك": {
     "total_budget": 2925000,
     "proportional": 1101750,
-    "actual": 1018101,
-    "diff": 83649,
-    "pct_used": 92.4,
-    "within_budget": true
+    "actual": 1163490,
+    "diff": -61740,
+    "within_budget": false,
+    "pct_used": 105.6
   },
   "الطباعة": {
     "total_budget": 36000,
     "proportional": 13560,
     "actual": 5579,
     "diff": 7981,
-    "pct_used": 41.1,
-    "within_budget": true
+    "within_budget": true,
+    "pct_used": 41.1
   },
   "البنرات": {
     "total_budget": 5100,
     "proportional": 1921,
     "actual": 1923,
     "diff": -2,
-    "pct_used": 100.1,
-    "within_budget": false
+    "within_budget": false,
+    "pct_used": 100.1
   },
   "الشحن": {
     "total_budget": 12000,
     "proportional": 4520,
     "actual": 4510,
     "diff": 10,
-    "pct_used": 99.8,
-    "within_budget": true
+    "within_budget": true,
+    "pct_used": 99.8
   },
   "SMS": {
     "total_budget": 36000,
     "proportional": 13560,
     "actual": 5650,
     "diff": 7910,
-    "pct_used": 41.7,
-    "within_budget": true
+    "within_budget": true,
+    "pct_used": 41.7
   },
   "الشهادة": {
     "total_budget": 1530000,
     "proportional": 576300,
     "actual": 577400,
     "diff": -1100,
-    "pct_used": 100.2,
-    "within_budget": false
+    "within_budget": false,
+    "pct_used": 100.2
   },
   "الموظفين": {
     "total_budget": 585000,
     "proportional": 220350,
     "actual": 220350,
     "diff": 0,
-    "pct_used": 100.0,
-    "within_budget": true
+    "within_budget": true,
+    "pct_used": 100.0
   }
 };
-
 const CITIES = [
   {
     "city": "الرياض",
@@ -137,9 +148,9 @@ const CITIES = [
     "passed": 464,
     "failed": 3,
     "withdrawn_during": 41,
-    "expenses": 458020.51,
+    "expenses": 450314.51,
     "revenue": 625920.0,
-    "profit": 167899.49,
+    "profit": 175605.49,
     "pass_rate": 91.3
   },
   {
@@ -383,7 +394,6 @@ const CITIES = [
     "pass_rate": 92.0
   }
 ];
-
 const MONTHS_DATA = [
   {
     "label": "يناير 2025",
@@ -395,8 +405,8 @@ const MONTHS_DATA = [
   {
     "label": "يوليو 2025",
     "revenue": 108232,
-    "expenses": 85293,
-    "profit": 22939,
+    "expenses": 77587,
+    "profit": 30645,
     "courses": 4
   },
   {
@@ -428,7 +438,6 @@ const MONTHS_DATA = [
     "courses": 5
   }
 ];
-
 const TRAINERS = [
   {
     "name": "بندر الجهني",
@@ -725,12 +734,11 @@ const TRAINERS = [
     "rate": 87.5
   }
 ];
-
 const COURSES = [
   {
     "num": 1,
     "code": "MT-RY-00267",
-    "date": "30-11-2025",
+    "date": "2025-11-30",
     "city": "الرياض",
     "hotel": "الأكاديمية",
     "trainer": "علي محمد قيراط",
@@ -742,7 +750,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 1,
     "expenses": 18953.0,
-    "total_expenses": 18953.0,
     "revenue": 16952.0,
     "profit": -2001.0,
     "profit_pct": -11.8
@@ -750,7 +757,7 @@ const COURSES = [
   {
     "num": 2,
     "code": "MT-MA-00263",
-    "date": "30-11-2025",
+    "date": "2025-11-30",
     "city": "المدينة المنورة",
     "hotel": "سدرة العالمي",
     "trainer": "بشرى كيماوي",
@@ -762,7 +769,6 @@ const COURSES = [
     "failed": 3,
     "withdrawn_during": 1,
     "expenses": 19810.29,
-    "total_expenses": 19810.29,
     "revenue": 14344.0,
     "profit": -5466.29,
     "profit_pct": -38.11
@@ -770,7 +776,7 @@ const COURSES = [
   {
     "num": 3,
     "code": "MT-JD-00262",
-    "date": "30-11-2025",
+    "date": "2025-11-30",
     "city": "جدة",
     "hotel": "سويس أوتيل ليفينج",
     "trainer": "بندر الجهني",
@@ -782,7 +788,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 15466.29,
-    "total_expenses": 15466.29,
     "revenue": 23472.0,
     "profit": 8005.71,
     "profit_pct": 34.11
@@ -802,7 +807,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 0,
     "expenses": 21054.29,
-    "total_expenses": 21054.29,
     "revenue": 31296.0,
     "profit": 10241.71,
     "profit_pct": 32.73
@@ -822,7 +826,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 0,
     "expenses": 26200.29,
-    "total_expenses": 26200.29,
     "revenue": 32600.0,
     "profit": 6399.71,
     "profit_pct": 19.63
@@ -841,11 +844,10 @@ const COURSES = [
     "passed": 22,
     "failed": 0,
     "withdrawn_during": 2,
-    "expenses": 23772.29,
-    "total_expenses": 23772.29,
+    "expenses": 16066.29,
     "revenue": 28688.0,
-    "profit": 4915.71,
-    "profit_pct": 17.14
+    "profit": 12621.71,
+    "profit_pct": 44.0
   },
   {
     "num": 7,
@@ -862,7 +864,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 2,
     "expenses": 14266.29,
-    "total_expenses": 14266.29,
     "revenue": 15648.0,
     "profit": 1381.71,
     "profit_pct": 8.83
@@ -870,7 +871,7 @@ const COURSES = [
   {
     "num": 8,
     "code": "MT-RY-00254",
-    "date": "14-12-2025",
+    "date": "2025-12-14",
     "city": "الرياض",
     "hotel": "ميليسيا",
     "trainer": "انور حكمي",
@@ -882,7 +883,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 5,
     "expenses": 24566.29,
-    "total_expenses": 24566.29,
     "revenue": 31296.0,
     "profit": 6729.71,
     "profit_pct": 21.5
@@ -890,7 +890,7 @@ const COURSES = [
   {
     "num": 9,
     "code": "MT-JD-00255",
-    "date": "14-12-2025",
+    "date": "2025-12-14",
     "city": "جدة",
     "hotel": "سويس أوتيل ليفينج",
     "trainer": "بندر الجهني",
@@ -902,7 +902,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 0,
     "expenses": 17666.29,
-    "total_expenses": 17666.29,
     "revenue": 39120.0,
     "profit": 21453.71,
     "profit_pct": 54.84
@@ -910,7 +909,7 @@ const COURSES = [
   {
     "num": 10,
     "code": "MT-MK-00256",
-    "date": "14-12-2025",
+    "date": "2025-12-14",
     "city": "مكة المكرمة",
     "hotel": "ملينيوم كوبثورن",
     "trainer": "بكر محمد امين فلاته",
@@ -922,7 +921,6 @@ const COURSES = [
     "failed": 2,
     "withdrawn_during": 1,
     "expenses": 24066.29,
-    "total_expenses": 24066.29,
     "revenue": 28688.0,
     "profit": 4621.71,
     "profit_pct": 16.11
@@ -930,7 +928,7 @@ const COURSES = [
   {
     "num": 11,
     "code": "MT-SH-00257",
-    "date": "14-12-2025",
+    "date": "2025-12-14",
     "city": "الدمام",
     "hotel": "جراند فرست",
     "trainer": "خالد محمد هفه",
@@ -942,7 +940,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 0,
     "expenses": 25406.29,
-    "total_expenses": 25406.29,
     "revenue": 33904.0,
     "profit": 8497.71,
     "profit_pct": 25.06
@@ -950,7 +947,7 @@ const COURSES = [
   {
     "num": 12,
     "code": "MT-JD-00259",
-    "date": "21-12-2025",
+    "date": "2025-12-21",
     "city": "جدة",
     "hotel": "سويس أوتيل ليفينج",
     "trainer": "بندر الجهني",
@@ -962,7 +959,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 1,
     "expenses": 17286.29,
-    "total_expenses": 17286.29,
     "revenue": 40424.0,
     "profit": 23137.71,
     "profit_pct": 57.24
@@ -970,7 +966,7 @@ const COURSES = [
   {
     "num": 13,
     "code": "MT-RY-00260",
-    "date": "21-12-2025",
+    "date": "2025-12-21",
     "city": "الرياض",
     "hotel": "ميليسيا",
     "trainer": "علي قيراط",
@@ -982,7 +978,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 0,
     "expenses": 27006.29,
-    "total_expenses": 27006.29,
     "revenue": 43032.0,
     "profit": 16025.71,
     "profit_pct": 37.24
@@ -990,7 +985,7 @@ const COURSES = [
   {
     "num": 14,
     "code": "MT-GN-00257",
-    "date": "21-12-2025",
+    "date": "2025-12-21",
     "city": "جازان",
     "hotel": "جراند جازان",
     "trainer": "أنور حكمي",
@@ -1002,7 +997,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 4,
     "expenses": 27000.29,
-    "total_expenses": 27000.29,
     "revenue": 31296.0,
     "profit": 4295.71,
     "profit_pct": 13.73
@@ -1010,7 +1004,7 @@ const COURSES = [
   {
     "num": 15,
     "code": "MT-KH-00294",
-    "date": "21-12-2025",
+    "date": "2025-12-21",
     "city": "الخرج",
     "hotel": "برج مياه الخرج",
     "trainer": "خلود الطويرقي",
@@ -1022,7 +1016,6 @@ const COURSES = [
     "failed": 5,
     "withdrawn_during": 3,
     "expenses": 27686.29,
-    "total_expenses": 27686.29,
     "revenue": 28688.0,
     "profit": 1001.71,
     "profit_pct": 3.49
@@ -1030,7 +1023,7 @@ const COURSES = [
   {
     "num": 16,
     "code": "MT-MK-00258",
-    "date": "21-12-2025",
+    "date": "2025-12-21",
     "city": "مكة المكرمة",
     "hotel": "ملينيوم كوبثورن",
     "trainer": "ابراهيم مصيري",
@@ -1042,7 +1035,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 26466.29,
-    "total_expenses": 26466.29,
     "revenue": 41728.0,
     "profit": 15261.71,
     "profit_pct": 36.57
@@ -1062,7 +1054,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 4,
     "expenses": 27841.29,
-    "total_expenses": 27841.29,
     "revenue": 40424.0,
     "profit": 12582.71,
     "profit_pct": 31.13
@@ -1082,7 +1073,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 3,
     "expenses": 30659.29,
-    "total_expenses": 30659.29,
     "revenue": 44336.0,
     "profit": 13676.71,
     "profit_pct": 30.85
@@ -1102,7 +1092,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 27241.29,
-    "total_expenses": 27241.29,
     "revenue": 45640.0,
     "profit": 18398.71,
     "profit_pct": 40.31
@@ -1122,7 +1111,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 2,
     "expenses": 30491.29,
-    "total_expenses": 30491.29,
     "revenue": 43032.0,
     "profit": 12540.71,
     "profit_pct": 29.14
@@ -1142,7 +1130,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 2,
     "expenses": 25591.29,
-    "total_expenses": 25591.29,
     "revenue": 35208.0,
     "profit": 9616.71,
     "profit_pct": 27.31
@@ -1162,7 +1149,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 25456.29,
-    "total_expenses": 25456.29,
     "revenue": 37816.0,
     "profit": 12359.71,
     "profit_pct": 32.68
@@ -1182,7 +1168,6 @@ const COURSES = [
     "failed": 2,
     "withdrawn_during": 1,
     "expenses": 26291.29,
-    "total_expenses": 26291.29,
     "revenue": 36512.0,
     "profit": 10220.71,
     "profit_pct": 27.99
@@ -1202,7 +1187,6 @@ const COURSES = [
     "failed": 3,
     "withdrawn_during": 1,
     "expenses": 25456.29,
-    "total_expenses": 25456.29,
     "revenue": 37816.0,
     "profit": 12359.71,
     "profit_pct": 32.68
@@ -1210,7 +1194,7 @@ const COURSES = [
   {
     "num": 25,
     "code": "MT-TF-00268",
-    "date": "2004-01-26",
+    "date": "",
     "city": "الطائف",
     "hotel": "إريديوم ",
     "trainer": "حسن حمدي",
@@ -1222,7 +1206,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 25542.29,
-    "total_expenses": 25542.29,
     "revenue": 35208.0,
     "profit": 9665.71,
     "profit_pct": 27.45
@@ -1230,7 +1213,7 @@ const COURSES = [
   {
     "num": 26,
     "code": "MT-RY-00300",
-    "date": "2004-01-26",
+    "date": "",
     "city": "الرياض",
     "hotel": "مليسا الرياض",
     "trainer": "خلود الطويرقي",
@@ -1242,7 +1225,6 @@ const COURSES = [
     "failed": 2,
     "withdrawn_during": 2,
     "expenses": 25538.29,
-    "total_expenses": 25538.29,
     "revenue": 37816.0,
     "profit": 12277.71,
     "profit_pct": 32.47
@@ -1250,7 +1232,7 @@ const COURSES = [
   {
     "num": 27,
     "code": "MT-JD-00301",
-    "date": "2004-01-26",
+    "date": "",
     "city": "جدة",
     "hotel": "روزموند الحمراء",
     "trainer": "صهيب تركستناني",
@@ -1262,7 +1244,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 26626.29,
-    "total_expenses": 26626.29,
     "revenue": 35208.0,
     "profit": 8581.71,
     "profit_pct": 24.37
@@ -1270,7 +1251,7 @@ const COURSES = [
   {
     "num": 28,
     "code": "MT-MA-00302",
-    "date": "2004-01-26",
+    "date": "",
     "city": "المدينة المنورة",
     "hotel": "فندق سدرة العالمي ",
     "trainer": "خالد هفه",
@@ -1282,7 +1263,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 29626.29,
-    "total_expenses": 29626.29,
     "revenue": 41728.0,
     "profit": 12101.71,
     "profit_pct": 29.0
@@ -1290,7 +1270,7 @@ const COURSES = [
   {
     "num": 29,
     "code": "MT-RY-00266",
-    "date": "2004-01-26",
+    "date": "",
     "city": "الرياض",
     "hotel": "مليسا الرياض",
     "trainer": "علي الشهري",
@@ -1302,7 +1282,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 25288.29,
-    "total_expenses": 25288.29,
     "revenue": 37816.0,
     "profit": 12527.71,
     "profit_pct": 33.13
@@ -1310,7 +1289,7 @@ const COURSES = [
   {
     "num": 30,
     "code": "MT-JD-00267",
-    "date": "2004-01-26",
+    "date": "",
     "city": "جدة",
     "hotel": "روزموند الحمراء",
     "trainer": "بندر الجهني",
@@ -1322,7 +1301,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 27226.29,
-    "total_expenses": 27226.29,
     "revenue": 39120.0,
     "profit": 11893.71,
     "profit_pct": 30.4
@@ -1330,7 +1308,7 @@ const COURSES = [
   {
     "num": 31,
     "code": "MT-MK-00271",
-    "date": "2004-01-26",
+    "date": "",
     "city": "مكة المكرمة",
     "hotel": "هوليداي إن",
     "trainer": "بكر فلاته",
@@ -1342,7 +1320,6 @@ const COURSES = [
     "failed": 4,
     "withdrawn_during": 1,
     "expenses": 31760.29,
-    "total_expenses": 31760.29,
     "revenue": 36512.0,
     "profit": 4751.71,
     "profit_pct": 13.01
@@ -1350,7 +1327,7 @@ const COURSES = [
   {
     "num": 32,
     "code": "MT-AO-00272",
-    "date": "2011-01-26",
+    "date": "",
     "city": "العلا",
     "hotel": "منتجع شادن",
     "trainer": "معزي الشوشي",
@@ -1362,7 +1339,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 40954.29,
-    "total_expenses": 40954.29,
     "revenue": 29992.0,
     "profit": -10962.29,
     "profit_pct": -36.55
@@ -1370,7 +1346,7 @@ const COURSES = [
   {
     "num": 33,
     "code": "MT-TB-00273",
-    "date": "2011-01-26",
+    "date": "",
     "city": "تبوك",
     "hotel": "سويس ان تبوك",
     "trainer": "عطالله العطوي",
@@ -1382,7 +1358,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 4,
     "expenses": 23856.29,
-    "total_expenses": 23856.29,
     "revenue": 31296.0,
     "profit": 7439.71,
     "profit_pct": 23.77
@@ -1390,7 +1365,7 @@ const COURSES = [
   {
     "num": 34,
     "code": "MT-SH-00274",
-    "date": "2011-01-26",
+    "date": "",
     "city": "الدمام",
     "hotel": "فيرست جراند",
     "trainer": "خالد هفه",
@@ -1402,7 +1377,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 25391.29,
-    "total_expenses": 25391.29,
     "revenue": 31296.0,
     "profit": 5904.71,
     "profit_pct": 18.87
@@ -1410,7 +1384,7 @@ const COURSES = [
   {
     "num": 35,
     "code": "MT-JD-00274",
-    "date": "2011-01-26",
+    "date": "",
     "city": "جدة",
     "hotel": "روزموند الحمراء",
     "trainer": "إبراهيم مصيري",
@@ -1422,7 +1396,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 26291.29,
-    "total_expenses": 26291.29,
     "revenue": 36512.0,
     "profit": 10220.71,
     "profit_pct": 27.99
@@ -1430,7 +1403,7 @@ const COURSES = [
   {
     "num": 36,
     "code": "MT-RY-00275",
-    "date": "2011-01-26",
+    "date": "",
     "city": "الرياض",
     "hotel": "ميليسيا",
     "trainer": "عبدالعزيز القحطاني",
@@ -1442,7 +1415,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 25088.29,
-    "total_expenses": 25088.29,
     "revenue": 36512.0,
     "profit": 11423.71,
     "profit_pct": 31.29
@@ -1450,7 +1422,7 @@ const COURSES = [
   {
     "num": 37,
     "code": "MT-AO-00312",
-    "date": "2011-01-26",
+    "date": "",
     "city": "العلا",
     "hotel": "منتجع شادن",
     "trainer": "بندر الجهني",
@@ -1462,7 +1434,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 1,
     "expenses": 41184.29,
-    "total_expenses": 41184.29,
     "revenue": 31296.0,
     "profit": -9888.29,
     "profit_pct": -31.6
@@ -1470,7 +1441,7 @@ const COURSES = [
   {
     "num": 38,
     "code": "MT-TB-00313",
-    "date": "2011-01-26",
+    "date": "",
     "city": "تبوك",
     "hotel": "سويس ان تبوك",
     "trainer": "هتان الغبان",
@@ -1482,7 +1453,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 8,
     "expenses": 23216.29,
-    "total_expenses": 23216.29,
     "revenue": 28688.0,
     "profit": 5471.71,
     "profit_pct": 19.07
@@ -1490,7 +1460,7 @@ const COURSES = [
   {
     "num": 39,
     "code": "MT-GN-00307",
-    "date": "2011-01-26",
+    "date": "",
     "city": "جازان",
     "hotel": "جراند بلازا",
     "trainer": "عبدالرحيم مصيري",
@@ -1502,7 +1472,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 26481.29,
-    "total_expenses": 26481.29,
     "revenue": 37816.0,
     "profit": 11334.71,
     "profit_pct": 29.97
@@ -1510,7 +1479,7 @@ const COURSES = [
   {
     "num": 40,
     "code": "MT--00305",
-    "date": "2018-01-26",
+    "date": "",
     "city": "أبها",
     "hotel": "سروات",
     "trainer": "وليد الشهراني",
@@ -1522,7 +1491,6 @@ const COURSES = [
     "failed": 2,
     "withdrawn_during": 3,
     "expenses": 29462.29,
-    "total_expenses": 29462.29,
     "revenue": 39120.0,
     "profit": 9657.71,
     "profit_pct": 24.69
@@ -1530,7 +1498,7 @@ const COURSES = [
   {
     "num": 41,
     "code": "MT--00303",
-    "date": "2018-01-26",
+    "date": "",
     "city": "أبها",
     "hotel": "سروات",
     "trainer": "زكي أحمد",
@@ -1542,7 +1510,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 6,
     "expenses": 29162.29,
-    "total_expenses": 29162.29,
     "revenue": 39120.0,
     "profit": 9957.71,
     "profit_pct": 25.45
@@ -1550,7 +1517,7 @@ const COURSES = [
   {
     "num": 42,
     "code": "MT-JF-00311",
-    "date": "2018-01-26",
+    "date": "",
     "city": "الجوف",
     "hotel": "توليب بلازا",
     "trainer": "سلمان الدواس",
@@ -1562,7 +1529,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 4,
     "expenses": 32166.29,
-    "total_expenses": 32166.29,
     "revenue": 33904.0,
     "profit": 1737.71,
     "profit_pct": 5.13
@@ -1570,7 +1536,7 @@ const COURSES = [
   {
     "num": 43,
     "code": "MT-RY-00276",
-    "date": "2018-01-26",
+    "date": "",
     "city": "الرياض",
     "hotel": "ميليسيا",
     "trainer": "خالد هفه",
@@ -1582,7 +1548,6 @@ const COURSES = [
     "failed": 2,
     "withdrawn_during": 0,
     "expenses": 24960.29,
-    "total_expenses": 24960.29,
     "revenue": 35208.0,
     "profit": 10247.71,
     "profit_pct": 29.11
@@ -1590,7 +1555,7 @@ const COURSES = [
   {
     "num": 44,
     "code": "MT-JD-00277",
-    "date": "2018-01-26",
+    "date": "",
     "city": "جدة",
     "hotel": "روزموند الحمراء",
     "trainer": "بندر الجهني",
@@ -1602,7 +1567,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 25291.29,
-    "total_expenses": 25291.29,
     "revenue": 29992.0,
     "profit": 4700.71,
     "profit_pct": 15.67
@@ -1610,7 +1574,7 @@ const COURSES = [
   {
     "num": 45,
     "code": "MT-BA-00275",
-    "date": "2018-01-26",
+    "date": "",
     "city": "الباحة",
     "hotel": "ذا هاي فيو ",
     "trainer": "مشبب المقبل",
@@ -1622,7 +1586,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 0,
     "expenses": 29381.29,
-    "total_expenses": 29381.29,
     "revenue": 37816.0,
     "profit": 8434.71,
     "profit_pct": 22.3
@@ -1630,7 +1593,7 @@ const COURSES = [
   {
     "num": 46,
     "code": "MT-JF-00276",
-    "date": "2018-01-26",
+    "date": "",
     "city": "الجوف",
     "hotel": "ايوا اكسبرس",
     "trainer": "عيسى عشي",
@@ -1642,7 +1605,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 32058.29,
-    "total_expenses": 32058.29,
     "revenue": 26080.0,
     "profit": -5978.29,
     "profit_pct": -22.92
@@ -1650,7 +1612,7 @@ const COURSES = [
   {
     "num": 47,
     "code": "MT-MA-00277",
-    "date": "2018-01-26",
+    "date": "",
     "city": "المدينة المنورة",
     "hotel": "سدرة العالمي",
     "trainer": "خلود الطويرقي",
@@ -1662,7 +1624,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 27631.29,
-    "total_expenses": 27631.29,
     "revenue": 35208.0,
     "profit": 7576.71,
     "profit_pct": 21.52
@@ -1682,7 +1643,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 25661.29,
-    "total_expenses": 25661.29,
     "revenue": 37816.0,
     "profit": 12154.71,
     "profit_pct": 32.14
@@ -1702,7 +1662,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 0,
     "expenses": 28084.29,
-    "total_expenses": 28084.29,
     "revenue": 39120.0,
     "profit": 11035.71,
     "profit_pct": 28.21
@@ -1722,7 +1681,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 3,
     "expenses": 24616.29,
-    "total_expenses": 24616.29,
     "revenue": 33904.0,
     "profit": 9287.71,
     "profit_pct": 27.39
@@ -1742,7 +1700,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 0,
     "expenses": 28631.29,
-    "total_expenses": 28631.29,
     "revenue": 41728.0,
     "profit": 13096.71,
     "profit_pct": 31.39
@@ -1762,7 +1719,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 24691.29,
-    "total_expenses": 24691.29,
     "revenue": 26080.0,
     "profit": 1388.71,
     "profit_pct": 5.32
@@ -1782,7 +1738,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 27006.29,
-    "total_expenses": 27006.29,
     "revenue": 32600.0,
     "profit": 5593.71,
     "profit_pct": 17.16
@@ -1802,7 +1757,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 1,
     "expenses": 29629.29,
-    "total_expenses": 29629.29,
     "revenue": 36512.0,
     "profit": 6882.71,
     "profit_pct": 18.85
@@ -1822,7 +1776,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 4,
     "expenses": 23416.29,
-    "total_expenses": 23416.29,
     "revenue": 26080.0,
     "profit": 2663.71,
     "profit_pct": 10.21
@@ -1842,7 +1795,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 26706.29,
-    "total_expenses": 26706.29,
     "revenue": 31296.0,
     "profit": 4589.71,
     "profit_pct": 14.67
@@ -1850,7 +1802,7 @@ const COURSES = [
   {
     "num": 57,
     "code": "MT-MA-00317",
-    "date": "2001-02-26",
+    "date": "",
     "city": "المدينة المنورة",
     "hotel": "سدرة العالمي",
     "trainer": "عيسى عشي",
@@ -1862,7 +1814,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 0,
     "expenses": 27520.29,
-    "total_expenses": 27520.29,
     "revenue": 37816.0,
     "profit": 10295.71,
     "profit_pct": 27.23
@@ -1870,7 +1821,7 @@ const COURSES = [
   {
     "num": 58,
     "code": "MT-AS-00286",
-    "date": "2001-02-26",
+    "date": "",
     "city": "أبها",
     "hotel": "سروات ",
     "trainer": "زكي أحمد",
@@ -1882,7 +1833,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 3,
     "expenses": 26103.29,
-    "total_expenses": 26103.29,
     "revenue": 26080.0,
     "profit": -23.29,
     "profit_pct": -0.09
@@ -1890,7 +1840,7 @@ const COURSES = [
   {
     "num": 59,
     "code": "MT-MK-00287",
-    "date": "2001-02-26",
+    "date": "",
     "city": "مكة المكرمة",
     "hotel": "ملينيوم كوبثورن",
     "trainer": "شفاء العميري",
@@ -1902,7 +1852,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 24266.29,
-    "total_expenses": 24266.29,
     "revenue": 27384.0,
     "profit": 3117.71,
     "profit_pct": 11.39
@@ -1910,7 +1859,7 @@ const COURSES = [
   {
     "num": 60,
     "code": "MT-NG-00270",
-    "date": "2001-02-26",
+    "date": "",
     "city": "نجران",
     "hotel": "ال ربيع",
     "trainer": "مانع اليامي",
@@ -1922,7 +1871,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 1,
     "expenses": 25966.29,
-    "total_expenses": 25966.29,
     "revenue": 29992.0,
     "profit": 4025.71,
     "profit_pct": 13.42
@@ -1930,7 +1878,7 @@ const COURSES = [
   {
     "num": 61,
     "code": "MT-TF-00308",
-    "date": "2001-02-26",
+    "date": "",
     "city": "الطائف",
     "hotel": "دور الريادة",
     "trainer": "حسن حمدي",
@@ -1942,7 +1890,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 21078.29,
-    "total_expenses": 21078.29,
     "revenue": 31296.0,
     "profit": 10217.71,
     "profit_pct": 32.65
@@ -1950,7 +1897,7 @@ const COURSES = [
   {
     "num": 62,
     "code": "MT-RY-00288",
-    "date": "2001-02-26",
+    "date": "",
     "city": "الرياض",
     "hotel": "ميليسيا",
     "trainer": "هادي الفيفي",
@@ -1962,7 +1909,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 24438.29,
-    "total_expenses": 24438.29,
     "revenue": 33904.0,
     "profit": 9465.71,
     "profit_pct": 27.92
@@ -1970,7 +1916,7 @@ const COURSES = [
   {
     "num": 63,
     "code": "MT-JD-00289",
-    "date": "2001-02-26",
+    "date": "",
     "city": "جدة",
     "hotel": "رمادا",
     "trainer": "بندر الجهني",
@@ -1982,7 +1928,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 1,
     "expenses": 25461.29,
-    "total_expenses": 25461.29,
     "revenue": 28688.0,
     "profit": 3226.71,
     "profit_pct": 11.25
@@ -1990,7 +1935,7 @@ const COURSES = [
   {
     "num": 64,
     "code": "MT-BA-00310",
-    "date": "2001-02-26",
+    "date": "",
     "city": "الباحة",
     "hotel": "ذا هاي فيو ",
     "trainer": "أنور حكمي",
@@ -2002,7 +1947,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 4,
     "expenses": 26321.29,
-    "total_expenses": 26321.29,
     "revenue": 31296.0,
     "profit": 4974.71,
     "profit_pct": 15.9
@@ -2010,7 +1954,7 @@ const COURSES = [
   {
     "num": 65,
     "code": "MT-KH-00314",
-    "date": "2001-02-26",
+    "date": "",
     "city": "الخرج",
     "hotel": "برج مياه الخرج",
     "trainer": "خلود الطويرقي",
@@ -2022,7 +1966,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 2,
     "expenses": 27091.29,
-    "total_expenses": 27091.29,
     "revenue": 28688.0,
     "profit": 1596.71,
     "profit_pct": 5.57
@@ -2030,7 +1973,7 @@ const COURSES = [
   {
     "num": 66,
     "code": "MT-HL-00290",
-    "date": "2008-02-26",
+    "date": "",
     "city": "حائل",
     "hotel": "هوليداي فيلا",
     "trainer": "وليد الشهراني",
@@ -2042,7 +1985,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 27836.29,
-    "total_expenses": 27836.29,
     "revenue": 41728.0,
     "profit": 13891.71,
     "profit_pct": 33.29
@@ -2050,7 +1992,7 @@ const COURSES = [
   {
     "num": 67,
     "code": "MT-JD-00291",
-    "date": "2008-02-26",
+    "date": "",
     "city": "جدة",
     "hotel": "رمادا كونتينتال",
     "trainer": "بندر الجهني",
@@ -2062,7 +2004,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 5,
     "expenses": 24801.29,
-    "total_expenses": 24801.29,
     "revenue": 24776.0,
     "profit": -25.29,
     "profit_pct": -0.1
@@ -2070,7 +2011,7 @@ const COURSES = [
   {
     "num": 68,
     "code": "MT-MA-00292",
-    "date": "2008-02-26",
+    "date": "",
     "city": "المدينة المنورة",
     "hotel": "سدرة العالمي",
     "trainer": "عيسى عشي",
@@ -2082,7 +2023,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 28669.29,
-    "total_expenses": 28669.29,
     "revenue": 39120.0,
     "profit": 10450.71,
     "profit_pct": 26.71
@@ -2090,7 +2030,7 @@ const COURSES = [
   {
     "num": 69,
     "code": "MT-RY-00293",
-    "date": "2008-02-26",
+    "date": "",
     "city": "الرياض",
     "hotel": "مليسا الرياض",
     "trainer": "هادي الفيفي",
@@ -2102,7 +2042,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 0,
     "expenses": 23166.29,
-    "total_expenses": 23166.29,
     "revenue": 26080.0,
     "profit": 2913.71,
     "profit_pct": 11.17
@@ -2110,7 +2049,7 @@ const COURSES = [
   {
     "num": 70,
     "code": "MT-AS-00296",
-    "date": "2008-02-26",
+    "date": "",
     "city": "أبها",
     "hotel": "سروات بارك ",
     "trainer": "مشبب المقبل",
@@ -2122,7 +2061,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 27303.29,
-    "total_expenses": 27303.29,
     "revenue": 33904.0,
     "profit": 6600.71,
     "profit_pct": 19.47
@@ -2130,7 +2068,7 @@ const COURSES = [
   {
     "num": 71,
     "code": "MT-GS-00304",
-    "date": "2008-02-26",
+    "date": "",
     "city": "القصيم",
     "hotel": "رامادا",
     "trainer": "خلود الطويرقي",
@@ -2142,7 +2080,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 24476.29,
-    "total_expenses": 24476.29,
     "revenue": 27384.0,
     "profit": 2907.71,
     "profit_pct": 10.62
@@ -2150,7 +2087,7 @@ const COURSES = [
   {
     "num": 72,
     "code": "MT-HL-00309",
-    "date": "2008-02-26",
+    "date": "",
     "city": "حائل",
     "hotel": "هوليداي فيلا",
     "trainer": "علي الشهري",
@@ -2162,7 +2099,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 25996.29,
-    "total_expenses": 25996.29,
     "revenue": 36512.0,
     "profit": 10515.71,
     "profit_pct": 28.8
@@ -2170,7 +2106,7 @@ const COURSES = [
   {
     "num": 73,
     "code": "MT-GN-00323",
-    "date": "2008-02-26",
+    "date": "",
     "city": "جازان",
     "hotel": "جراند بلازا",
     "trainer": "أنور حكمي",
@@ -2182,7 +2118,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 5,
     "expenses": 27051.29,
-    "total_expenses": 27051.29,
     "revenue": 33904.0,
     "profit": 6852.71,
     "profit_pct": 20.21
@@ -2190,7 +2125,7 @@ const COURSES = [
   {
     "num": 74,
     "code": "MT--00327",
-    "date": "2008-02-26",
+    "date": "",
     "city": "الدمام",
     "hotel": "فندق سمو",
     "trainer": "خالد هفه",
@@ -2202,7 +2137,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 22951.29,
-    "total_expenses": 22951.29,
     "revenue": 20864.0,
     "profit": -2087.29,
     "profit_pct": -10.0
@@ -2222,7 +2156,6 @@ const COURSES = [
     "failed": 2,
     "withdrawn_during": 2,
     "expenses": 31526.29,
-    "total_expenses": 31526.29,
     "revenue": 36512.0,
     "profit": 4985.71,
     "profit_pct": 13.65
@@ -2242,7 +2175,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 23301.29,
-    "total_expenses": 23301.29,
     "revenue": 22168.0,
     "profit": -1133.29,
     "profit_pct": -5.11
@@ -2262,7 +2194,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 22416.29,
-    "total_expenses": 22416.29,
     "revenue": 33904.0,
     "profit": 11487.71,
     "profit_pct": 33.88
@@ -2282,7 +2213,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 25506.29,
-    "total_expenses": 25506.29,
     "revenue": 41728.0,
     "profit": 16221.71,
     "profit_pct": 38.87
@@ -2302,7 +2232,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 27938.29,
-    "total_expenses": 27938.29,
     "revenue": 40424.0,
     "profit": 12485.71,
     "profit_pct": 30.89
@@ -2322,7 +2251,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 28276.29,
-    "total_expenses": 28276.29,
     "revenue": 52160.0,
     "profit": 23883.71,
     "profit_pct": 45.79
@@ -2342,7 +2270,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 29786.29,
-    "total_expenses": 29786.29,
     "revenue": 32600.0,
     "profit": 2813.71,
     "profit_pct": 8.63
@@ -2362,7 +2289,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 5,
     "expenses": 27596.29,
-    "total_expenses": 27596.29,
     "revenue": 35208.0,
     "profit": 7611.71,
     "profit_pct": 21.62
@@ -2382,7 +2308,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 23526.29,
-    "total_expenses": 23526.29,
     "revenue": 36512.0,
     "profit": 12985.71,
     "profit_pct": 35.57
@@ -2402,7 +2327,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 26526.29,
-    "total_expenses": 26526.29,
     "revenue": 44336.0,
     "profit": 17809.71,
     "profit_pct": 40.17
@@ -2422,7 +2346,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 0,
     "expenses": 25941.29,
-    "total_expenses": 25941.29,
     "revenue": 32600.0,
     "profit": 6658.71,
     "profit_pct": 20.43
@@ -2442,7 +2365,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 23216.29,
-    "total_expenses": 23216.29,
     "revenue": 37816.0,
     "profit": 14599.71,
     "profit_pct": 38.61
@@ -2462,7 +2384,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 12,
     "expenses": 24406.29,
-    "total_expenses": 24406.29,
     "revenue": 43032.0,
     "profit": 18625.71,
     "profit_pct": 43.28
@@ -2482,7 +2403,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 0,
     "expenses": 26811.29,
-    "total_expenses": 26811.29,
     "revenue": 40424.0,
     "profit": 13612.71,
     "profit_pct": 33.67
@@ -2502,7 +2422,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 24941.29,
-    "total_expenses": 24941.29,
     "revenue": 28688.0,
     "profit": 3746.71,
     "profit_pct": 13.06
@@ -2522,7 +2441,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 4,
     "expenses": 25166.29,
-    "total_expenses": 25166.29,
     "revenue": 41728.0,
     "profit": 16561.71,
     "profit_pct": 39.69
@@ -2542,7 +2460,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 4,
     "expenses": 24466.29,
-    "total_expenses": 24466.29,
     "revenue": 43032.0,
     "profit": 18565.71,
     "profit_pct": 43.14
@@ -2562,7 +2479,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 10,
     "expenses": 25751.29,
-    "total_expenses": 25751.29,
     "revenue": 41728.0,
     "profit": 15976.71,
     "profit_pct": 38.29
@@ -2582,7 +2498,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 4,
     "expenses": 25221.29,
-    "total_expenses": 25221.29,
     "revenue": 32600.0,
     "profit": 7378.71,
     "profit_pct": 22.63
@@ -2602,7 +2517,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 0,
     "expenses": 26252.29,
-    "total_expenses": 26252.29,
     "revenue": 37816.0,
     "profit": 11563.71,
     "profit_pct": 30.58
@@ -2622,7 +2536,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 23766.29,
-    "total_expenses": 23766.29,
     "revenue": 31296.0,
     "profit": 7529.71,
     "profit_pct": 24.06
@@ -2642,7 +2555,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 25241.29,
-    "total_expenses": 25241.29,
     "revenue": 35208.0,
     "profit": 9966.71,
     "profit_pct": 28.31
@@ -2662,7 +2574,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 24351.29,
-    "total_expenses": 24351.29,
     "revenue": 33904.0,
     "profit": 9552.71,
     "profit_pct": 28.18
@@ -2682,7 +2593,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 2,
     "expenses": 26661.29,
-    "total_expenses": 26661.29,
     "revenue": 45640.0,
     "profit": 18978.71,
     "profit_pct": 41.58
@@ -2702,7 +2612,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 4,
     "expenses": 23516.29,
-    "total_expenses": 23516.29,
     "revenue": 40424.0,
     "profit": 16907.71,
     "profit_pct": 41.83
@@ -2722,7 +2631,6 @@ const COURSES = [
     "failed": 1,
     "withdrawn_during": 2,
     "expenses": 24506.29,
-    "total_expenses": 24506.29,
     "revenue": 35208.0,
     "profit": 10701.71,
     "profit_pct": 30.4
@@ -2742,7 +2650,6 @@ const COURSES = [
     "failed": 3,
     "withdrawn_during": 4,
     "expenses": 23746.29,
-    "total_expenses": 23746.29,
     "revenue": 44336.0,
     "profit": 20589.71,
     "profit_pct": 46.44
@@ -2762,7 +2669,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 7,
     "expenses": 22550.0,
-    "total_expenses": 22550.0,
     "revenue": 31296.0,
     "profit": 8746.0,
     "profit_pct": 27.95
@@ -2782,7 +2688,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 4,
     "expenses": 25441.29,
-    "total_expenses": 25441.29,
     "revenue": 37816.0,
     "profit": 12374.71,
     "profit_pct": 32.72
@@ -2802,7 +2707,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 25866.29,
-    "total_expenses": 25866.29,
     "revenue": 39120.0,
     "profit": 13253.71,
     "profit_pct": 33.88
@@ -2822,7 +2726,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 28556.29,
-    "total_expenses": 28556.29,
     "revenue": 39120.0,
     "profit": 10563.71,
     "profit_pct": 27.0
@@ -2842,7 +2745,6 @@ const COURSES = [
     "failed": 2,
     "withdrawn_during": 2,
     "expenses": 22066.29,
-    "total_expenses": 22066.29,
     "revenue": 27384.0,
     "profit": 5317.71,
     "profit_pct": 19.42
@@ -2862,7 +2764,6 @@ const COURSES = [
     "failed": 6,
     "withdrawn_during": 2,
     "expenses": 25176.29,
-    "total_expenses": 25176.29,
     "revenue": 35208.0,
     "profit": 10031.71,
     "profit_pct": 28.49
@@ -2882,7 +2783,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 25961.29,
-    "total_expenses": 25961.29,
     "revenue": 36512.0,
     "profit": 10550.71,
     "profit_pct": 28.9
@@ -2902,7 +2802,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 4,
     "expenses": 25741.29,
-    "total_expenses": 25741.29,
     "revenue": 36512.0,
     "profit": 10770.71,
     "profit_pct": 29.5
@@ -2922,7 +2821,6 @@ const COURSES = [
     "failed": 2,
     "withdrawn_during": 2,
     "expenses": 24266.29,
-    "total_expenses": 24266.29,
     "revenue": 41728.0,
     "profit": 17461.71,
     "profit_pct": 41.85
@@ -2942,7 +2840,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 26756.29,
-    "total_expenses": 26756.29,
     "revenue": 46944.0,
     "profit": 20187.71,
     "profit_pct": 43.0
@@ -2962,7 +2859,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 3,
     "expenses": 24091.29,
-    "total_expenses": 24091.29,
     "revenue": 32600.0,
     "profit": 8508.71,
     "profit_pct": 26.1
@@ -2982,7 +2878,6 @@ const COURSES = [
     "failed": 0,
     "withdrawn_during": 1,
     "expenses": 27681.29,
-    "total_expenses": 27681.29,
     "revenue": 41728.0,
     "profit": 14046.71,
     "profit_pct": 33.66
