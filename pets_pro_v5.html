@@ -1,0 +1,2463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PetStay · Boarding Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ════════════════════════════════════════════
+   TOKENS
+════════════════════════════════════════════ */
+:root {
+  --bg:       #080C12;
+  --bg2:      #0E1520;
+  --bg3:      #141D2E;
+  --bg4:      #1A2540;
+  --border:   rgba(255,255,255,.07);
+  --border2:  rgba(255,255,255,.12);
+  --text:     #E8EEF8;
+  --muted:    #5A7494;
+  --muted2:   #8AA0BC;
+
+  --gold:     #F5C842;
+  --gold2:    #FFD96B;
+  --teal:     #00D4C8;
+  --teal2:    #40EAE0;
+  --amber:    #FF9A3C;
+  --violet:   #A855F7;
+  --violet2:  #C084FC;
+  --rose:     #F43F5E;
+  --emerald:  #10B981;
+  --sky:      #38BDF8;
+
+  --xsmall:   #38BDF8;
+  --small:    #A855F7;
+  --medium:   #FF9A3C;
+  --large:    #10B981;
+  --cat:      #F43F5E;
+  --big:      #FF9A3C;
+
+  --radius:   14px;
+  --radius-sm: 8px;
+  --shadow:   0 0 0 1px var(--border), 0 4px 24px rgba(0,0,0,.4);
+  --glow-gold: 0 0 24px rgba(245,200,66,.15);
+  --glow-teal: 0 0 24px rgba(0,212,200,.15);
+}
+
+/* ════════════════════════════════════════════
+   RESET & BASE
+════════════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+/* ════════════════════════════════════════════
+   BACKGROUND MESH
+════════════════════════════════════════════ */
+.mesh {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 20%, rgba(0,212,200,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 80%, rgba(168,85,247,.06) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 35% at 50% 50%, rgba(245,200,66,.03) 0%, transparent 60%);
+}
+
+/* ════════════════════════════════════════════
+   HEADER
+════════════════════════════════════════════ */
+.hdr {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(8,12,18,.88);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+}
+.hdr-brand { display: flex; align-items: center; gap: 12px; }
+.hdr-paw {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--teal), var(--violet));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  box-shadow: var(--glow-teal);
+}
+.hdr-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 700; color: white; letter-spacing: -.3px;
+}
+.hdr-sub { font-size: 10px; color: var(--muted); margin-top: 1px; font-family: 'DM Mono', monospace; }
+.hdr-pills { display: flex; gap: 8px; align-items: center; }
+.hpill {
+  padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 600;
+  letter-spacing: .3px; font-family: 'DM Mono', monospace;
+}
+.live-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--emerald);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ════════════════════════════════════════════
+   NAV TABS
+════════════════════════════════════════════ */
+.nav {
+  display: flex; padding: 0 28px;
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  overflow-x: auto; gap: 0;
+}
+.nav::-webkit-scrollbar { display: none; }
+.ntab {
+  padding: 13px 18px; font-size: 12.5px; font-weight: 600;
+  color: var(--muted); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color .2s, border-color .2s;
+  background: none; border-top: none; border-left: none; border-right: none;
+  font-family: 'DM Sans', sans-serif; white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+}
+.ntab:hover { color: var(--text); }
+.ntab.on { color: var(--teal); border-bottom-color: var(--teal); }
+
+/* ════════════════════════════════════════════
+   LAYOUT
+════════════════════════════════════════════ */
+.body-wrap { position: relative; z-index: 1; }
+.main { padding: 24px 28px 60px; max-width: 1380px; margin: 0 auto; }
+.pg { display: none; }
+.pg.on { display: block; }
+
+/* ════════════════════════════════════════════
+   CARDS
+════════════════════════════════════════════ */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.card:hover { border-color: var(--border2); }
+.card-hd {
+  display: flex; align-items: center; gap: 9px;
+  margin-bottom: 16px; padding-bottom: 13px;
+  border-bottom: 1px solid var(--border);
+}
+.card-ico {
+  width: 28px; height: 28px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+  flex-shrink: 0;
+}
+.card-title { font-size: 13px; font-weight: 600; }
+.card-sub { font-size: 10px; color: var(--muted); margin-top: 2px; font-family: 'DM Mono', monospace; }
+
+/* ════════════════════════════════════════════
+   KPI GRID
+════════════════════════════════════════════ */
+.kpi-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 12px; margin-bottom: 20px; }
+.kpi {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+  position: relative; overflow: hidden;
+  cursor: default; transition: transform .25s, border-color .2s;
+}
+.kpi::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--ac,var(--teal)), transparent 60%);
+  opacity: 0; transition: opacity .3s;
+}
+.kpi:hover { transform: translateY(-3px); border-color: var(--ac, var(--teal)); }
+.kpi:hover::after { opacity: .04; }
+.kpi-glow {
+  position: absolute; top: -20px; right: -20px;
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--ac, var(--teal));
+  opacity: .06; filter: blur(20px);
+}
+.kpi-icon { font-size: 20px; margin-bottom: 10px; }
+.kpi-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; font-weight: 700;
+  line-height: 1; color: white;
+  transition: all .5s;
+}
+.kpi-label { font-size: 11px; color: var(--muted); margin-top: 6px; font-weight: 500; }
+.kpi-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9px; font-weight: 700; font-family: 'DM Mono', monospace;
+  padding: 2px 7px; border-radius: 10px; margin-top: 5px;
+  letter-spacing: .3px;
+}
+
+/* ════════════════════════════════════════════
+   GRID HELPERS
+════════════════════════════════════════════ */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 16px; }
+
+/* ════════════════════════════════════════════
+   CAPACITY BARS
+════════════════════════════════════════════ */
+.cap-type { margin-bottom: 20px; }
+.cap-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cap-name { font-size: 13px; font-weight: 600; }
+.cap-nums { display: flex; gap: 16px; }
+.cap-num { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+.cap-num b { color: var(--text); }
+.cap-track {
+  height: 10px; border-radius: 5px; background: var(--bg4); overflow: hidden; position: relative;
+}
+.cap-fill {
+  height: 100%; border-radius: 5px;
+  transition: width 1.8s cubic-bezier(.22,.61,.36,1);
+  position: relative;
+}
+.cap-fill::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent);
+  animation: shimmer 2.5s infinite;
+}
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }
+.cap-chips { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.chip {
+  padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 600;
+  font-family: 'DM Mono', monospace; cursor: default;
+  border: 1px solid; transition: transform .2s;
+}
+.chip:hover { transform: scale(1.05); }
+
+/* ════════════════════════════════════════════
+   TABLE
+════════════════════════════════════════════ */
+.tbl-filters { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.fsel {
+  padding: 6px 12px; border-radius: 8px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--text); font-size: 11px; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; outline: none; transition: border-color .2s;
+}
+.fsel:focus { border-color: var(--teal); }
+.fsearch {
+  flex: 1; min-width: 180px;
+  padding: 6px 12px; border-radius: 8px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--text); font-size: 11px; font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border-color .2s;
+}
+.fsearch::placeholder { color: var(--muted); }
+.fsearch:focus { border-color: var(--teal); }
+.fcount { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; margin-right: auto; }
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+th {
+  background: var(--bg3); padding: 9px 8px;
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  text-align: left; border-bottom: 1px solid var(--border);
+  white-space: nowrap; letter-spacing: .5px; overflow: hidden;
+  font-family: 'DM Mono', monospace; cursor: pointer;
+  user-select: none; transition: color .2s;
+}
+th:hover { color: var(--teal); }
+th .sort { margin-right: 4px; opacity: .4; }
+td {
+  padding: 9px 8px; border-bottom: 1px solid var(--border);
+  vertical-align: middle; transition: background .15s;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+tr:hover td { background: rgba(255,255,255,.025); }
+tr:last-child td { border-bottom: none; }
+
+/* ════════════════════════════════════════════
+   TAGS & BADGES
+════════════════════════════════════════════ */
+.tag {
+  padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 700;
+  display: inline-block; font-family: 'DM Mono', monospace;
+}
+
+/* ════════════════════════════════════════════
+   BOOKING CARDS
+════════════════════════════════════════════ */
+.bk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 14px; }
+.bk {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px;
+  transition: transform .25s, border-color .25s, box-shadow .25s;
+  cursor: default; position: relative; overflow: hidden;
+}
+.bk::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--ac, var(--teal));
+}
+.bk:hover { transform: translateY(-3px); border-color: var(--ac, var(--teal)); box-shadow: 0 12px 40px rgba(0,0,0,.3); }
+.bk-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+.bk-pet { font-size: 16px; font-weight: 700; font-family: 'Playfair Display', serif; }
+.bk-owner { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.bk-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.bk-s {
+  text-align: center; padding: 8px; border-radius: 8px;
+  background: var(--bg3); border: 1px solid var(--border);
+}
+.bk-sv { font-size: 16px; font-weight: 700; font-family: 'Playfair Display', serif; }
+.bk-sl { font-size: 9px; color: var(--muted); margin-top: 2px; font-family: 'DM Mono', monospace; letter-spacing: .3px; }
+.bk-foot {
+  margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+/* ════════════════════════════════════════════
+   TIMELINE / GANTT
+════════════════════════════════════════════ */
+.gantt-wrap { overflow-x: auto; }
+.gantt {
+  min-width: 700px; position: relative;
+  font-family: 'DM Mono', monospace;
+}
+.gantt-header { display: flex; margin-bottom: 2px; }
+.gantt-label { width: 160px; flex-shrink: 0; font-size: 10px; color: var(--muted); padding: 4px 8px; }
+.gantt-days { flex: 1; display: flex; }
+.gantt-day {
+  flex: 1; text-align: center; font-size: 9px; color: var(--muted);
+  padding: 4px 0; border-left: 1px solid var(--border);
+}
+.gantt-row { display: flex; align-items: center; margin-bottom: 6px; }
+.gantt-name {
+  width: 160px; flex-shrink: 0; font-size: 11px; padding: 0 8px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.gantt-track { flex: 1; height: 28px; position: relative; background: var(--bg3); border-radius: 4px; }
+.gantt-bar {
+  position: absolute; height: 22px; top: 3px;
+  border-radius: 4px; display: flex; align-items: center;
+  padding: 0 8px; font-size: 10px; font-weight: 600; color: white;
+  white-space: nowrap; overflow: hidden; cursor: pointer;
+  transition: filter .2s, transform .2s;
+}
+.gantt-bar:hover { filter: brightness(1.2); transform: scaleY(1.1); }
+
+/* ════════════════════════════════════════════
+   ALERTS
+════════════════════════════════════════════ */
+.alert-row { display: flex; flex-direction: column; gap: 8px; }
+.alert {
+  padding: 12px 16px; border-radius: 10px;
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: 12px; line-height: 1.5; border: 1px solid;
+  animation: slideIn .4s ease;
+}
+@keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:none} }
+
+/* ════════════════════════════════════════════
+   STAT RING (capacity visual)
+════════════════════════════════════════════ */
+.ring-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 16px; }
+.ring-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px 20px;
+  display: flex; flex-direction: column; align-items: center;
+  transition: transform .25s, border-color .2s;
+}
+.ring-card:hover { transform: translateY(-3px); }
+.ring-wrap { position: relative; width: 130px; height: 130px; margin-bottom: 16px; }
+.ring-wrap svg { width: 130px; height: 130px; transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(--bg4); stroke-width: 10; }
+.ring-fg { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 2s cubic-bezier(.22,.61,.36,1); }
+.ring-label {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.ring-pct { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; }
+.ring-sub { font-size: 9px; color: var(--muted); margin-top: 2px; font-family: 'DM Mono', monospace; }
+.ring-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.ring-detail { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-bottom: 12px; }
+.ring-guests { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+.rg {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 10px; border-radius: 7px; background: var(--bg3);
+  font-size: 11px;
+}
+.rg-pet { font-weight: 600; }
+.rg-info { color: var(--muted); font-size: 10px; font-family: 'DM Mono', monospace; }
+
+/* ════════════════════════════════════════════
+   ANIMATIONS
+════════════════════════════════════════════ */
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+.pg.on > * { animation: fadeUp .4s ease backwards; }
+.pg.on > *:nth-child(1){animation-delay:.05s}
+.pg.on > *:nth-child(2){animation-delay:.1s}
+.pg.on > *:nth-child(3){animation-delay:.15s}
+.pg.on > *:nth-child(4){animation-delay:.2s}
+.pg.on > *:nth-child(5){animation-delay:.25s}
+
+/* Count-up animation */
+.count-up { transition: all .8s; }
+
+/* ════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════ */
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:780px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .g2,.g3,.g4,.ring-grid{grid-template-columns:1fr;}
+  .main{padding:16px 14px 48px;}
+}
+
+/* ════════════════════════════════════════════
+   ADD BOOKING FORM
+════════════════════════════════════════════ */
+.form-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 10px; font-weight: 700; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: .5px; }
+.form-input {
+  padding: 9px 13px; border-radius: 9px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--text); font-size: 12px; font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+}
+.form-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,212,200,.1); }
+.form-input::placeholder { color: var(--muted); }
+.form-select {
+  padding: 9px 13px; border-radius: 9px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  color: var(--text); font-size: 12px; font-family: 'DM Sans', sans-serif;
+  outline: none; cursor: pointer; transition: border-color .2s;
+}
+.form-select:focus { border-color: var(--teal); }
+.btn-add {
+  padding: 11px 28px; border-radius: 10px; border: none;
+  background: linear-gradient(135deg, var(--teal), #00A8A0);
+  color: #080C12; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: transform .2s, box-shadow .2s;
+  box-shadow: 0 4px 16px rgba(0,212,200,.25);
+}
+.btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,212,200,.35); }
+.btn-del {
+  padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(244,63,94,.3);
+  background: rgba(244,63,94,.08); color: var(--rose);
+  font-size: 10px; font-weight: 700; cursor: pointer;
+  font-family: 'DM Mono', monospace; transition: background .2s;
+}
+.btn-del:hover { background: rgba(244,63,94,.18); }
+.btn-edit {
+  padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(56,189,248,.3);
+  background: rgba(56,189,248,.08); color: var(--sky);
+  font-size: 10px; font-weight: 700; cursor: pointer;
+  font-family: 'DM Mono', monospace; transition: background .2s; margin-right:4px;
+}
+.btn-edit:hover { background: rgba(56,189,248,.18); }
+.toast {
+  position: fixed; bottom: 28px; right: 28px; z-index: 999;
+  padding: 12px 20px; border-radius: 12px;
+  background: rgba(16,185,129,.15); border: 1px solid rgba(16,185,129,.3);
+  color: #10B981; font-size: 13px; font-weight: 600;
+  backdrop-filter: blur(12px);
+  transform: translateY(80px); opacity: 0;
+  transition: transform .3s, opacity .3s;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.form-divider { grid-column: 1/-1; height: 1px; background: var(--border); margin: 4px 0; }
+.entry-count { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; }
+@media(max-width:780px){ .form-grid{ grid-template-columns:1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="mesh"></div>
+<div class="body-wrap">
+
+<!-- ════ HEADER ════ -->
+<div class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-paw">🐾</div>
+    <div>
+      <div class="hdr-name">PetStay</div>
+      <div class="hdr-sub">Boarding & Analytics Dashboard</div>
+    </div>
+  </div>
+  <div class="hdr-pills">
+    <div class="live-dot"></div>
+    <span class="hpill" style="background:rgba(16,185,129,.1);color:#10B981;border:1px solid rgba(16,185,129,.2)">LIVE · MAY 2026</span>
+    <span class="hpill" style="background:rgba(56,189,248,.1);color:#38BDF8;border:1px solid rgba(56,189,248,.2)">SAR 18,923 · MAY</span>
+    <span class="hpill" style="background:rgba(245,200,66,.1);color:#F5C842;border:1px solid rgba(245,200,66,.2)">CAP 115 TOTAL</span>
+    <button onclick="showSettings()" style="padding:5px 14px;border-radius:8px;background:rgba(0,212,200,.1);border:1px solid rgba(0,212,200,.2);color:#00D4C8;font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;font-weight:700">⚙️ Sync</button>
+    <button onclick="pushAllToSheets()" style="padding:5px 14px;border-radius:8px;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.2);color:#F5C842;font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;font-weight:700">☁️ رفع للشيت</button>
+  </div>
+</div>
+
+<!-- ════ NAV ════ -->
+<div class="nav">
+  <button class="ntab on" onclick="T('ov',this)"><span>📊</span> Overview</button>
+  <button class="ntab"    onclick="T('cap',this)"><span>🏠</span> Capacity</button>
+  <button class="ntab"    onclick="T('bk',this)"><span>📋</span> Bookings</button>
+  <button class="ntab"    onclick="T('tl',this)"><span>🗓</span> Timeline</button>
+  <button class="ntab"    onclick="T('rev',this)"><span>💰</span> Revenue</button>
+  <button class="ntab"    onclick="T('cl',this)"><span>👥</span> Clients</button>
+  <button class="ntab"    onclick="T('pkg',this)" style="color:var(--gold)"><span>🎁</span> Packages</button>
+  <button class="ntab"    onclick="T('exp',this)" style="color:var(--rose)"><span>💸</span> Expenses</button>
+  <button class="ntab"    onclick="T('add',this)" style="color:var(--teal)"><span>➕</span> Add Booking</button>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════════════════════════════════════
+   OVERVIEW
+═══════════════════════════════════════════════ -->
+<div class="pg on" id="pg-ov">
+
+  <div class="kpi-grid">
+    <div class="kpi" style="--ac:var(--teal)">
+      <div class="kpi-glow"></div>
+      <div class="kpi-icon">📋</div>
+      <div class="kpi-val" id="kpiTotal">0</div>
+      <div class="kpi-label">Total Bookings</div>
+      <div class="kpi-badge" style="background:rgba(0,212,200,.1);color:var(--teal);border-color:rgba(0,212,200,.2)">MAY 2026</div>
+    </div>
+    <div class="kpi" style="--ac:var(--emerald)">
+      <div class="kpi-glow"></div>
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-val" id="kpiRev">0</div>
+      <div class="kpi-label">Total Revenue (SAR)</div>
+      <div class="kpi-badge" style="background:rgba(16,185,129,.1);color:var(--emerald);border-color:rgba(16,185,129,.2)">MAY 2026</div>
+    </div>
+    <div class="kpi" style="--ac:var(--xsmall)">
+      <div class="kpi-glow"></div>
+      <div class="kpi-icon">🐕</div>
+      <div class="kpi-val" id="kpiXS">0</div>
+      <div class="kpi-label">X Small</div>
+      <div class="kpi-badge" style="background:rgba(56,189,248,.1);color:var(--xsmall);border-color:rgba(56,189,248,.2)">CAP: 15</div>
+    </div>
+    <div class="kpi" style="--ac:var(--small)">
+      <div class="kpi-glow"></div>
+      <div class="kpi-icon">🐩</div>
+      <div class="kpi-val" id="kpiSM">0</div>
+      <div class="kpi-label">Small</div>
+      <div class="kpi-badge" style="background:rgba(168,85,247,.1);color:var(--small);border-color:rgba(168,85,247,.2)">CAP: 25</div>
+    </div>
+    <div class="kpi" style="--ac:var(--medium)">
+      <div class="kpi-glow"></div>
+      <div class="kpi-icon">🐕</div>
+      <div class="kpi-val" id="kpiMD">0</div>
+      <div class="kpi-label">Medium</div>
+      <div class="kpi-badge" style="background:rgba(255,154,60,.1);color:var(--medium);border-color:rgba(255,154,60,.2)">CAP: 15</div>
+    </div>
+    <div class="kpi" style="--ac:var(--large)">
+      <div class="kpi-glow"></div>
+      <div class="kpi-icon">🦮</div>
+      <div class="kpi-val" id="kpiLG">0</div>
+      <div class="kpi-label">Large</div>
+      <div class="kpi-badge" style="background:rgba(16,185,129,.1);color:var(--large);border-color:rgba(16,185,129,.2)">CAP: 10</div>
+    </div>
+    <div class="kpi" style="--ac:var(--cat)">
+      <div class="kpi-glow"></div>
+      <div class="kpi-icon">🐱</div>
+      <div class="kpi-val" id="kpiCAT">0</div>
+      <div class="kpi-label">Cat</div>
+      <div class="kpi-badge" style="background:rgba(244,63,94,.1);color:var(--cat);border-color:rgba(244,63,94,.2)">CAP: 65</div>
+    </div>
+    <div class="kpi" style="--ac:var(--sky)">
+      <div class="kpi-glow"></div>
+      <div class="kpi-icon">⏱</div>
+      <div class="kpi-val" id="kpiAvg">0</div>
+      <div class="kpi-label">Avg Stay (days)</div>
+      <div class="kpi-badge" style="background:rgba(56,189,248,.1);color:var(--sky);border-color:rgba(56,189,248,.2)">MAX: 30 DAYS</div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <!-- Monthly chart -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ico" style="background:rgba(0,212,200,.1)">📈</div>
+        <div>
+          <div class="card-title">Monthly Revenue & Bookings</div>
+          <div class="card-sub">SAR · May 2026</div>
+        </div>
+      </div>
+      <div style="position:relative;height:220px"><canvas id="cMonthly"></canvas></div>
+    </div>
+
+    <!-- Capacity snapshot -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ico" style="background:rgba(168,85,247,.1)">🏠</div>
+        <div>
+          <div class="card-title">Live Capacity Snapshot</div>
+          <div class="card-sub">Current occupancy · May 2026</div>
+        </div>
+      </div>
+      <div id="capSnapshot"></div>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div class="card">
+      <div class="card-hd"><div class="card-ico" style="background:rgba(245,200,66,.1)">🥧</div>
+        <div><div class="card-title">Pet Type Mix</div><div class="card-sub">All 9 bookings</div></div>
+      </div>
+      <div style="position:relative;height:180px"><canvas id="cMix"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-ico" style="background:rgba(56,189,248,.1)">📅</div>
+        <div><div class="card-title">Stay Length Distribution</div><div class="card-sub">Nights per booking</div></div>
+      </div>
+      <div style="position:relative;height:180px"><canvas id="cStay"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-ico" style="background:rgba(16,185,129,.1)">💳</div>
+        <div><div class="card-title">Payment Methods</div><div class="card-sub">Transaction split</div></div>
+      </div>
+      <div style="position:relative;height:180px"><canvas id="cPay"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ico" style="background:rgba(244,63,94,.1)">⚡</div>
+      <div><div class="card-title">Smart Alerts & Insights</div><div class="card-sub">Auto-generated from booking data</div></div>
+    </div>
+    <div class="alert-row" id="alertRow"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+   CAPACITY
+═══════════════════════════════════════════════ -->
+<div class="pg" id="pg-cap">
+  <div class="ring-grid" id="ringGrid"></div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd"><div class="card-ico" style="background:rgba(0,212,200,.1)">📊</div>
+        <div><div class="card-title">Capacity Utilisation</div><div class="card-sub">Occupied vs available</div></div>
+      </div>
+      <div style="position:relative;height:240px"><canvas id="cCap"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-ico" style="background:rgba(245,200,66,.1)">📆</div>
+        <div><div class="card-title">Monthly Occupancy Trend</div><div class="card-sub">Bookings per month per type</div></div>
+      </div>
+      <div style="position:relative;height:240px"><canvas id="cMonthType"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+   BOOKINGS TABLE
+═══════════════════════════════════════════════ -->
+<div class="pg" id="pg-bk">
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ico" style="background:rgba(56,189,248,.1)">📋</div>
+      <div><div class="card-title">All Bookings</div><div class="card-sub" id="bkSub">9 records · May 2026</div></div>
+    </div>
+    <div class="tbl-filters">
+      <input class="fsearch" id="srch" placeholder="🔍  Search pet, owner..." oninput="filterBk()">
+      <select class="fsel" id="fMonth" onchange="filterBk()">
+        <option value="">All Months</option>
+        <option value="May">May 2026</option>
+      </select>
+      <select class="fsel" id="fType" onchange="filterBk()">
+        <option value="">All Types</option>
+        <option value="xsmall">🐕 X Small</option>
+        <option value="small">🐩 Small</option>
+        <option value="medium">🐕 Medium</option>
+        <option value="large">🦮 Large</option>
+        <option value="cat">🐱 Cat</option>
+      </select>
+      <select class="fsel" id="fPay" onchange="filterBk()">
+        <option value="">All Payments</option>
+        <option value="STC Pay">💜 STC Pay</option>
+        <option value="Bank Transfer">🏦 Bank Transfer</option>
+        <option value="Cash">💵 Cash</option>
+        <option value="Package">🎁 Package</option>
+      </select>
+      <select class="fsel" id="fPaid" onchange="filterBk()">
+        <option value="">All Paid Status</option>
+        <option value="paid">✅ Paid</option>
+        <option value="pending">⏳ Pending</option>
+      </select>
+      <span class="fcount" id="fCount">9 results</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <colgroup>
+          <col style="width:38px">
+          <col style="width:80px">
+          <col style="width:85px">
+          <col style="width:45px">
+          <col style="width:45px">
+          <col style="width:100px">
+          <col style="width:90px">
+          <col style="width:85px">
+          <col style="width:48px">
+          <col style="width:65px">
+          <col style="width:82px">
+          <col style="width:82px">
+          <col style="width:45px">
+          <col style="width:68px">
+          <col style="width:52px">
+          <col style="width:65px">
+          <col style="width:100px">
+          <col style="width:80px">
+          <col style="width:50px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th onclick="sortBk('id')"><span class="sort">↕</span>#</th>
+            <th onclick="sortBk('pet')"><span class="sort">↕</span>PET</th>
+            <th>BREED</th>
+            <th>AGE</th>
+            <th>KG</th>
+            <th onclick="sortBk('owner')"><span class="sort">↕</span>OWNER</th>
+            <th>PHONE</th>
+            <th>TYPE</th>
+            <th>NEUT</th>
+            <th>DISC</th>
+            <th onclick="sortBk('from')"><span class="sort">↕</span>CHECK IN</th>
+            <th onclick="sortBk('to')"><span class="sort">↕</span>CHECK OUT</th>
+            <th onclick="sortBk('days')"><span class="sort">↕</span>DAYS</th>
+            <th onclick="sortBk('amount')"><span class="sort">↕</span>AMOUNT</th>
+            <th>TAXI</th>
+            <th onclick="sortBk('total')"><span class="sort">↕</span>TOTAL</th>
+            <th onclick="sortBk('payment')"><span class="sort">↕</span>PAYMENT</th>
+            <th onclick="sortBk('paidDate')"><span class="sort">↕</span>PAID DATE</th>
+            <th>MONTH</th>
+          </tr>
+        </thead>
+        <tbody id="bkBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+   TIMELINE / GANTT
+═══════════════════════════════════════════════ -->
+<div class="pg" id="pg-tl">
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-hd">
+      <div class="card-ico" style="background:rgba(245,200,66,.1)">🗓</div>
+      <div>
+        <div class="card-title">Booking Timeline — May 2026</div>
+        <div class="card-sub">Gantt view · hover bars for details</div>
+      </div>
+    </div>
+    <div class="gantt-wrap" id="ganttMay"></div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-hd">
+      <div class="card-ico" style="background:rgba(168,85,247,.1)">🗓</div>
+      <div><div class="card-title">April 2026</div><div class="card-sub">Gantt view</div></div>
+    </div>
+    <div class="gantt-wrap" id="ganttApr"></div>
+  </div>
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ico" style="background:rgba(0,212,200,.1)">🗓</div>
+      <div><div class="card-title">March 2026</div><div class="card-sub">Gantt view</div></div>
+    </div>
+    <div class="gantt-wrap" id="ganttMar"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+   REVENUE
+═══════════════════════════════════════════════ -->
+<div class="pg" id="pg-rev">
+  <div class="g4">
+    <div class="kpi" style="--ac:var(--emerald)">
+      <div class="kpi-glow"></div>
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-val">18,923</div>
+      <div class="kpi-label">Total Revenue (SAR)</div>
+    </div>
+    <div class="kpi" style="--ac:var(--amber)">
+      <div class="kpi-glow"></div>
+      <div class="kpi-icon">🚕</div>
+      <div class="kpi-val">480</div>
+      <div class="kpi-label">Taxi Revenue (SAR)</div>
+    </div>
+    <div class="kpi" style="--ac:var(--gold)">
+      <div class="kpi-glow"></div>
+      <div class="kpi-icon">📦</div>
+      <div class="kpi-val">3</div>
+      <div class="kpi-label">STC Pay Bookings</div>
+    </div>
+    <div class="kpi" style="--ac:var(--sky)">
+      <div class="kpi-glow"></div>
+      <div class="kpi-icon">📐</div>
+      <div class="kpi-val">2,103</div>
+      <div class="kpi-label">Avg / Booking (SAR)</div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-hd"><div class="card-ico" style="background:rgba(16,185,129,.1)">📉</div>
+        <div><div class="card-title">Revenue Trend</div><div class="card-sub">SAR per month</div></div>
+      </div>
+      <div style="position:relative;height:240px"><canvas id="cRevTrend"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-ico" style="background:rgba(255,154,60,.1)">🥧</div>
+        <div><div class="card-title">Revenue by Pet Type</div><div class="card-sub">Contribution split</div></div>
+      </div>
+      <div style="position:relative;height:240px"><canvas id="cRevSplit"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-ico" style="background:rgba(245,200,66,.1)">🏆</div>
+      <div><div class="card-title">Top Clients by Revenue</div><div class="card-sub">Ranked by total spend</div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>RANK</th><th>OWNER</th><th>PETS</th><th>BOOKINGS</th><th>DAYS</th><th>TOTAL (SAR)</th><th>AVG / BOOKING</th></tr></thead>
+        <tbody id="topClBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+   CLIENTS
+═══════════════════════════════════════════════ -->
+<div class="pg" id="pg-cl">
+  <div class="tbl-filters">
+    <input class="fsearch" id="clSrch" placeholder="🔍  Search client..." oninput="filterCl()">
+    <select class="fsel" id="clType" onchange="filterCl()">
+      <option value="">All Types</option>
+      <option value="big_dog">🐕 Big Dog</option>
+      <option value="small_dog">🐩 Small Dog</option>
+    </select>
+    <span class="fcount" id="clCount"></span>
+  </div>
+  <div class="bk-grid" id="clGrid"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+   ADD / EDIT BOOKING
+═══════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════
+   PACKAGES
+═══════════════════════════════════════════════ -->
+<div class="pg" id="pg-pkg">
+  <div class="g2" style="margin-bottom:16px">
+    <!-- Active Packages -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ico" style="background:rgba(245,200,66,.1)">🎁</div>
+        <div><div class="card-title">Active Packages</div><div class="card-sub" id="pkgCount">Loading...</div></div>
+        <button class="btn-add" style="margin-left:auto" onclick="showNewPkgForm()">+ New Package</button>
+      </div>
+      <div id="pkgList"></div>
+    </div>
+    <!-- New Package Form -->
+    <div class="card" id="newPkgCard" style="display:none">
+      <div class="card-hd">
+        <div class="card-ico" style="background:rgba(245,200,66,.1)">➕</div>
+        <div><div class="card-title" id="pkgFormTitle">New Package</div><div class="card-sub">30-day boarding package</div></div>
+      </div>
+      <div class="form-grid" style="grid-template-columns:1fr 1fr">
+        <div class="form-group"><label class="form-label">OWNER NAME *</label><input class="form-input" id="pk_owner" placeholder="e.g. Faisal Yousef"></div>
+        <div class="form-group"><label class="form-label">PET NAME *</label><input class="form-input" id="pk_pet" placeholder="e.g. Fofo"></div>
+        <div class="form-group"><label class="form-label">PET TYPE *</label>
+          <select class="form-select" id="pk_type">
+            <option value="">Select...</option>
+            <option value="xsmall">X Small 🐕</option>
+            <option value="small">Small 🐩</option>
+            <option value="medium">Medium 🐕</option>
+            <option value="large">Large 🦮</option>
+            <option value="cat">Cat 🐱</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">PHONE</label><input class="form-input" id="pk_phone" placeholder="+966..."></div>
+        <div class="form-group"><label class="form-label">PACKAGE DAYS *</label><input class="form-input" id="pk_days" type="number" value="30" min="1"></div>
+        <div class="form-group"><label class="form-label">PACKAGE AMOUNT (SAR) *</label><input class="form-input" id="pk_amount" type="number" placeholder="e.g. 2500"></div>
+        <div class="form-group"><label class="form-label">START DATE (DD.MM) *</label><input class="form-input" id="pk_start" placeholder="e.g. 1.6"></div>
+        <div class="form-group"><label class="form-label">MONTH *</label>
+          <select class="form-select" id="pk_month">
+            <option value="Jun">June 2026</option><option value="May">May 2026</option>
+            <option value="Apr">April 2026</option><option value="Mar">March 2026</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn-add" style="background:rgba(244,63,94,.12);color:var(--rose);box-shadow:none;border:1px solid rgba(244,63,94,.25)" onclick="document.getElementById('newPkgCard').style.display='none'">✕ Cancel</button>
+          <button class="btn-add" style="background:linear-gradient(135deg,#F5C842,#E5A800);color:#080C12" onclick="savePkg()">🎁 Save Package</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Use Package -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ico" style="background:rgba(0,212,200,.1)">📅</div>
+      <div><div class="card-title">Use Package Days</div><div class="card-sub">Deduct days from existing package</div></div>
+    </div>
+    <div class="form-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="form-group">
+        <label class="form-label">SELECT PACKAGE</label>
+        <select class="form-select" id="use_pkg" onchange="previewUse()">
+          <option value="">Select package...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">CHECK IN (DD.MM)</label>
+        <input class="form-input" id="use_from" placeholder="e.g. 5.6">
+      </div>
+      <div class="form-group">
+        <label class="form-label">CHECK OUT (DD.MM)</label>
+        <input class="form-input" id="use_to" placeholder="e.g. 10.6">
+      </div>
+      <div class="form-group">
+        <label class="form-label">DAYS TO USE *</label>
+        <input class="form-input" id="use_days" type="number" placeholder="e.g. 6" min="1">
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <div id="pkgPreview" style="padding:10px 14px;border-radius:10px;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.15);font-size:12px;color:var(--gold2);display:none"></div>
+      </div>
+      <div class="form-group" style="grid-column:1/-1;display:flex;justify-content:flex-end">
+        <button class="btn-add" style="background:linear-gradient(135deg,var(--teal),#00A8A0);color:#080C12" onclick="usePkgDays()">✅ Use Days</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+   EXPENSES
+═══════════════════════════════════════════════ -->
+<div class="pg" id="pg-exp">
+  <!-- KPIs -->
+  <div class="g4" style="margin-bottom:16px" id="expKpis">
+    <div class="kpi" style="--ac:var(--rose)"><div class="kpi-glow"></div><div class="kpi-icon">💸</div>
+      <div class="kpi-val" id="expTotal">0</div><div class="kpi-label">Total Expenses (SAR)</div></div>
+    <div class="kpi" style="--ac:var(--emerald)"><div class="kpi-glow"></div><div class="kpi-icon">💰</div>
+      <div class="kpi-val" id="expRevenue">0</div><div class="kpi-label">Total Revenue (SAR)</div></div>
+    <div class="kpi" style="--ac:var(--gold)"><div class="kpi-glow"></div><div class="kpi-icon">📈</div>
+      <div class="kpi-val" id="expProfit">0</div><div class="kpi-label">Net Profit (SAR)</div></div>
+    <div class="kpi" style="--ac:var(--sky)"><div class="kpi-glow"></div><div class="kpi-icon">📊</div>
+      <div class="kpi-val" id="expMargin">0%</div><div class="kpi-label">Profit Margin</div></div>
+  </div>
+  <div class="g2" style="margin-bottom:16px">
+    <!-- Add Expense Form -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ico" style="background:rgba(244,63,94,.1)">➕</div>
+        <div><div class="card-title">Add Expense</div><div class="card-sub">Record a new expense</div></div>
+      </div>
+      <div class="form-grid" style="grid-template-columns:1fr 1fr">
+        <div class="form-group">
+          <label class="form-label">EXPENSE TYPE *</label>
+          <select class="form-select" id="ex_type">
+            <option value="">Select type...</option>
+            <option value="رواتب">👥 رواتب</option>
+            <option value="إيجار">🏠 إيجار</option>
+            <option value="إعاشة">🍽 إعاشة</option>
+            <option value="أكل حيوانات">🐾 أكل للحيوانات</option>
+            <option value="مستلزمات حيوانات">🧴 مستلزمات حيوانات</option>
+            <option value="صيانة">🔧 صيانة</option>
+            <option value="مشتريات متفرقة">🛒 مشتريات متفرقة</option>
+            <option value="أجهزة">💻 أجهزة</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">DATE (DD.MM) *</label>
+          <input class="form-input" id="ex_date" placeholder="e.g. 15.5">
+        </div>
+        <div class="form-group">
+          <label class="form-label">AMOUNT (SAR) *</label>
+          <input class="form-input" id="ex_amount" type="number" placeholder="e.g. 1500" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">MONTH *</label>
+          <select class="form-select" id="ex_month">
+            <option value="Jun">June 2026</option><option value="May" selected>May 2026</option>
+            <option value="Apr">April 2026</option><option value="Mar">March 2026</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">NOTES</label>
+          <input class="form-input" id="ex_notes" placeholder="Optional notes...">
+        </div>
+        <div class="form-group" style="grid-column:1/-1;display:flex;justify-content:flex-end">
+          <button class="btn-add" onclick="saveExpense()">💸 Add Expense</button>
+        </div>
+      </div>
+    </div>
+    <!-- Expenses by Category Chart -->
+    <div class="card">
+      <div class="card-hd"><div class="card-ico" style="background:rgba(244,63,94,.1)">🥧</div>
+        <div><div class="card-title">Expenses by Category</div><div class="card-sub">Breakdown</div></div>
+      </div>
+      <div style="position:relative;height:240px"><canvas id="cExpCat"></canvas></div>
+    </div>
+  </div>
+  <!-- Expenses Table -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ico" style="background:rgba(244,63,94,.1)">📋</div>
+      <div><div class="card-title">All Expenses</div><div class="card-sub entry-count" id="expCount">0 expenses</div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>#</th><th>TYPE</th><th>DATE</th><th>AMOUNT</th><th>MONTH</th><th>NOTES</th><th>ACTIONS</th></tr></thead>
+        <tbody id="expBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="pg" id="pg-add">
+
+  <!-- Form Card -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-hd">
+      <div class="card-ico" style="background:rgba(0,212,200,.1)">➕</div>
+      <div>
+        <div class="card-title" id="formTitle">New Booking</div>
+        <div class="card-sub">Fill in all fields and click Save</div>
+      </div>
+      <button class="btn-add" style="margin-right:0;margin-left:auto;padding:7px 18px;font-size:11px;background:rgba(244,63,94,.12);color:var(--rose);box-shadow:none;border:1px solid rgba(244,63,94,.25)" onclick="resetForm()" id="btnCancel" style="display:none">✕ Cancel Edit</button>
+    </div>
+
+    <div style="font-size:10px;font-weight:700;color:var(--teal);font-family:'DM Mono',monospace;letter-spacing:1px;margin-bottom:8px;padding:6px 10px;background:rgba(0,212,200,.06);border-radius:8px">🐾 PET INFORMATION</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">PET NAME *</label>
+        <input class="form-input" id="f_pet" placeholder="e.g. Bailey">
+      </div>
+      <div class="form-group">
+        <label class="form-label">BREED (السلالة)</label>
+        <input class="form-input" id="f_breed" placeholder="e.g. Pomeranian">
+      </div>
+      <div class="form-group">
+        <label class="form-label">PET TYPE *</label>
+        <select class="form-select" id="f_type">
+          <option value="">Select type...</option>
+          <option value="xsmall">🐕 X Small</option>
+          <option value="small">🐩 Small</option>
+          <option value="medium">🐕 Medium</option>
+          <option value="large">🦮 Large</option>
+          <option value="cat">🐱 Cat</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">AGE (سنة الميلاد)</label>
+        <input class="form-input" id="f_age" placeholder="e.g. 2021" type="number">
+      </div>
+      <div class="form-group">
+        <label class="form-label">WEIGHT KG</label>
+        <input class="form-input" id="f_kg" placeholder="e.g. 4" type="number" step="0.1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">NEUTERED / SPAYED</label>
+        <select class="form-select" id="f_neutered">
+          <option value="yes">✅ Yes</option>
+          <option value="no">❌ No</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="font-size:10px;font-weight:700;color:var(--sky);font-family:'DM Mono',monospace;letter-spacing:1px;margin:12px 0 8px;padding:6px 10px;background:rgba(56,189,248,.06);border-radius:8px">👤 OWNER INFORMATION</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">OWNER NAME *</label>
+        <input class="form-input" id="f_owner" placeholder="e.g. Sandra Bell">
+      </div>
+      <div class="form-group">
+        <label class="form-label">PHONE NUMBER</label>
+        <input class="form-input" id="f_phone" placeholder="e.g. +966501234567">
+      </div>
+      <div class="form-group">
+        <label class="form-label">DISCOUNT (SAR)</label>
+        <input class="form-input" id="f_discount" type="number" placeholder="0" min="0" value="0">
+      </div>
+    </div>
+
+    <div style="font-size:10px;font-weight:700;color:var(--gold);font-family:'DM Mono',monospace;letter-spacing:1px;margin:12px 0 8px;padding:6px 10px;background:rgba(245,200,66,.06);border-radius:8px">📅 BOOKING DETAILS</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">CHECK IN (DD.MM) *</label>
+        <input class="form-input" id="f_from" placeholder="e.g. 1.6">
+      </div>
+      <div class="form-group">
+        <label class="form-label">CHECK OUT (DD.MM) *</label>
+        <input class="form-input" id="f_to" placeholder="e.g. 7.6">
+      </div>
+      <div class="form-group">
+        <label class="form-label">DAYS *</label>
+        <input class="form-input" id="f_days" type="number" placeholder="e.g. 6" min="1">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">AMOUNT (SAR) *</label>
+        <input class="form-input" id="f_amount" type="number" placeholder="e.g. 750" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">TAXI (SAR)</label>
+        <input class="form-input" id="f_taxi" type="number" placeholder="0 if none" min="0" value="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">TOTAL (SAR)</label>
+        <input class="form-input" id="f_total_preview" readonly placeholder="Auto calculated" style="color:var(--emerald);font-weight:700">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">PAYMENT METHOD *</label>
+        <select class="form-select" id="f_payment" onchange="onPaymentChange()">
+          <option value="">Select...</option>
+          <option value="STC Pay">💜 STC Pay</option>
+          <option value="Bank Transfer">🏦 Bank Transfer</option>
+          <option value="Cash">💵 Cash</option>
+          <option value="Package">🎁 Package (خصم من الباقة)</option>
+        </select>
+      </div>
+      <div class="form-group" id="f_pkg_group" style="display:none">
+        <label class="form-label">SELECT PACKAGE 🎁</label>
+        <select class="form-select" id="f_pkg_id" onchange="onPkgSelect()">
+          <option value="">اختر الباقة...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">PAID DATE (leave — if pending)</label>
+        <input class="form-input" id="f_paidDate" placeholder="e.g. 1.6 or —">
+      </div>
+      <div class="form-group">
+        <label class="form-label">MONTH *</label>
+        <select class="form-select" id="f_month">
+          <option value="">Select month...</option>
+          <option value="Jun">June 2026</option>
+          <option value="May">May 2026</option>
+          <option value="Apr">April 2026</option>
+          <option value="Mar">March 2026</option>
+          <option value="Feb">February 2026</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="f_pkg_preview_group" style="grid-column:1/-1;display:none">
+        <div id="f_pkg_preview" style="padding:10px 14px;border-radius:10px;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);font-size:12px;color:var(--gold2)"></div>
+      </div>
+      <div class="form-group" style="grid-column:1/-1;display:flex;justify-content:flex-end;gap:10px;margin-top:4px">
+        <button class="btn-add" style="background:rgba(244,63,94,.12);color:var(--rose);box-shadow:none;border:1px solid rgba(244,63,94,.25)" onclick="resetForm()">✕ Clear</button>
+        <button class="btn-add" onclick="saveBooking()" id="btnSave">💾 Save Booking</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Entries Table -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ico" style="background:rgba(245,200,66,.1)">📝</div>
+      <div>
+        <div class="card-title">All Bookings — Live Edit</div>
+        <div class="card-sub entry-count" id="entryCount">Loading...</div>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>PET</th><th>BREED</th><th>AGE</th><th>KG</th><th>OWNER</th><th>PHONE</th><th>TYPE</th><th>NEUTERED</th><th>DISCOUNT</th>
+            <th>IN</th><th>OUT</th><th>DAYS</th>
+            <th>AMOUNT</th><th>TAXI</th><th>TOTAL</th>
+            <th>PAYMENT</th><th>PAID</th><th>MONTH</th><th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody id="editBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div><!-- /body-wrap -->
+
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;width:520px;max-width:95vw">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <span style="font-size:20px">⚙️</span>
+      <div>
+        <div style="font-weight:700;font-size:16px">Google Sheets Sync</div>
+        <div style="font-size:11px;color:var(--muted)">اربط الداشبورد بشيتك لحفظ البيانات تلقائياً</div>
+      </div>
+      <button onclick="hideSettings()" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer">✕</button>
+    </div>
+
+    <div style="background:rgba(0,212,200,.06);border:1px solid rgba(0,212,200,.15);border-radius:12px;padding:14px;margin-bottom:16px;font-size:12px;line-height:1.7;color:var(--muted2)">
+      <b style="color:var(--teal)">📖 خطوات الإعداد (مرة واحدة فقط):</b><br>
+      1. افتح الشيت → <b>Extensions → Apps Script</b><br>
+      2. الصق الكود من الزر أدناه واضغط <b>Deploy → Web App</b><br>
+      3. اضبط <b>Execute as: Me</b> و <b>Access: Anyone</b><br>
+      4. انسخ الـ URL وضعه في الخانة أدناه
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label style="font-size:10px;font-weight:700;color:var(--muted);font-family:'DM Mono',monospace;display:block;margin-bottom:6px">APPS SCRIPT URL</label>
+      <input id="appsScriptUrl" class="form-input" placeholder="https://script.google.com/macros/s/..." style="width:100%;box-sizing:border-box"
+        value="${window.APPS_SCRIPT_URL||localStorage.getItem('petstay_asurl')||''}">
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button onclick="copyAppsScript()" style="padding:9px 16px;border-radius:9px;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.2);color:var(--gold);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">
+        📋 نسخ كود Apps Script
+      </button>
+      <button onclick="saveAppsScriptUrl()" style="padding:9px 16px;border-radius:9px;background:linear-gradient(135deg,var(--teal),#00A8A0);border:none;color:#080C12;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">
+        💾 حفظ الإعداد
+      </button>
+      <button onclick="loadFromSheets()" style="padding:9px 16px;border-radius:9px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:var(--emerald);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">
+        🔄 مزامنة الآن
+      </button>
+      <button onclick="uploadInitialData()" style="padding:9px 16px;border-radius:9px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);color:#A855F7;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">
+        ⬆️ رفع البيانات الأولية للشيت
+      </button>
+    </div>
+
+    <div style="margin-top:14px;padding:10px 14px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.15);border-radius:10px;font-size:11px;color:var(--sky)">
+      📊 Sheet ID: <code style="font-family:'DM Mono',monospace">{SHEET_ID}</code>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ADD BOOKING PAGE -->
+<div style="display:none" id="pg-add-wrap">
+</div>
+
+<script>
+Chart.defaults.color='#5A7494';
+Chart.defaults.font.family='DM Sans';
+const fmt=n=>new Intl.NumberFormat('en-US').format(Math.round(n));
+const fmt1=n=>n.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+
+/* ══════════════════════════
+   DATA
+══════════════════════════ */
+const BK=[
+  {id:1, pet:'Chispita', owner:'Ana Sanches', phone:'—', type:'small', breed:'Pomeranian', age:2021, kg:4, neutered:'yes', discount:20, from:'11.5',to:'28.5',days:17, amount:2932,taxi:120,total:3052, payment:'STC Pay', paidDate:'15.5', month:'May'},
+  {id:2, pet:'Ruber', owner:'Guil Tati Tavares', phone:'—', type:'small', breed:'Pomeranian', age:2014, kg:7, neutered:'yes', discount:4, from:'12.5',to:'7.6', days:26, amount:2932,taxi:120,total:3052, payment:'STC Pay', paidDate:'12.5', month:'May'},
+  {id:3, pet:'Amore', owner:'Sahar Moh Aljumaih', phone:'—', type:'xsmall', breed:'Toy Poodle', age:2024, kg:4, neutered:'no', discount:0, from:'13.5',to:'16.5',days:4, amount:460,taxi:120,total:580, payment:'STC Pay', paidDate:'13.5/16.5', month:'May'},
+  {id:4, pet:'Oreo', owner:'Michele Char Saliba', phone:'—', type:'small', breed:'Shitzhu', age:2013, kg:8, neutered:'yes', discount:0, from:'17.5',to:'30.5',days:14, amount:2125,taxi:0,total:2125, payment:'Bank Transfer', paidDate:'—', month:'May'},
+  {id:5, pet:'Snowy', owner:'Salman Rana', phone:'—', type:'xsmall', breed:'Maltese', age:2016, kg:10, neutered:'yes', discount:0, from:'21.5',to:'25.5',days:4, amount:500,taxi:0,total:500, payment:'Bank Transfer', paidDate:'—', month:'May'},
+  {id:6, pet:'Calla', owner:'Mariam Tashkandi', phone:'—', type:'medium', breed:'Shitzhu mix', age:2023, kg:13, neutered:'yes', discount:0, from:'21.5',to:'20.6',days:30, amount:2000,taxi:0,total:2000, payment:'Bank Transfer', paidDate:'19.5', month:'May'},
+  {id:7, pet:'Riya', owner:'Kiana Jaber', phone:'—', type:'small', breed:'Maltipoo', age:2022, kg:10, neutered:'yes', discount:0, from:'26.5',to:'6.6',days:11, amount:1375,taxi:120,total:1495, payment:'Bank Transfer', paidDate:'—', month:'May'},
+  {id:8, pet:'Meoru', owner:'Jongin Park', phone:'—', type:'large', breed:'Pumi', age:2021, kg:15, neutered:'yes', discount:14, from:'22.5',to:'30.5',days:8, amount:3187,taxi:0,total:3187, payment:'Bank Transfer', paidDate:'8.12', month:'May'},
+  {id:9, pet:'Fofo', owner:'Faisal Yousef Alkheliwi', phone:'—', type:'small', breed:'Shitzhu', age:2018, kg:6, neutered:'yes', discount:0, from:'31.5',to:'30.6',days:30, amount:2932,taxi:0,total:2932, payment:'Bank Transfer', paidDate:'—', month:'May'},
+];
+
+const TC={xsmall:'#38BDF8',small:'#A855F7',medium:'#FF9A3C',large:'#10B981',cat:'#F43F5E',big_dog:'#FF9A3C',small_dog:'#A855F7'};
+const TL={xsmall:'X Small 🐕',small:'Small 🐩',medium:'Medium 🐕',large:'Large 🦮',cat:'Cat 🐱',big_dog:'Medium 🐕',small_dog:'Small 🐩'};
+const MC={May:'#00D4C8',Apr:'#A855F7',Mar:'#F5C842',Jun:'#10B981',Feb:'#F43F5E',Jan:'#38BDF8'};
+const PC={'STC Pay':{bg:'rgba(118,75,226,.12)',color:'#A78BFA',border:'rgba(118,75,226,.25)'},
+          'Bank Transfer':{bg:'rgba(56,189,248,.08)',color:'#38BDF8',border:'rgba(56,189,248,.15)'},
+          'Cash':{bg:'rgba(16,185,129,.08)',color:'#10B981',border:'rgba(16,185,129,.15)'},
+          'Package':{bg:'rgba(245,200,66,.10)',color:'#F5C842',border:'rgba(245,200,66,.25)'}};
+
+/* ══════════════════════════
+   COUNT-UP
+══════════════════════════ */
+function countUp(){
+  // حساب الإحصائيات من BK مباشرة
+  const xs  = BK.filter(b=>b.type==='xsmall').length;
+  const sm  = BK.filter(b=>b.type==='small'||b.type==='small_dog').length;
+  const md  = BK.filter(b=>b.type==='medium'||b.type==='big_dog').length;
+  const lg  = BK.filter(b=>b.type==='large').length;
+  const cat = BK.filter(b=>b.type==='cat').length;
+  const rev = BK.filter(b=>b.payment!=='Package').reduce((s,b)=>s+b.total,0);
+  const avg = BK.length ? (BK.reduce((s,b)=>s+b.days,0)/BK.length).toFixed(1) : 0;
+  const setEl=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  setEl('kpiTotal', BK.length);
+  setEl('kpiRev',   fmt(rev));
+  setEl('kpiXS',    xs);
+  setEl('kpiSM',    sm);
+  setEl('kpiMD',    md);
+  setEl('kpiLG',    lg);
+  setEl('kpiCAT',   cat);
+  setEl('kpiAvg',   avg);
+  document.getElementById('fCount').textContent = BK.length+' results';
+
+  document.querySelectorAll('[data-target]').forEach(el=>{
+    const target=parseFloat(el.dataset.target);
+    const isFloat=String(target).includes('.');
+    let start=0,dur=1200,startTime=null;
+    function step(ts){
+      if(!startTime)startTime=ts;
+      const p=Math.min((ts-startTime)/dur,1);
+      const ease=1-Math.pow(1-p,4);
+      const val=start+(target-start)*ease;
+      el.textContent=isFloat?fmt1(val):fmt(val);
+      if(p<1)requestAnimationFrame(step);
+      else el.textContent=isFloat?fmt1(target):fmt(target);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+/* ══════════════════════════
+   CAPACITY SNAPSHOT
+══════════════════════════ */
+function buildCapSnapshot(){
+  const g=t=>BK.filter(b=>b.type===t).map(b=>`${b.pet} (${b.owner.split(' ')[0]})`);
+  const types=[
+    {label:'X Small 🐕', type:'xsmall', occ:g('xsmall').length, cap:15, color:'var(--xsmall)', guests:g('xsmall')},
+    {label:'Small 🐩',   type:'small',  occ:g('small').length+g('small_dog').length,  cap:25, color:'var(--small)',  guests:[...g('small'),...g('small_dog')]},
+    {label:'Medium 🐕',  type:'medium', occ:g('medium').length+g('big_dog').length, cap:15, color:'var(--medium)', guests:[...g('medium'),...g('big_dog')]},
+    {label:'Large 🦮',   type:'large',  occ:g('large').length,  cap:10, color:'var(--large)',  guests:g('large')},
+    {label:'Cats 🐱',    type:'cat',    occ:g('cat').length,    cap:65, color:'var(--cat)',    guests:g('cat')},
+  ];
+  document.getElementById('capSnapshot').innerHTML=types.map(t=>`
+    <div class="cap-type">
+      <div class="cap-head">
+        <span class="cap-name" style="color:${t.color}">${t.label}</span>
+        <div class="cap-nums">
+          <span class="cap-num"><b style="color:${t.color}">${t.occ}</b> occupied</span>
+          <span class="cap-num"><b style="color:#10B981">${t.cap-t.occ}</b> free</span>
+          <span class="cap-num"><b style="color:${t.color}">${Math.round(t.occ/t.cap*100)}%</b></span>
+        </div>
+      </div>
+      <div class="cap-track"><div class="cap-fill" style="width:0%;background:${t.color}" data-w="${Math.round(t.occ/t.cap*100)}"></div></div>
+      <div class="cap-chips">
+        ${t.guests.map(g=>`<div class="chip" style="border-color:${t.color}44;color:${t.color};background:${t.color}11">🐾 ${g}</div>`).join('')}
+        ${t.guests.length===0?`<div class="chip" style="border-color:rgba(255,255,255,.1);color:var(--muted)">No current guests</div>`:''}
+      </div>
+    </div>`).join('');
+  // Animate bars
+  setTimeout(()=>{
+    document.querySelectorAll('.cap-fill[data-w]').forEach(el=>{
+      el.style.width=el.dataset.w+'%';
+    });
+  },300);
+}
+
+/* ══════════════════════════
+   CAPACITY RINGS
+══════════════════════════ */
+function buildRings(){
+  const R=60, C=2*Math.PI*R;
+  const mg=t=>BK.filter(b=>b.type===t).map(b=>({pet:b.pet,info:`${b.owner.split(' ')[0]} · ${b.from}→${b.to} · ${b.days}d`}));
+  const types=[
+    {label:'X Small',icon:'🐕',occ:BK.filter(b=>b.type==='xsmall').length, cap:15,color:'#38BDF8',guests:mg('xsmall')},
+    {label:'Small',  icon:'🐩',occ:BK.filter(b=>b.type==='small'||b.type==='small_dog').length,  cap:25,color:'#A855F7',guests:[...mg('small'),...mg('small_dog')]},
+    {label:'Medium', icon:'🐕',occ:BK.filter(b=>b.type==='medium'||b.type==='big_dog').length, cap:15,color:'#FF9A3C',guests:[...mg('medium'),...mg('big_dog')]},
+    {label:'Large',  icon:'🦮',occ:BK.filter(b=>b.type==='large').length,  cap:10,color:'#10B981',guests:mg('large')},
+    {label:'Cats',   icon:'🐱',occ:BK.filter(b=>b.type==='cat').length,    cap:65,color:'#F43F5E',guests:mg('cat')},
+  ];
+  document.getElementById('ringGrid').innerHTML=types.map(t=>{
+    const pct=t.occ/t.cap;
+    const offset=C*(1-pct);
+    return`<div class="ring-card" style="border-top:2px solid ${t.color}44">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 140 140">
+          <circle class="ring-bg" cx="70" cy="70" r="${R}"/>
+          <circle class="ring-fg" cx="70" cy="70" r="${R}"
+            stroke="${t.color}"
+            stroke-dasharray="${C}"
+            stroke-dashoffset="${C}"
+            data-offset="${offset}"
+            style="filter:drop-shadow(0 0 6px ${t.color}44)"/>
+        </svg>
+        <div class="ring-label">
+          <span class="ring-pct" style="color:${t.color}">${Math.round(pct*100)}%</span>
+          <span class="ring-sub">USED</span>
+        </div>
+      </div>
+      <div class="ring-title">${t.icon} ${t.label}</div>
+      <div class="ring-detail">${t.occ} / ${t.cap} spots · ${t.cap-t.occ} available</div>
+      <div class="ring-guests">
+        ${t.guests.length===0
+          ? `<div style="text-align:center;padding:14px;color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">No guests booked<br><span style="font-size:10px">${t.cap} spots fully available</span></div>`
+          : t.guests.map(g=>`<div class="rg"><span class="rg-pet">${g.pet}</span><span class="rg-info">${g.info}</span></div>`).join('')
+        }
+      </div>
+    </div>`;
+  }).join('');
+  // Animate rings
+  setTimeout(()=>{
+    document.querySelectorAll('.ring-fg[data-offset]').forEach(el=>{
+      el.style.strokeDashoffset=el.dataset.offset;
+    });
+  },400);
+}
+
+/* ══════════════════════════
+   CHARTS
+══════════════════════════ */
+function buildCharts(){
+  const gridColor='rgba(255,255,255,.05)';
+  const tickColor='#5A7494';
+
+  // Monthly Revenue + Bookings
+  new Chart('cMonthly',{type:'bar',data:{
+    labels:['May 2026'],
+    datasets:[
+      {label:'Revenue (SAR)',data:[18923],
+       backgroundColor:['rgba(0,212,200,.7)'],
+       borderColor:['#00D4C8'],borderWidth:1.5,borderRadius:8,yAxisID:'y1'},
+      {label:'Bookings',data:[9],type:'line',
+       borderColor:'#10B981',pointBackgroundColor:'#10B981',
+       backgroundColor:'transparent',borderWidth:2,pointRadius:5,yAxisID:'y2'}
+    ]},options:{responsive:true,maintainAspectRatio:false,
+    scales:{
+      y1:{grid:{color:gridColor},ticks:{color:tickColor,callback:v=>fmt(v)}},
+      y2:{position:'right',min:0,max:18,grid:{display:false},ticks:{color:'#10B981'}},
+      x:{grid:{display:false},ticks:{color:tickColor}}
+    },plugins:{legend:{labels:{color:tickColor,boxWidth:12,font:{size:11}}}}}});
+
+  // ── Pet Type Mix — ديناميكي من BK ──
+  const typeGroups=[
+    {label:'X Small 🐕', key:'xsmall', color:'#38BDF8'},
+    {label:'Small 🐩',   key:'small',  color:'#A855F7'},
+    {label:'Medium 🐕',  key:'medium', color:'#FF9A3C'},
+    {label:'Large 🦮',   key:'large',  color:'#10B981'},
+    {label:'Cat 🐱',     key:'cat',    color:'#F43F5E'},
+  ];
+  const typeCounts = typeGroups.map(t=>BK.filter(b=>b.type===t.key||
+    (t.key==='small'&&b.type==='small_dog')||(t.key==='medium'&&b.type==='big_dog')).length);
+  const activeTypes = typeGroups.filter((_,i)=>typeCounts[i]>0);
+  const activeCounts= typeCounts.filter(v=>v>0);
+  new Chart('cMix',{type:'doughnut',data:{
+    labels:activeTypes.map((t,i)=>`${t.label} (${activeCounts[i]})`),
+    datasets:[{data:activeCounts,backgroundColor:activeTypes.map(t=>t.color),borderWidth:4,borderColor:'#0E1520'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'70%',
+    plugins:{legend:{position:'bottom',labels:{color:tickColor,boxWidth:10,font:{size:11},padding:14}}}}});
+
+  // ── Stay Distribution — ديناميكي ──
+  const s1=BK.filter(b=>b.days<=3).length;
+  const s2=BK.filter(b=>b.days>=4&&b.days<=7).length;
+  const s3=BK.filter(b=>b.days>=8&&b.days<=15).length;
+  const s4=BK.filter(b=>b.days>=16).length;
+  new Chart('cStay',{type:'bar',data:{
+    labels:['1–3d','4–7d','8–15d','16–30d'],
+    datasets:[{data:[s1,s2,s3,s4],backgroundColor:['#38BDF8AA','#00D4C8AA','#A855F7AA','#F5C842AA'],
+      borderColor:['#38BDF8','#00D4C8','#A855F7','#F5C842'],borderWidth:1.5,borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{grid:{color:gridColor},ticks:{color:tickColor,stepSize:1}},x:{grid:{display:false},ticks:{color:tickColor}}},
+    plugins:{legend:{display:false}}}});
+
+  // ── Payment Split — ديناميكي ──
+  const payGroups=['STC Pay','Bank Transfer','Cash','Package'];
+  const payColors=['#A78BFA','#38BDF8','#10B981','#F5C842'];
+  const payCounts=payGroups.map(p=>BK.filter(b=>b.payment===p).length);
+  const activePay=payGroups.filter((_,i)=>payCounts[i]>0);
+  const activePayC=payCounts.filter(v=>v>0);
+  new Chart('cPay',{type:'doughnut',data:{
+    labels:activePay.map((p,i)=>`${p} (${activePayC[i]})`),
+    datasets:[{data:activePayC,backgroundColor:payColors.filter((_,i)=>payCounts[i]>0),borderWidth:4,borderColor:'#0E1520'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+    plugins:{legend:{position:'bottom',labels:{color:tickColor,boxWidth:10,font:{size:11}}}}}});
+
+  // ── Capacity Bar — ديناميكي ──
+  const capDef=[
+    {label:'X Small',key:'xsmall',cap:15,color:'#38BDF8'},
+    {label:'Small',  key:'small', cap:25,color:'#A855F7'},
+    {label:'Medium', key:'medium',cap:15,color:'#FF9A3C'},
+    {label:'Large',  key:'large', cap:10,color:'#10B981'},
+    {label:'Cat',    key:'cat',   cap:65,color:'#F43F5E'},
+  ];
+  const capOcc=capDef.map(t=>BK.filter(b=>b.type===t.key||(t.key==='small'&&b.type==='small_dog')||(t.key==='medium'&&b.type==='big_dog')).length);
+  const capAvl=capDef.map((t,i)=>t.cap-capOcc[i]);
+  new Chart('cCap',{type:'bar',data:{
+    labels:capDef.map(t=>t.label),
+    datasets:[
+      {label:'Occupied', data:capOcc,backgroundColor:capDef.map(t=>t.color+'99'),borderRadius:6},
+      {label:'Available',data:capAvl,backgroundColor:capDef.map(t=>t.color+'22'),
+       borderColor:capDef.map(t=>t.color+'44'),borderWidth:1,borderRadius:6}
+    ]},options:{responsive:true,maintainAspectRatio:false,
+    scales:{x:{stacked:true,grid:{display:false},ticks:{color:tickColor}},
+      y:{stacked:true,grid:{color:gridColor},ticks:{color:tickColor}}},
+    plugins:{legend:{labels:{color:tickColor,boxWidth:12}}}}});
+
+  // ── Monthly by Type — May فقط ──
+  const months=[...new Set(BK.map(b=>b.month))];
+  new Chart('cMonthType',{type:'bar',data:{
+    labels:months,
+    datasets:typeGroups.filter(t=>BK.some(b=>b.type===t.key)).map(t=>({
+      label:t.label,
+      data:months.map(m=>BK.filter(b=>b.month===m&&(b.type===t.key||(t.key==='small'&&b.type==='small_dog')||(t.key==='medium'&&b.type==='big_dog'))).length),
+      backgroundColor:t.color+'AA',borderRadius:4
+    }))},options:{responsive:true,maintainAspectRatio:false,
+    scales:{x:{stacked:true,grid:{display:false},ticks:{color:tickColor}},
+      y:{stacked:true,grid:{color:gridColor},ticks:{color:tickColor,stepSize:1}}},
+    plugins:{legend:{labels:{color:tickColor,boxWidth:12}}}}});
+
+  // ── Revenue Trend — ديناميكي ──
+  const revByMonth=months.map(m=>BK.filter(b=>b.month===m&&b.payment!=='Package').reduce((s,b)=>s+b.total,0));
+  new Chart('cRevTrend',{type:'line',data:{
+    labels:months,
+    datasets:[{label:'Revenue (SAR)',data:revByMonth,
+      borderColor:'#00D4C8',backgroundColor:'rgba(0,212,200,.08)',fill:true,
+      borderWidth:2.5,tension:.4,pointRadius:7,pointBackgroundColor:'#00D4C8',
+      pointBorderColor:'#0E1520',pointBorderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{grid:{color:gridColor},ticks:{color:tickColor,callback:v=>fmt(v)}},x:{grid:{display:false},ticks:{color:tickColor}}},
+    plugins:{legend:{display:false}}}});
+
+  // ── Revenue by Type — ديناميكي ──
+  const revByType=typeGroups.map(t=>BK.filter(b=>b.type===t.key&&b.payment!=='Package').reduce((s,b)=>s+b.total,0));
+  const activeRevTypes=typeGroups.filter((_,i)=>revByType[i]>0);
+  const activeRevVals=revByType.filter(v=>v>0);
+  new Chart('cRevSplit',{type:'doughnut',data:{
+    labels:activeRevTypes.map((t,i)=>`${t.label} (SAR ${fmt(activeRevVals[i])})`),
+    datasets:[{data:activeRevVals,backgroundColor:activeRevTypes.map(t=>t.color),borderWidth:4,borderColor:'#0E1520'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+    plugins:{legend:{position:'bottom',labels:{color:tickColor,boxWidth:10,font:{size:11}}}}}});
+}
+
+/* ══════════════════════════
+   ALERTS
+══════════════════════════ */
+function buildAlerts(){
+  const pending=BK.filter(b=>b.paidDate==='—'&&b.payment!=='Package');
+  const pendingTotal=pending.reduce((s,b)=>s+b.total,0);
+  const totalRev=BK.filter(b=>b.payment!=='Package').reduce((s,b)=>s+b.total,0);
+  const catBk=BK.filter(b=>b.type==='cat').length;
+  const pkgBk=BK.filter(b=>b.payment==='Package').length;
+  const topClient=Object.entries(BK.reduce((acc,b)=>{acc[b.owner]=(acc[b.owner]||0)+b.total;return acc},{}))
+    .sort((a,b)=>b[1]-a[1])[0];
+  const alerts=[
+    pending.length>0?{icon:'⚠️',color:'#F87171',bg:'rgba(239,68,68,.08)',border:'rgba(239,68,68,.2)',
+     text:`<b>${pending.length} pending payment${pending.length>1?'s':''}:</b> ${pending.map(b=>`${b.pet} (${b.owner.split(' ')[0]})`).join(', ')} — SAR ${fmt(pendingTotal)} awaiting confirmation.`}:null,
+    catBk===0?{icon:'🐱',color:'#F43F5E',bg:'rgba(244,63,94,.08)',border:'rgba(244,63,94,.2)',
+     text:'<b>Cat section fully empty (65 spots).</b> Zero cat bookings recorded. Consider a targeted promotion to fill this capacity.'}:null,
+    pkgBk>0?{icon:'🎁',color:'#F5C842',bg:'rgba(245,200,66,.08)',border:'rgba(245,200,66,.2)',
+     text:`<b>${pkgBk} package booking${pkgBk>1?'s':''}</b> recorded this period. Package clients offer stable recurring revenue.`}:null,
+    topClient?{icon:'🏆',color:'#10B981',bg:'rgba(16,185,129,.08)',border:'rgba(16,185,129,.2)',
+     text:`<b>Top client: ${topClient[0]}</b> — SAR ${fmt(topClient[1])} total spend. Average booking value: SAR ${fmt(totalRev/Math.max(BK.length,1))}.`}:null,
+    {icon:'📊',color:'#38BDF8',bg:'rgba(56,189,248,.08)',border:'rgba(56,189,248,.2)',
+     text:`<b>May 2026 summary:</b> ${BK.length} bookings · SAR ${fmt(totalRev)} revenue · ${BK.reduce((s,b)=>s+b.days,0)} total boarding days · Avg stay ${(BK.reduce((s,b)=>s+b.days,0)/Math.max(BK.length,1)).toFixed(1)} days.`},
+  ].filter(Boolean);
+  document.getElementById('alertRow').innerHTML=alerts.map(a=>`
+    <div class="alert" style="background:${a.bg};border-color:${a.border}">
+      <span style="font-size:20px;flex-shrink:0">${a.icon}</span>
+      <div style="font-size:12px;line-height:1.6">${a.text}</div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════
+   BOOKINGS TABLE
+══════════════════════════ */
+let bkSort={col:'id',asc:true};
+function sortBk(col){
+  if(bkSort.col===col)bkSort.asc=!bkSort.asc;
+  else{bkSort.col=col;bkSort.asc=true;}
+  filterBk();
+}
+function filterBk(){
+  let d=[...BK];
+  const q=document.getElementById('srch').value.toLowerCase();
+  const fm=document.getElementById('fMonth').value;
+  const ft=document.getElementById('fType').value;
+  const fp=document.getElementById('fPay').value;
+  if(q)d=d.filter(b=>b.pet.toLowerCase().includes(q)||b.owner.toLowerCase().includes(q));
+  if(fm)d=d.filter(b=>b.month===fm);
+  if(ft)d=d.filter(b=>b.type===ft);
+  if(fp)d=d.filter(b=>b.payment===fp);
+  const fpaid=document.getElementById('fPaid').value;
+  if(fpaid==='paid')d=d.filter(b=>b.paidDate!=='—');
+  if(fpaid==='pending')d=d.filter(b=>b.paidDate==='—');
+  d.sort((a,b_)=>{
+    let v=bkSort.asc?1:-1;
+    if(typeof a[bkSort.col]==='number')return(a[bkSort.col]-b_[bkSort.col])*v;
+    return String(a[bkSort.col]).localeCompare(String(b_[bkSort.col]))*v;
+  });
+  document.getElementById('fCount').textContent=`${d.length} result${d.length!==1?'s':''}`;
+  document.getElementById('bkBody').innerHTML=d.map(b=>{
+    const p=PC[b.payment]||PC['Bank Transfer'];
+    return`<tr>
+    <td style="color:var(--muted);font-family:'DM Mono',monospace">${b.id}</td>
+    <td style="font-weight:600">${b.pet}</td>
+    <td style="color:var(--muted2);font-size:11px">${b.breed||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;text-align:center">${b.age||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;text-align:center">${b.kg?b.kg+'kg':'—'}</td>
+    <td>${b.owner}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2)">${b.phone||'—'}</td>
+    <td><span class="tag" style="background:${TC[b.type]}18;color:${TC[b.type]};border:1px solid ${TC[b.type]}33">${TL[b.type]}</span></td>
+    <td style="text-align:center">${b.neutered==='yes'?'✅':'❌'}</td>
+    <td style="font-family:'DM Mono',monospace;color:${b.discount?'var(--rose)':'var(--muted)'}">${b.discount?'-SAR '+b.discount:'—'}</td>
+    <td style="font-family:'DM Mono',monospace">${b.from}</td>
+    <td style="font-family:'DM Mono',monospace">${b.to}</td>
+    <td style="text-align:center;font-weight:700">${b.days??'—'}</td>
+    <td style="font-family:'DM Mono',monospace">${fmt(b.amount)}</td>
+    <td style="font-family:'DM Mono',monospace;color:${b.taxi?'var(--amber)':'var(--muted)'}">${b.taxi?fmt(b.taxi):'—'}</td>
+    <td style="font-weight:700;font-family:'DM Mono',monospace;color:${b.total>1000?'var(--emerald)':'var(--text)'}">${fmt(b.total)}</td>
+    <td><span class="tag" style="background:${p.bg};color:${p.color};border:1px solid ${p.border}">${b.payment}</span></td>
+    <td style="font-family:'DM Mono',monospace;color:${b.paidDate==='—'?'var(--muted)':'var(--emerald)'}">${b.paidDate}</td>
+    <td><span class="tag" style="background:${MC[b.month]}15;color:${MC[b.month]};border:1px solid ${MC[b.month]}33">${b.month}</span></td>
+  </tr>`}).join('');
+}
+
+/* ══════════════════════════
+   GANTT
+══════════════════════════ */
+function buildGantt(containerId, month, days, monthBks){
+  const el=document.getElementById(containerId);
+  const cols=Array.from({length:days},(_,i)=>i+1);
+  const pct=d=>(d-1)/days*100+'%';
+  const wid=d=>d/days*100+'%';
+  let html=`<div class="gantt">
+    <div class="gantt-header">
+      <div class="gantt-label">Pet / Owner</div>
+      <div class="gantt-days">${cols.map(d=>`<div class="gantt-day">${d}</div>`).join('')}</div>
+    </div>`;
+  monthBks.forEach(b=>{
+    const fromDay=parseInt(b.from.split('.')[0])||1;
+    const toDay  =parseInt(b.to.split('.')[0])||days;
+    const barDays=Math.max(1,toDay-fromDay);
+    const c=TC[b.type];
+    html+=`<div class="gantt-row">
+      <div class="gantt-name" title="${b.owner}">${b.pet} <span style="color:var(--muted);font-size:10px">· ${b.owner.split(' ')[0]}</span></div>
+      <div class="gantt-track">
+        <div class="gantt-bar"
+          style="left:${pct(fromDay)};width:${wid(barDays)};background:linear-gradient(90deg,${c}CC,${c}88);border:1px solid ${c}44;--ac:${c}"
+          title="${b.pet} · ${b.from}→${b.to} · ${b.days}d · SAR ${fmt(b.total)}">
+          ${b.pet}
+        </div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html+'</div>';
+}
+
+/* ══════════════════════════
+   CLIENTS
+══════════════════════════ */
+function buildClients(){
+  const owners={};
+  BK.forEach(b=>{
+    if(!owners[b.owner])owners[b.owner]={owner:b.owner,pets:new Set(),bookings:0,days:0,total:0,types:new Set(),hasPackage:false};
+    owners[b.owner].pets.add(b.pet);
+    owners[b.owner].bookings++;
+    owners[b.owner].days+=b.days||0;
+    owners[b.owner].total+=b.total||0;
+    owners[b.owner].types.add(b.type);
+    if(b.payment==='Package') owners[b.owner].hasPackage=true;
+  });
+  window._clients=Object.values(owners).sort((a,b)=>b.total-a.total).filter(o=>o.owner!=='Unknown');
+
+  // Top clients table
+  document.getElementById('topClBody').innerHTML=window._clients.slice(0,10).map((o,i)=>`<tr>
+    <td style="font-size:16px">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</td>
+    <td style="font-weight:600">${o.owner}</td>
+    <td>${[...o.pets].join(', ')}</td>
+    <td style="text-align:center;font-family:'DM Mono',monospace">${o.bookings}</td>
+    <td style="text-align:center;font-family:'DM Mono',monospace">${o.days}</td>
+    <td style="font-weight:700;color:var(--emerald);font-family:'DM Mono',monospace">${fmt(o.total)}</td>
+    <td style="font-family:'DM Mono',monospace;color:var(--muted)">${fmt(o.total/o.bookings)}</td>
+  </tr>`).join('');
+  renderClGrid();
+}
+function filterCl(){
+  const q=document.getElementById('clSrch').value.toLowerCase();
+  const ft=document.getElementById('clType').value;
+  let d=window._clients;
+  if(q)d=d.filter(o=>o.owner.toLowerCase().includes(q)||[...o.pets].join('').toLowerCase().includes(q));
+  if(ft)d=d.filter(o=>[...o.types].includes(ft));
+  document.getElementById('clCount').textContent=`${d.length} clients`;
+  renderClGrid(d);
+}
+function renderClGrid(data){
+  data=data||window._clients;
+  document.getElementById('clGrid').innerHTML=data.map(o=>{
+    const c=TC[[...o.types][0]]||'var(--teal)';
+    return`<div class="bk" style="--ac:${c}">
+      <div class="bk-top">
+        <div class="bk-pet">${o.owner}</div>
+        <span class="tag" style="background:${c}18;color:${c};border:1px solid ${c}33">${[...o.types].map(t=>TL[t]).join('/')}</span>
+      </div>
+      <div class="bk-owner">🐾 ${[...o.pets].join(' · ')}</div>
+      <div class="bk-stats">
+        <div class="bk-s"><div class="bk-sv">${o.bookings}</div><div class="bk-sl">BOOKINGS</div></div>
+        <div class="bk-s"><div class="bk-sv">${o.days}</div><div class="bk-sl">TOTAL DAYS</div></div>
+        <div class="bk-s"><div class="bk-sv" style="font-size:14px">${fmt(o.total)}</div><div class="bk-sl">SAR TOTAL</div></div>
+      </div>
+      <div style="margin-top:10px;padding:8px 10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace">PAYMENT</span>
+        <span style="font-size:11px;font-weight:600;color:${o.hasPackage?'#F5C842':'#38BDF8'}">${o.hasPackage?'📦 Package':'💳 Bank Transfer'}</span>
+      </div>
+      <div class="bk-foot">
+        <span style="color:var(--muted);font-size:10px;font-family:'DM Mono',monospace">Avg SAR ${fmt(o.total/o.bookings)} / booking</span>
+        <span style="font-size:16px;font-weight:700;font-family:'Playfair Display',serif;color:var(--emerald)">SAR ${fmt(o.total)}</span>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('clCount').textContent=`${data.length} clients`;
+}
+
+/* ══════════════════════════
+   TAB SWITCH
+══════════════════════════ */
+const _built={};
+function T(id,btn){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  if(btn)btn.classList.add('on');
+  if(!_built[id]){
+    _built[id]=true;
+    if(id==='cap'){buildRings();}
+    if(id==='bk'){filterBk();}
+    if(id==='add'){renderEditTable();}
+    if(id==='pkg'){renderPackages();}
+    if(id==='exp'){renderExpenses();}
+    if(id==='tl'){
+      buildGantt('ganttMay','May',31,BK.filter(b=>b.month==='May'));
+      const aprBk=BK.filter(b=>b.month==='Apr');
+      if(aprBk.length) buildGantt('ganttApr','Apr',30,aprBk);
+      else document.getElementById('ganttApr').innerHTML='<p style="color:var(--muted);font-size:12px;padding:12px">No bookings yet for April.</p>';
+      const marBk=BK.filter(b=>b.month==='Mar');
+      if(marBk.length) buildGantt('ganttMar','Mar',31,marBk);
+      else document.getElementById('ganttMar').innerHTML='<p style="color:var(--muted);font-size:12px;padding:12px">No bookings yet for March.</p>';
+    }
+  }
+}
+
+
+
+/* ══════════════════════════════════════════
+   GOOGLE SHEETS INTEGRATION
+   Sheet ID: 1Uer8MVX-x1j_RtGcOr9EZzMe3DkEeXtqjLIbduqyH28
+══════════════════════════════════════════ */
+const SHEET_ID = '1Uer8MVX-x1j_RtGcOr9EZzMe3DkEeXtqjLIbduqyH28';
+const BASE_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}`;
+
+// قراءة شيت كـ CSV
+async function readSheet(sheetName){
+  try{
+    const url=`${BASE_URL}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
+    const res=await fetch(url);
+    if(!res.ok) throw new Error('fetch failed');
+    const txt=await res.text();
+    return parseCSV(txt);
+  }catch(e){
+    console.warn('readSheet error:',e);
+    return[];
+  }
+}
+
+// تحليل CSV
+function parseCSV(txt){
+  const lines=txt.trim().split('\n');
+  if(lines.length<2) return[];
+  const headers=lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim().toLowerCase());
+  return lines.slice(1).map(line=>{
+    const vals=[];
+    let cur='',inQ=false;
+    for(let i=0;i<line.length;i++){
+      if(line[i]==='"'){ inQ=!inQ; }
+      else if(line[i]===','&&!inQ){ vals.push(cur); cur=''; }
+      else cur+=line[i];
+    }
+    vals.push(cur);
+    const obj={};
+    headers.forEach((h,i)=>obj[h]=(vals[i]||'').replace(/^"|"$/g,'').trim());
+    return obj;
+  });
+}
+
+// كتابة صف جديد في الشيت عبر Google Apps Script
+// (يحتاج Apps Script Webhook — راجع التعليمات أدناه)
+async function appendRow(sheetName, rowData){
+  try{
+    if(!window.APPS_SCRIPT_URL) return false;
+    const res=await fetch(window.APPS_SCRIPT_URL,{
+      method:'POST',
+      body:JSON.stringify({action:'append',sheet:sheetName,row:rowData})
+    });
+    const txt=await res.text();
+    try{ const j=JSON.parse(txt); return j.status==='ok'; }catch(e){ return res.ok; }
+  }catch(e){ console.warn('appendRow error:',e); return false; }
+}
+
+async function batchAppendRows(sheetName, rows){
+  try{
+    if(!window.APPS_SCRIPT_URL) return false;
+    const res=await fetch(window.APPS_SCRIPT_URL,{
+      method:'POST',
+      body:JSON.stringify({action:'batchAppend',sheet:sheetName,rows:rows})
+    });
+    const txt=await res.text();
+    try{ const j=JSON.parse(txt); return j.status==='ok'; }catch(e){ return res.ok; }
+  }catch(e){ console.warn('batchAppend error:',e); return false; }
+}
+
+async function updateRow(sheetName, id, rowData){
+  try{
+    if(!window.APPS_SCRIPT_URL) return false;
+    const res=await fetch(window.APPS_SCRIPT_URL,{
+      method:'POST',
+      body:JSON.stringify({action:'update',sheet:sheetName,id,row:rowData})
+    });
+    return res.ok;
+  }catch(e){ return false; }
+}
+
+async function deleteRow(sheetName, id){
+  try{
+    if(!window.APPS_SCRIPT_URL) return false;
+    const res=await fetch(window.APPS_SCRIPT_URL,{
+      method:'POST',
+      body:JSON.stringify({action:'delete',sheet:sheetName,id})
+    });
+    return res.ok;
+  }catch(e){ return false; }
+}
+
+// تحميل البيانات من الشيت عند فتح الصفحة
+async function loadFromSheets(){
+  showSyncStatus('⏳ جاري تحميل البيانات...');
+  try{
+    // تحميل الحجوزات
+    const bkRows = await readSheet('Bookings');
+    if(bkRows.length>0){
+      BK.splice(0,BK.length,...bkRows.map(r=>(({
+        id:parseInt(r.id)||0,
+        pet:r.pet||'',owner:r.owner||'',phone:r.phone||'—',
+        type:r.type||'small',
+        breed:r.breed||'',age:r.age||'',kg:r.kg||'',
+        neutered:r.neutered||'no',discount:parseFloat(r.discount)||0,
+        from:r.from||'',to:r.to||'',
+        days:parseFloat(r.days)||0,amount:parseFloat(r.amount)||0,
+        taxi:parseFloat(r.taxi)||0,total:parseFloat(r.total)||0,
+        payment:r.payment||'',paidDate:r.paidDate||'—',month:r.month||''
+      }))));
+    }
+
+    // تحميل الباقات
+    const pkgRows = await readSheet('Packages');
+    if(pkgRows.length>0){
+      PACKAGES.splice(0,PACKAGES.length,...pkgRows.map(r=>(({
+        id:parseInt(r.id)||0,
+        owner:r.owner||'',pet:r.pet||'',type:r.type||'',phone:r.phone||'—',
+        totalDays:parseInt(r.totalDays)||30,usedDays:parseInt(r.usedDays)||0,
+        amount:parseFloat(r.amount)||0,start:r.start||'',month:r.month||'',
+        active:r.active==='true'||r.active===true,
+        createdAt:r.createdAt||'',
+        history:r.history?JSON.parse(r.history||'[]'):[]
+      }))));
+    }
+
+    // تحميل المصاريف
+    const expRows = await readSheet('Expenses');
+    if(expRows.length>0){
+      EXPENSES.splice(0,EXPENSES.length,...expRows.map(r=>(({
+        id:parseInt(r.id)||0,
+        type:r.type||'',date:r.date||'',
+        amount:parseFloat(r.amount)||0,
+        month:r.month||'',notes:r.notes||''
+      }))));
+    }
+
+    showSyncStatus('✅ البيانات محدّثة');
+    // تحديث الواجهة
+    buildCharts(); buildCapSnapshot(); buildAlerts();
+    buildClients(); filterBk(); renderEditTable();
+    renderPackages(); renderExpenses(); countUp();
+    setTimeout(()=>hideSyncStatus(),2000);
+  }catch(e){
+    showSyncStatus('⚠️ خطأ في التحميل — يعمل محلياً','#F87171');
+    console.error(e);
+  }
+}
+
+function showSyncStatus(msg, color='#00D4C8'){
+  let el=document.getElementById('syncStatus');
+  if(!el){
+    el=document.createElement('div');
+    el.id='syncStatus';
+    el.style.cssText='position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9999;padding:8px 20px;border-radius:99px;font-size:12px;font-weight:600;font-family:DM Sans,sans-serif;backdrop-filter:blur(12px);transition:opacity .3s;background:rgba(14,21,32,.9);border:1px solid rgba(255,255,255,.1)';
+    document.body.appendChild(el);
+  }
+  el.style.color=color;
+  el.style.opacity='1';
+  el.textContent=msg;
+}
+function hideSyncStatus(){
+  const el=document.getElementById('syncStatus');
+  if(el) el.style.opacity='0';
+}
+
+// رفع كل البيانات للشيت دفعة واحدة
+async function pushAllToSheets(){
+  if(!window.APPS_SCRIPT_URL){ showToast('⚠️ Apps Script URL غير مضبوط','#F43F5E'); return; }
+  if(!confirm(`سيتم رفع ${BK.length} حجوزات + ${PACKAGES.length} باقات + ${EXPENSES.length} مصاريف للشيت. هل أنت متأكد؟`)) return;
+  showSyncStatus('⏳ جاري رفع البيانات...');
+  let ok=true;
+  // رفع الحجوزات
+  for(const b of BK){
+    const res = await appendRow('Bookings',[b.id,b.pet,b.owner,b.phone,b.type,b.from,b.to,b.days,b.amount,b.taxi,b.total,b.payment,b.paidDate,b.month]);
+    if(!res) ok=false;
+  }
+  // رفع الباقات
+  for(const p of PACKAGES){
+    const res = await appendRow('Packages',[p.id,p.owner,p.pet,p.type,p.phone,p.totalDays,p.usedDays,p.amount,p.start,p.month,p.active,p.createdAt,JSON.stringify(p.history)]);
+    if(!res) ok=false;
+  }
+  // رفع المصاريف
+  for(const e of EXPENSES){
+    const res = await appendRow('Expenses',[e.id,e.type,e.date,e.amount,e.month,e.notes]);
+    if(!res) ok=false;
+  }
+  showSyncStatus(ok?`✅ تم رفع كل البيانات للشيت بنجاح!`:'⚠️ بعض البيانات لم ترفع', ok?'#10B981':'#F87171');
+  setTimeout(hideSyncStatus, 3000);
+  if(ok) showToast(`✅ ${BK.length} حجوزات · ${PACKAGES.length} باقات · ${EXPENSES.length} مصاريف — كلها في الشيت!`,'#10B981');
+}
+
+// حفظ محلي احتياطي + مزامنة
+function saveBK(){
+  localStorage.setItem('petstay_bk',JSON.stringify(BK));
+}
+function savePKG(){
+  localStorage.setItem('petstay_pkg',JSON.stringify(PACKAGES));
+}
+function saveEXP(){
+  localStorage.setItem('petstay_exp',JSON.stringify(EXPENSES));
+}
+
+const APPS_SCRIPT_CODE = `
+function doPost(e) {
+  var data = JSON.parse(e.postData.contents);
+  var ss = SpreadsheetApp.openById('1Uer8MVX-x1j_RtGcOr9EZzMe3DkEeXtqjLIbduqyH28');
+  var sheet = ss.getSheetByName(data.sheet);
+  if (!sheet) return ContentService.createTextOutput('Sheet not found');
+
+  if (data.action === 'append') {
+    sheet.appendRow(data.row);
+  } else if (data.action === 'update') {
+    var col1 = sheet.getRange(1,1,sheet.getLastRow(),1).getValues();
+    for (var i=1;i<col1.length;i++) {
+      if (String(col1[i][0]) === String(data.id)) {
+        var range = sheet.getRange(i+1, 1, 1, data.row.length);
+        range.setValues([data.row]);
+        break;
+      }
+    }
+  } else if (data.action === 'delete') {
+    var col1 = sheet.getRange(1,1,sheet.getLastRow(),1).getValues();
+    for (var i=1;i<col1.length;i++) {
+      if (String(col1[i][0]) === String(data.id)) {
+        sheet.deleteRow(i+1);
+        break;
+      }
+    }
+  }
+  return ContentService.createTextOutput('OK').setMimeType(ContentService.MimeType.TEXT);
+}
+`;
+
+function showSettings(){
+  const m=document.getElementById('settingsModal');
+  m.style.display='flex';
+  const url=window.APPS_SCRIPT_URL||localStorage.getItem('petstay_asurl')||'';
+  document.getElementById('appsScriptUrl').value=url;
+}
+function hideSettings(){ document.getElementById('settingsModal').style.display='none'; }
+
+function saveAppsScriptUrl(){
+  const url=document.getElementById('appsScriptUrl').value.trim();
+  window.APPS_SCRIPT_URL=url;
+  localStorage.setItem('petstay_asurl',url);
+  hideSettings();
+  showToast('✅ تم حفظ الإعداد — جاري المزامنة...','#00D4C8');
+  setTimeout(()=>loadFromSheets(),500);
+}
+
+function copyAppsScript(){
+  navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(()=>{
+    showToast('📋 تم نسخ الكود!','#F5C842');
+  });
+}
+
+async function uploadInitialData(){
+  if(!window.APPS_SCRIPT_URL){ showToast('⚠️ الرابط غير محفوظ','#F43F5E'); return; }
+  if(!confirm('سيتم رفع كل البيانات الحالية للشيت — هل أنت متأكد؟')) return;
+  hideSettings();
+  showSyncStatus('⏳ جاري رفع البيانات...');
+
+  // تحضير صفوف الحجوزات
+  const bkRows = BK.map(b=>[b.id,b.pet,b.owner,b.phone,b.type,b.from,b.to,b.days,b.amount,b.taxi,b.total,b.payment,b.paidDate,b.month]);
+  // تحضير صفوف الباقات
+  const pkgRows = PACKAGES.map(p=>[p.id,p.owner,p.pet,p.type,p.phone,p.totalDays,p.usedDays,p.amount,p.start,p.month,p.active,p.createdAt,JSON.stringify(p.history)]);
+  // تحضير صفوف المصاريف
+  const expRows = EXPENSES.map(e=>[e.id,e.type,e.date,e.amount,e.month,e.notes]);
+
+  let ok1=false, ok2=true, ok3=true;
+
+  // رفع الحجوزات دفعة واحدة
+  if(bkRows.length>0) ok1 = await batchAppendRows('Bookings', bkRows);
+  else ok1=true;
+
+  // رفع الباقات
+  if(pkgRows.length>0) ok2 = await batchAppendRows('Packages', pkgRows);
+
+  // رفع المصاريف
+  if(expRows.length>0) ok3 = await batchAppendRows('Expenses', expRows);
+
+  const allOk = ok1&&ok2&&ok3;
+  showSyncStatus(allOk?`✅ تم رفع ${bkRows.length} حجوزات للشيت بنجاح!`:'⚠️ تحقق من الشيت', allOk?'#10B981':'#F87171');
+  if(allOk) showToast(`✅ ${bkRows.length} حجوزات في الشيت!`,'#10B981');
+  setTimeout(hideSyncStatus, 4000);
+}
+
+// تحميل الـ URL المحفوظ عند الفتح
+window.APPS_SCRIPT_URL = localStorage.getItem('petstay_asurl')||'https://script.google.com/macros/s/AKfycbwxzRD8gn3_BrDwq7knNJjuCjydknYfY4NRs4rXuBJr5cW_MN9O7kXUQDp8HL-a_IS3Fw/exec';
+
+/* ══════════════════════════════════════════
+   PACKAGES SYSTEM
+══════════════════════════════════════════ */
+let PACKAGES = [];
+let EXPENSES  = [];
+
+(function(){
+  try{ const s=localStorage.getItem('petstay_pkg'); if(s) PACKAGES=JSON.parse(s)||[]; }catch(e){}
+  try{ const s=localStorage.getItem('petstay_exp'); if(s) EXPENSES=JSON.parse(s)||[]; }catch(e){}
+})();
+
+function savePKG(){ localStorage.setItem('petstay_pkg',JSON.stringify(PACKAGES)); }
+function saveEXP(){ localStorage.setItem('petstay_exp',JSON.stringify(EXPENSES)); }
+
+function showNewPkgForm(){
+  document.getElementById('newPkgCard').style.display='';
+  document.getElementById('pkgFormTitle').textContent='New Package';
+}
+
+function savePkg(){
+  const owner = document.getElementById('pk_owner').value.trim();
+  const pet   = document.getElementById('pk_pet').value.trim();
+  const type  = document.getElementById('pk_type').value;
+  const phone = document.getElementById('pk_phone').value.trim()||'—';
+  const days  = parseInt(document.getElementById('pk_days').value)||30;
+  const amount= parseFloat(document.getElementById('pk_amount').value)||0;
+  const start = document.getElementById('pk_start').value.trim();
+  const month = document.getElementById('pk_month').value;
+  if(!owner||!pet||!type||!start||!amount){ showToast('⚠️ Fill all required fields','#F43F5E'); return; }
+  const id = PACKAGES.length ? Math.max(...PACKAGES.map(p=>p.id))+1 : 1;
+  PACKAGES.push({id, owner, pet, type, phone, totalDays:days, usedDays:0, amount, start, month,
+    history:[], active:true, createdAt: new Date().toLocaleDateString('en-GB')});
+  savePKG();
+  if(window.APPS_SCRIPT_URL){
+    const p=PACKAGES[PACKAGES.length-1];
+    if(p) appendRow('Packages',[p.id,p.owner,p.pet,p.type,p.phone,p.totalDays,p.usedDays,p.amount,p.start,p.month,p.active,p.createdAt,JSON.stringify(p.history)]).then(ok=>{
+      showSyncStatus(ok?'✅ الباقة حُفظت في الشيت':'⚠️ حفظ محلي فقط',ok?'#10B981':'#F87171');
+      setTimeout(hideSyncStatus,2000);
+    });
+  }
+  document.getElementById('newPkgCard').style.display='none';
+  ['pk_owner','pk_pet','pk_phone','pk_start'].forEach(i=>document.getElementById(i).value='');
+  ['pk_type','pk_month'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('pk_days').value='30';
+  document.getElementById('pk_amount').value='';
+  renderPackages();
+  showToast('🎁 Package created!','#F5C842');
+}
+
+function previewUse(){
+  const pid=document.getElementById('use_pkg').value;
+  const p=PACKAGES.find(x=>x.id==pid);
+  const prev=document.getElementById('pkgPreview');
+  if(!p){prev.style.display='none';return;}
+  const rem=p.totalDays-p.usedDays;
+  prev.style.display='';
+  prev.innerHTML=`<b>${p.pet}</b> (${p.owner}) — 🎁 ${p.totalDays} day package · Used: <b style="color:var(--rose)">${p.usedDays}</b> · Remaining: <b style="color:var(--emerald)">${rem}</b> days`;
+}
+
+function usePkgDays(){
+  const pid=parseInt(document.getElementById('use_pkg').value);
+  const from=document.getElementById('use_from').value.trim();
+  const to=document.getElementById('use_to').value.trim();
+  const days=parseInt(document.getElementById('use_days').value)||0;
+  if(!pid||!days||!from||!to){ showToast('⚠️ Fill all fields','#F43F5E'); return; }
+  const idx=PACKAGES.findIndex(p=>p.id===pid);
+  if(idx<0){ showToast('Package not found','#F43F5E'); return; }
+  const rem=PACKAGES[idx].totalDays-PACKAGES[idx].usedDays;
+  if(days>rem){ showToast(`⚠️ Only ${rem} days remaining!`,'#F43F5E'); return; }
+  PACKAGES[idx].usedDays+=days;
+  PACKAGES[idx].history.push({from,to,days,date:new Date().toLocaleDateString('en-GB')});
+  if(PACKAGES[idx].usedDays>=PACKAGES[idx].totalDays) PACKAGES[idx].active=false;
+  // add to BK as Package booking
+  const bk=PACKAGES[idx];
+  const newId=BK.length?Math.max(...BK.map(b=>b.id))+1:1;
+  BK.push({id:newId,pet:bk.pet,owner:bk.owner,phone:bk.phone,type:bk.type,from,to,days,amount:0,taxi:0,total:0,payment:'Package',paidDate:'Package',month:'May'});
+  saveBK(); savePKG();
+  ['use_from','use_to','use_days'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('pkgPreview').style.display='none';
+  renderPackages(); filterBk(); buildCapSnapshot(); buildCharts(); countUp();
+  showToast(`✅ ${days} days used · ${PACKAGES[idx].totalDays-PACKAGES[idx].usedDays} remaining`,'#10B981');
+}
+
+function deletePkg(id){
+  if(!confirm('Delete this package?')) return;
+  PACKAGES=PACKAGES.filter(p=>p.id!==id);
+  savePKG(); renderPackages();
+  showToast('🗑 Package deleted','#F43F5E');
+}
+
+function renderPackages(){
+  const sel=document.getElementById('use_pkg');
+  sel.innerHTML='<option value="">Select package...</option>'+
+    PACKAGES.filter(p=>p.active).map(p=>`<option value="${p.id}">${p.pet} (${p.owner}) — ${p.totalDays-p.usedDays} days left</option>`).join('');
+  document.getElementById('pkgCount').textContent=`${PACKAGES.filter(p=>p.active).length} active · ${PACKAGES.filter(p=>!p.active).length} completed`;
+  document.getElementById('pkgList').innerHTML=PACKAGES.length===0
+    ? `<div style="text-align:center;padding:32px;color:var(--muted);font-size:13px">No packages yet. Create one above.</div>`
+    : PACKAGES.map(p=>{
+        const rem=p.totalDays-p.usedDays;
+        const pct=Math.round(p.usedDays/p.totalDays*100);
+        const color=p.active?'var(--gold)':'var(--muted)';
+        return`<div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span style="font-weight:700;color:${color}">${p.pet}</span>
+            <span style="color:var(--muted2);font-size:12px">${p.owner}</span>
+            <span class="tag" style="background:${TC[p.type]||'#888'}18;color:${TC[p.type]||'#888'};border:1px solid ${TC[p.type]||'#888'}33">${TL[p.type]||p.type}</span>
+            <span class="tag" style="background:${p.active?'rgba(16,185,129,.1)':'rgba(90,116,148,.1)'};color:${p.active?'var(--emerald)':'var(--muted)'};border:1px solid ${p.active?'rgba(16,185,129,.2)':'rgba(90,116,148,.2)'}">${p.active?'● Active':'✓ Completed'}</span>
+            <span style="margin-left:auto;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">SAR ${fmt(p.amount)} · ${p.totalDays} days</span>
+            <button class="btn-del" onclick="deletePkg(${p.id})">🗑</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:6px;background:var(--bg4);border-radius:99px;overflow:hidden">
+              <div style="height:100%;width:${pct}%;background:${p.active?'var(--gold)':'var(--muted)'};border-radius:99px;transition:width .6s"></div>
+            </div>
+            <span style="font-size:11px;font-family:'DM Mono',monospace;color:${p.active?'var(--emerald)':'var(--muted)'}">
+              Used <b>${p.usedDays}</b> · Remaining <b>${rem}</b> / ${p.totalDays} days
+            </span>
+          </div>
+          ${p.history.length?`<div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace">Visits: ${p.history.map(h=>`${h.from}→${h.to} (${h.days}d)`).join(' · ')}</div>`:''}
+        </div>`;
+      }).join('');
+}
+
+/* ══════════════════════════════════════════
+   EXPENSES SYSTEM
+══════════════════════════════════════════ */
+function saveExpense(){
+  const type  = document.getElementById('ex_type').value;
+  const date  = document.getElementById('ex_date').value.trim();
+  const amount= parseFloat(document.getElementById('ex_amount').value)||0;
+  const month = document.getElementById('ex_month').value;
+  const notes = document.getElementById('ex_notes').value.trim();
+  if(!type||!date||!amount||!month){ showToast('⚠️ Fill all required fields','#F43F5E'); return; }
+  const id=EXPENSES.length?Math.max(...EXPENSES.map(e=>e.id))+1:1;
+  EXPENSES.push({id,type,date,amount,month,notes});
+  saveEXP();
+  if(window.APPS_SCRIPT_URL){
+    appendRow('Expenses',[id,type,date,amount,month,notes]).then(ok=>{
+      showSyncStatus(ok?'✅ حُفظ في الشيت':'⚠️ حفظ محلي فقط',ok?'#10B981':'#F87171');
+      setTimeout(hideSyncStatus,2000);
+    });
+  }
+  ['ex_date','ex_amount','ex_notes'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('ex_type').value='';
+  renderExpenses();
+  showToast('💸 Expense added!','#F43F5E');
+}
+
+function deleteExpense(id){
+  if(!confirm('Delete this expense?')) return;
+  EXPENSES=EXPENSES.filter(e=>e.id!==id);
+  saveEXP(); renderExpenses();
+  showToast('🗑 Expense deleted','#F43F5E');
+}
+
+function renderExpenses(){
+  const totalExp=EXPENSES.reduce((s,e)=>s+e.amount,0);
+  const totalRev=BK.filter(b=>b.payment!=='Package').reduce((s,b)=>s+b.total,0);
+  const profit=totalRev-totalExp;
+  const margin=totalRev>0?Math.round(profit/totalRev*100):0;
+  document.getElementById('expTotal').textContent   = fmt(totalExp);
+  document.getElementById('expRevenue').textContent = fmt(totalRev);
+  document.getElementById('expProfit').textContent  = fmt(profit);
+  document.getElementById('expProfit').style.color  = profit>=0?'var(--emerald)':'var(--rose)';
+  document.getElementById('expMargin').textContent  = margin+'%';
+  document.getElementById('expMargin').style.color  = margin>=0?'var(--gold)':'var(--rose)';
+  document.getElementById('expCount').textContent   = `${EXPENSES.length} expenses · SAR ${fmt(totalExp)} total`;
+
+  // Table
+  document.getElementById('expBody').innerHTML=EXPENSES.length===0
+    ? `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No expenses recorded yet.</td></tr>`
+    : [...EXPENSES].reverse().map(e=>`<tr>
+        <td style="color:var(--muted);font-family:'DM Mono',monospace">${e.id}</td>
+        <td style="font-weight:600">${e.type}</td>
+        <td style="font-family:'DM Mono',monospace">${e.date}</td>
+        <td style="font-weight:700;color:var(--rose);font-family:'DM Mono',monospace">SAR ${fmt(e.amount)}</td>
+        <td><span class="tag" style="background:${(MC[e.month]||'#888')}15;color:${MC[e.month]||'#888'};border:1px solid ${MC[e.month]||'#888'}33">${e.month}</span></td>
+        <td style="color:var(--muted2);font-size:11px">${e.notes||'—'}</td>
+        <td><button class="btn-del" onclick="deleteExpense(${e.id})">🗑 Del</button></td>
+      </tr>`).join('');
+
+  // Chart
+  const cats=[...new Set(EXPENSES.map(e=>e.type))];
+  const vals=cats.map(t=>EXPENSES.filter(e=>e.type===t).reduce((s,e)=>s+e.amount,0));
+  const colors=['#F43F5E','#A855F7','#FF9A3C','#10B981','#38BDF8','#F5C842','#00D4C8','#F87171'];
+  if(window._expChart) window._expChart.destroy();
+  if(cats.length>0){
+    window._expChart=new Chart('cExpCat',{type:'doughnut',data:{labels:cats,datasets:[{data:vals,backgroundColor:colors.slice(0,cats.length),borderWidth:0}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#5A7494',font:{size:11}}}}}});
+  }
+}
+
+
+/* ══════════════════════════
+   INIT
+══════════════════════════ */
+// Load saved bookings from localStorage if any
+(function(){
+  const saved = localStorage.getItem('petstay_bk');
+  if(saved){
+    try{
+      const parsed = JSON.parse(saved);
+      if(Array.isArray(parsed) && parsed.length) BK.splice(0, BK.length, ...parsed);
+    }catch(e){}
+  }
+})();
+
+function saveBK(){
+  localStorage.setItem('petstay_bk', JSON.stringify(BK));
+}
+
+function showToast(msg, color='#10B981'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.color = color;
+  t.style.background = color==='#10B981'?'rgba(16,185,129,.15)':'rgba(0,212,200,.15)';
+  t.style.borderColor = color==='#10B981'?'rgba(16,185,129,.3)':'rgba(0,212,200,.3)';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+let _editId = null;
+
+
+/* ══════════════════════════════════════════
+   PACKAGE LINK IN ADD BOOKING
+══════════════════════════════════════════ */
+function calcTotal(){
+  const amt  = parseFloat(document.getElementById('f_amount').value)||0;
+  const taxi = parseFloat(document.getElementById('f_taxi').value)||0;
+  const disc = parseFloat(document.getElementById('f_discount').value)||0;
+  const total = amt + taxi - disc;
+  document.getElementById('f_total_preview').value = total > 0 ? 'SAR ' + total.toLocaleString() : '';
+}
+// إضافة event listeners للحساب التلقائي
+document.addEventListener('DOMContentLoaded', function(){
+  ['f_amount','f_taxi','f_discount'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('input', calcTotal);
+  });
+});
+
+function onPaymentChange(){
+  const pay = document.getElementById('f_payment').value;
+  const grp = document.getElementById('f_pkg_group');
+  const prevGrp = document.getElementById('f_pkg_preview_group');
+  if(pay==='Package'){
+    // تحديث قائمة الباقات النشطة
+    const sel = document.getElementById('f_pkg_id');
+    sel.innerHTML='<option value="">اختر الباقة...</option>'+
+      PACKAGES.filter(p=>p.active).map(p=>{
+        const rem=p.totalDays-p.usedDays;
+        return`<option value="${p.id}">${p.pet} (${p.owner}) — متبقي ${rem} يوم من ${p.totalDays}</option>`;
+      }).join('');
+    grp.style.display='';
+    // تعبئة تلقائية للمبلغ بصفر
+    document.getElementById('f_amount').value='0';
+    document.getElementById('f_paidDate').value='Package';
+    if(PACKAGES.filter(p=>p.active).length===0){
+      sel.innerHTML='<option value="">⚠️ لا توجد باقات نشطة — أنشئ باقة أولاً</option>';
+    }
+  } else {
+    grp.style.display='none';
+    prevGrp.style.display='none';
+    if(document.getElementById('f_paidDate').value==='Package')
+      document.getElementById('f_paidDate').value='';
+    if(document.getElementById('f_amount').value==='0')
+      document.getElementById('f_amount').value='';
+  }
+}
+
+function onPkgSelect(){
+  const pid = parseInt(document.getElementById('f_pkg_id').value);
+  const p = PACKAGES.find(x=>x.id===pid);
+  const prevGrp = document.getElementById('f_pkg_preview_group');
+  const prev = document.getElementById('f_pkg_preview');
+  if(!p){ prevGrp.style.display='none'; return; }
+  const rem = p.totalDays - p.usedDays;
+  prevGrp.style.display='';
+  prev.innerHTML=`
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <span>🎁 <b>${p.pet}</b> — ${p.owner}</span>
+      <span style="color:var(--muted2)">${TL[p.type]||p.type}</span>
+      <span>الباقة: <b>${p.totalDays} يوم</b></span>
+      <span>مستخدم: <b style="color:var(--rose)">${p.usedDays}</b></span>
+      <span>متبقي: <b style="color:var(--emerald)">${rem}</b> يوم</span>
+    </div>
+    <div style="margin-top:8px;height:6px;background:var(--bg4);border-radius:99px;overflow:hidden">
+      <div style="height:100%;width:${Math.round(p.usedDays/p.totalDays*100)}%;background:var(--gold);border-radius:99px"></div>
+    </div>
+    <div style="margin-top:6px;font-size:10px;color:var(--muted)">⚠️ عند الحفظ سيتم خصم الأيام المدخلة من هذه الباقة تلقائياً</div>`;
+  // تعبئة تلقائية للبيانات من الباقة
+  if(!document.getElementById('f_pet').value)  document.getElementById('f_pet').value  = p.pet;
+  if(!document.getElementById('f_owner').value) document.getElementById('f_owner').value = p.owner;
+  if(!document.getElementById('f_phone').value) document.getElementById('f_phone').value = p.phone||'';
+  if(!document.getElementById('f_type').value)  document.getElementById('f_type').value  = p.type;
+}
+
+function resetForm(){
+  ['f_pet','f_breed','f_owner','f_phone','f_from','f_to','f_paidDate'].forEach(id=>document.getElementById(id).value='');
+  ['f_age','f_kg'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f_discount').value='0';
+  document.getElementById('f_neutered').value='yes';
+  document.getElementById('f_total_preview').value='';
+  ['f_type','f_payment','f_month','f_pkg_id'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('f_days').value='';
+  document.getElementById('f_amount').value='';
+  document.getElementById('f_taxi').value='0';
+  document.getElementById('formTitle').textContent='New Booking';
+  document.getElementById('btnSave').textContent='💾 Save Booking';
+  const pg=document.getElementById('f_pkg_group'); if(pg) pg.style.display='none';
+  const pp=document.getElementById('f_pkg_preview_group'); if(pp) pp.style.display='none';
+  _editId = null;
+}
+
+function saveBooking(){
+  const pet     = document.getElementById('f_pet').value.trim();
+  const breed   = document.getElementById('f_breed').value.trim()||'—';
+  const age     = parseInt(document.getElementById('f_age').value)||0;
+  const kg      = parseFloat(document.getElementById('f_kg').value)||0;
+  const neutered= document.getElementById('f_neutered').value;
+  const owner   = document.getElementById('f_owner').value.trim();
+  const phone   = document.getElementById('f_phone').value.trim()||'—';
+  const discount= parseFloat(document.getElementById('f_discount').value)||0;
+  const type    = document.getElementById('f_type').value;
+  const from    = document.getElementById('f_from').value.trim();
+  const to      = document.getElementById('f_to').value.trim();
+  const days    = parseInt(document.getElementById('f_days').value)||0;
+  const amount  = parseFloat(document.getElementById('f_amount').value)||0;
+  const taxi    = parseFloat(document.getElementById('f_taxi').value)||0;
+  const payment = document.getElementById('f_payment').value;
+  const paidDate= document.getElementById('f_paidDate').value.trim()||'—';
+  const month   = document.getElementById('f_month').value;
+
+  if(!pet||!owner||!type||!from||!to||!days||!payment||!month){
+    showToast('⚠️ Please fill all required fields', '#F43F5E'); return;
+  }
+
+  const total = amount + taxi;
+
+  if(_editId !== null){
+    const idx = BK.findIndex(b=>b.id===_editId);
+    if(idx>-1) BK[idx] = {...BK[idx], pet, breed, age, kg, neutered, owner, phone, discount, type, from, to, days, amount, taxi, total, payment, paidDate, month};
+    showToast('✅ Booking updated!');
+    resetForm();
+  } else {
+    const newId = BK.length ? Math.max(...BK.map(b=>b.id))+1 : 1;
+    BK.push({id:newId, pet, breed, age, kg, neutered, owner, phone, discount, type, from, to, days, amount, taxi, total, payment, paidDate, month});
+    showToast('✅ Booking added!');
+    resetForm();
+  }
+
+  saveBK();
+  renderEditTable();
+  // refresh all tabs
+  _built['bk']=false; _built['cl']=false; _built['cap']=false;
+  filterBk(); buildClients(); buildCapSnapshot(); buildCharts();
+  countUp();
+}
+
+function editBooking(id){
+  const b = BK.find(x=>x.id===id);
+  if(!b) return;
+  _editId = id;
+  document.getElementById('f_pet').value      = b.pet;
+  document.getElementById('f_breed').value    = b.breed||'';
+  document.getElementById('f_age').value      = b.age||'';
+  document.getElementById('f_kg').value       = b.kg||'';
+  document.getElementById('f_neutered').value = b.neutered||'yes';
+  document.getElementById('f_owner').value    = b.owner;
+  document.getElementById('f_phone').value    = b.phone||'';
+  document.getElementById('f_discount').value = b.discount||0;
+  document.getElementById('f_type').value     = b.type;
+  document.getElementById('f_from').value   = b.from;
+  document.getElementById('f_to').value     = b.to;
+  document.getElementById('f_days').value   = b.days;
+  document.getElementById('f_amount').value = b.amount;
+  document.getElementById('f_taxi').value   = b.taxi;
+  document.getElementById('f_payment').value= b.payment;
+  document.getElementById('f_paidDate').value= b.paidDate==='—'?'':b.paidDate;
+  document.getElementById('f_month').value  = b.month;
+  document.getElementById('formTitle').textContent = `Editing: ${b.pet} (${b.owner})`;
+  document.getElementById('btnSave').textContent = '✏️ Update Booking';
+  document.getElementById('pg-add').scrollIntoView({behavior:'smooth'});
+}
+
+function deleteBooking(id){
+  if(!confirm('Delete this booking?')) return;
+  const idx = BK.findIndex(b=>b.id===id);
+  if(idx>-1) BK.splice(idx,1);
+  saveBK();
+  renderEditTable();
+  _built['bk']=false; _built['cl']=false;
+  filterBk(); buildClients(); buildCapSnapshot(); buildCharts(); countUp();
+  showToast('🗑 Booking deleted', '#F43F5E');
+}
+
+function renderEditTable(){
+  document.getElementById('entryCount').textContent = `${BK.length} bookings total`;
+  document.getElementById('editBody').innerHTML = [...BK].reverse().map(b=>`<tr>
+    <td style="color:var(--muted);font-family:'DM Mono',monospace">${b.id}</td>
+    <td style="font-weight:600">${b.pet}</td>
+    <td style="color:var(--muted2);font-size:11px">${b.breed||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;text-align:center">${b.age||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;text-align:center">${b.kg?b.kg+'kg':'—'}</td>
+    <td>${b.owner}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2)">${b.phone||'—'}</td>
+    <td><span class="tag" style="background:${TC[b.type]}18;color:${TC[b.type]};border:1px solid ${TC[b.type]}33">${TL[b.type]}</span></td>
+    <td style="text-align:center">${b.neutered==='yes'?'✅':'❌'}</td>
+    <td style="font-family:'DM Mono',monospace;color:${b.discount?'var(--rose)':'var(--muted)'}">${b.discount?'-SAR '+b.discount:'—'}</td>
+    <td style="font-family:'DM Mono',monospace">${b.from}</td>
+    <td style="font-family:'DM Mono',monospace">${b.to}</td>
+    <td style="text-align:center;font-weight:700">${b.days}</td>
+    <td style="font-family:'DM Mono',monospace">${fmt(b.amount)}</td>
+    <td style="font-family:'DM Mono',monospace;color:${b.taxi?'var(--amber)':'var(--muted)'}">${b.taxi?fmt(b.taxi):'—'}</td>
+    <td style="font-weight:700;font-family:'DM Mono',monospace;color:${b.total>1000?'var(--emerald)':'var(--text)'}">${fmt(b.total)}</td>
+    <td>${(p=>{return`<span class="tag" style="background:${p.bg};color:${p.color};border:1px solid ${p.border}">${b.payment}</span>`})(PC[b.payment]||PC['Bank Transfer'])}</td>
+    <td style="font-family:'DM Mono',monospace;color:${b.paidDate==='—'?'var(--muted)':'var(--emerald)'}">${b.paidDate}</td>
+    <td><span class="tag" style="background:${(MC[b.month]||'#888')}15;color:${MC[b.month]||'#888'};border:1px solid ${MC[b.month]||'#888'}33">${b.month}</span></td>
+    <td>
+      <button class="btn-edit" onclick="editBooking(${b.id})">✏️ Edit</button>
+      <button class="btn-del"  onclick="deleteBooking(${b.id})">🗑 Del</button>
+    </td>
+  </tr>`).join('');
+}
+
+// تحميل من Google Sheets إذا متوفر
+if(window.APPS_SCRIPT_URL){
+  loadFromSheets();
+} else {
+  // تحميل من localStorage احتياطي
+  buildCharts();
+  buildCapSnapshot();
+  buildAlerts();
+  buildClients();
+  filterBk();
+  renderEditTable();
+  renderPackages();
+  renderExpenses();
+  countUp();
+}
+_built['bk']=true;
+_built['cl']=true;
+</script>
+</body>
+</html>
