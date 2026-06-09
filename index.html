@@ -8,3 +8,676 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Tajawal', sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        min-height: 100vh;
+        color: #fff;
+        padding: 20px;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+        text-align: center;
+        padding: 30px 20px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 20px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .header .subtitle {
+        font-size: 1.2rem;
+        color: #a0a0a0;
+        margin-bottom: 20px;
+    }
+    .info-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .info-card {
+        background: rgba(255,255,255,0.08);
+        padding: 15px;
+        border-radius: 15px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .info-card .label { font-size: 0.9rem; color: #a0a0a0; margin-bottom: 5px; }
+    .info-card .value { font-size: 1.3rem; font-weight: 700; color: #00d4ff; }
+
+    /* KPI Cards */
+    .kpi-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .kpi-card {
+        background: rgba(255,255,255,0.05);
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        transition: transform 0.3s, box-shadow 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,212,255,0.2);
+    }
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+    }
+    .kpi-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        opacity: 0.8;
+    }
+    .kpi-value {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin-bottom: 5px;
+    }
+    .kpi-label {
+        font-size: 1rem;
+        color: #a0a0a0;
+        margin-bottom: 10px;
+    }
+    .kpi-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+    .badge-excellent { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+    .badge-high { background: rgba(0, 212, 255, 0.2); color: #00d4ff; }
+    .badge-warning { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
+
+    /* Charts Section */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+    .chart-box {
+        background: rgba(255,255,255,0.05);
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+    }
+    .chart-box h3 {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        color: #00d4ff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+
+    /* Full Width Charts */
+    .full-width { grid-column: 1 / -1; }
+
+    /* Table Section */
+    .table-section {
+        background: rgba(255,255,255,0.05);
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        margin-bottom: 30px;
+        overflow-x: auto;
+    }
+    .table-section h3 {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        color: #00d4ff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+    th {
+        background: rgba(0, 212, 255, 0.15);
+        padding: 12px;
+        text-align: right;
+        font-weight: 700;
+        color: #00d4ff;
+        border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+    }
+    td {
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    tr:hover td { background: rgba(255,255,255,0.03); }
+    .score-bar {
+        height: 8px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        display: inline-block;
+        width: 100px;
+        vertical-align: middle;
+        margin-left: 10px;
+    }
+    .score-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 1s ease;
+    }
+
+    /* Recommendations */
+    .rec-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .rec-card {
+        background: rgba(255,255,255,0.05);
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+    }
+    .rec-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .rec-card.strengths h3 { color: #2ecc71; }
+    .rec-card.improvements h3 { color: #f1c40f; }
+    .rec-card.recommendations h3 { color: #00d4ff; }
+    .rec-card ul {
+        list-style: none;
+        padding: 0;
+    }
+    .rec-card li {
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    .rec-card li:last-child { border-bottom: none; }
+
+    /* Footer */
+    .footer {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .header h1 { font-size: 1.8rem; }
+        .charts-grid { grid-template-columns: 1fr; }
+        .kpi-section { grid-template-columns: 1fr; }
+        .rec-section { grid-template-columns: 1fr; }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .kpi-card, .chart-box, .table-section, .rec-card {
+        animation: fadeIn 0.6s ease forwards;
+    }
+    .kpi-card:nth-child(1) { animation-delay: 0.1s; }
+    .kpi-card:nth-child(2) { animation-delay: 0.2s; }
+    .kpi-card:nth-child(3) { animation-delay: 0.3s; }
+    .kpi-card:nth-child(4) { animation-delay: 0.4s; }
+    .kpi-card:nth-child(5) { animation-delay: 0.5s; }
+</style>
+<base target="_blank">
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1><i class="fas fa-chart-line"></i> لوحة معلومات تحليل استبيان رضا الطلاب</h1>
+        <div class="subtitle">ENGL 102 | اللغة الإنجليزية (2) - S2C | دبلوم السلامة والصحة المهنية</div>
+        <div class="info-cards">
+            <div class="info-card">
+                <div class="label"><i class="fas fa-users"></i> عدد المستجيبين</div>
+                <div class="value">47 طالب/طالبة</div>
+            </div>
+            <div class="info-card">
+                <div class="label"><i class="fas fa-calendar"></i> تاريخ التحليل</div>
+                <div class="value">يونيو 2026</div>
+            </div>
+            <div class="info-card">
+                <div class="label"><i class="fas fa-ruler"></i> مقياس التقييم</div>
+                <div class="value">ليكرت 5 درجات</div>
+            </div>
+            <div class="info-card">
+                <div class="label"><i class="fas fa-check-circle"></i> عدد البنود</div>
+                <div class="value">22 بند</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-section">
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fas fa-smile"></i></div>
+            <div class="kpi-value" style="color: #00d4ff;">4.694</div>
+            <div class="kpi-label">الرضا العام (من 5.000)</div>
+            <span class="kpi-badge badge-excellent">93.9% ممتاز</span>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fas fa-star"></i></div>
+            <div class="kpi-value" style="color: #2ecc71;">76.6%</div>
+            <div class="kpi-label">نسبة التقييم بـ 5 (ممتاز)</div>
+            <span class="kpi-badge badge-excellent">مرتفع جداً</span>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fas fa-thumbs-up"></i></div>
+            <div class="kpi-value" style="color: #f1c40f;">95.7%</div>
+            <div class="kpi-label">نسبة التقييم بـ 4-5 (جيد-ممتاز)</div>
+            <span class="kpi-badge badge-high">مرتفع جداً</span>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="kpi-value" style="color: #e74c3c;">0.990</div>
+            <div class="kpi-label">معامل Cronbach Alpha</div>
+            <span class="kpi-badge badge-excellent">موثوقية ممتازة</span>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fas fa-chart-bar"></i></div>
+            <div class="kpi-value" style="color: #9b59b6;">0.566</div>
+            <div class="kpi-label">الانحراف المعياري</div>
+            <span class="kpi-badge badge-high">اتساق عالي</span>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+        <div class="chart-box">
+            <h3><i class="fas fa-chart-pie"></i> توزيع مستويات الرضا العام</h3>
+            <div class="chart-container">
+                <canvas id="satisfactionChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-box">
+            <h3><i class="fas fa-chart-bar"></i> تحليل الأبعاد الخمسة</h3>
+            <div class="chart-container">
+                <canvas id="dimensionsChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-box full-width">
+            <h3><i class="fas fa-list-ol"></i> تحليل مفصل لبنود الاستبيان (Top 10)</h3>
+            <div class="chart-container" style="height: 400px;">
+                <canvas id="itemsChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-box">
+            <h3><i class="fas fa-shield-alt"></i> تحليل الموثوقية (Cronbach Alpha)</h3>
+            <div class="chart-container">
+                <canvas id="reliabilityChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-box">
+            <h3><i class="fas fa-percentage"></i> نسب التقييم حسب الأبعاد</h3>
+            <div class="chart-container">
+                <canvas id="percentChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Table -->
+    <div class="table-section">
+        <h3><i class="fas fa-table"></i> تحليل مفصل لبنود الاستبيان (22 بند)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>م</th>
+                    <th>البند</th>
+                    <th>المتوسط</th>
+                    <th>النسبة</th>
+                    <th>التقييم</th>
+                </tr>
+            </thead>
+            <tbody id="itemsTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="rec-section">
+        <div class="rec-card strengths">
+            <h3><i class="fas fa-trophy"></i> نقاط القوة</h3>
+            <ul>
+                <li><i class="fas fa-check" style="color: #2ecc71;"></i> تنوع الوسائل التعليمية (4.766) - أعلى بند</li>
+                <li><i class="fas fa-check" style="color: #2ecc71;"></i> وضوح أهداف المقرر الدراسي (4.745)</li>
+                <li><i class="fas fa-check" style="color: #2ecc71;"></i> مهارة المدرب في إدارة المقرر (4.745)</li>
+                <li><i class="fas fa-check" style="color: #2ecc71;"></i> سهولة استخدام المنصة (4.723)</li>
+                <li><i class="fas fa-check" style="color: #2ecc71;"></i> تفاعل المدرب مع الحضور (4.723)</li>
+                <li><i class="fas fa-check" style="color: #2ecc71;"></i> قدرة المدرب على توصيل المعلومات (4.723)</li>
+            </ul>
+        </div>
+        <div class="rec-card improvements">
+            <h3><i class="fas fa-exclamation-triangle"></i> مجالات التحسين</h3>
+            <ul>
+                <li><i class="fas fa-arrow-up" style="color: #f1c40f;"></i> وضوح أهداف المقرر في المادة العلمية (4.596)</li>
+                <li><i class="fas fa-arrow-up" style="color: #f1c40f;"></i> ملاءمة الموضوعات لمستوى الطلاب (4.638)</li>
+                <li><i class="fas fa-arrow-up" style="color: #f1c40f;"></i> حداثة المادة العلمية (4.638)</li>
+                <li><i class="fas fa-arrow-up" style="color: #f1c40f;"></i> سرعة استجابة المنسق الأكاديمي (4.660)</li>
+                <li><i class="fas fa-arrow-up" style="color: #f1c40f;"></i> قدرة المدرب على الإلقاء والحوار (4.660)</li>
+            </ul>
+        </div>
+        <div class="rec-card recommendations">
+            <h3><i class="fas fa-lightbulb"></i> التوصيات</h3>
+            <ul>
+                <li><i class="fas fa-star" style="color: #00d4ff;"></i> الحفاظ على المستوى الممتاز في تنوع الوسائل</li>
+                <li><i class="fas fa-star" style="color: #00d4ff;"></i> تطوير دليل تعليمي واضح للأهداف</li>
+                <li><i class="fas fa-star" style="color: #00d4ff;"></i> مراجعة ملاءمة الموضوعات للمستويات المختلفة</li>
+                <li><i class="fas fa-star" style="color: #00d4ff;"></i> تحديث المحتوى العلمي بشكل دوري</li>
+                <li><i class="fas fa-star" style="color: #00d4ff;"></i> تطوير آليات الاستجابة السريعة</li>
+                <li><i class="fas fa-star" style="color: #00d4ff;"></i> تعزيز مهارات الإلقاء والحوار للمدربين</li>
+                <li><i class="fas fa-star" style="color: #00d4ff;"></i> استمرار قياس الرضا بشكل دوري</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>تم إنشاء هذه اللوحة بتاريخ يونيو 2026 | الأكاديمية النوعية للتدريب</p>
+    </div>
+</div>
+
+<script>
+// Register DataLabels plugin
+Chart.register(ChartDataLabels);
+
+// Common chart options
+const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            labels: { color: '#fff', font: { family: 'Tajawal', size: 12 } }
+        },
+        datalabels: {
+            color: '#fff',
+            font: { family: 'Tajawal', weight: 'bold' },
+            formatter: (value) => value
+        }
+    }
+};
+
+// 1. Satisfaction Distribution Chart
+const satisfactionCtx = document.getElementById('satisfactionChart').getContext('2d');
+new Chart(satisfactionCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['ممتاز جداً (4.50-5.00)', 'مرتفع (4.00-4.49)', 'متوسط (3.50-3.99)', 'منخفض (3.00-3.49)', 'منخفض جداً (<3.00)'],
+        datasets: [{
+            data: [80.9, 12.8, 2.1, 2.1, 2.1],
+            backgroundColor: ['#2ecc71', '#3498db', '#f1c40f', '#e67e22', '#e74c3c'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        ...commonOptions,
+        plugins: {
+            ...commonOptions.plugins,
+            datalabels: {
+                color: '#fff',
+                font: { family: 'Tajawal', weight: 'bold', size: 14 },
+                formatter: (value) => value + '%'
+            }
+        }
+    }
+});
+
+// 2. Dimensions Chart
+const dimensionsCtx = document.getElementById('dimensionsChart').getContext('2d');
+new Chart(dimensionsCtx, {
+    type: 'bar',
+    data: {
+        labels: ['المقرر الدراسي', 'الحقيبة التدريبية', 'مكان التدريب', 'المدرب', 'الدعم'],
+        datasets: [{
+            label: 'المتوسط',
+            data: [4.739, 4.633, 4.707, 4.711, 4.681],
+            backgroundColor: ['#00d4ff', '#e74c3c', '#2ecc71', '#9b59b6', '#f1c40f'],
+            borderRadius: 10
+        }]
+    },
+    options: {
+        ...commonOptions,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 5,
+                ticks: { color: '#a0a0a0' },
+                grid: { color: 'rgba(255,255,255,0.1)' }
+            },
+            x: {
+                ticks: { color: '#a0a0a0', font: { family: 'Tajawal' } },
+                grid: { display: false }
+            }
+        },
+        plugins: {
+            ...commonOptions.plugins,
+            datalabels: {
+                anchor: 'end',
+                align: 'top',
+                color: '#fff',
+                font: { family: 'Tajawal', weight: 'bold' },
+                formatter: (value) => value.toFixed(3)
+            }
+        }
+    }
+});
+
+// 3. Items Chart (Top 10)
+const itemsData = [
+    { name: 'تنوع الوسائل التعليمية', score: 4.766 },
+    { name: 'وضوح أهداف المقرر', score: 4.745 },
+    { name: 'مهارة إدارة المقرر', score: 4.745 },
+    { name: 'مدى الاستفادة من المقرر', score: 4.723 },
+    { name: 'تسلسل موضوعات المقرر', score: 4.723 },
+    { name: 'سهولة استخدام المنصة', score: 4.723 },
+    { name: 'سلامة التجهيزات التقنية', score: 4.723 },
+    { name: 'تفاعل المدرب مع الحضور', score: 4.723 },
+    { name: 'قدرته على توصيل المعلومات', score: 4.723 },
+    { name: 'توفر خدمات مساندة', score: 4.702 }
+];
+
+const itemsCtx = document.getElementById('itemsChart').getContext('2d');
+new Chart(itemsCtx, {
+    type: 'bar',
+    data: {
+        labels: itemsData.map(d => d.name),
+        datasets: [{
+            label: 'المتوسط',
+            data: itemsData.map(d => d.score),
+            backgroundColor: itemsData.map((d, i) => {
+                const colors = ['#2ecc71', '#2ecc71', '#2ecc71', '#00d4ff', '#00d4ff', '#00d4ff', '#00d4ff', '#00d4ff', '#00d4ff', '#3498db'];
+                return colors[i];
+            }),
+            borderRadius: 8
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        ...commonOptions,
+        scales: {
+            x: {
+                beginAtZero: true,
+                max: 5,
+                ticks: { color: '#a0a0a0' },
+                grid: { color: 'rgba(255,255,255,0.1)' }
+            },
+            y: {
+                ticks: { color: '#fff', font: { family: 'Tajawal', size: 11 } },
+                grid: { display: false }
+            }
+        },
+        plugins: {
+            ...commonOptions.plugins,
+            datalabels: {
+                anchor: 'end',
+                align: 'right',
+                color: '#fff',
+                font: { family: 'Tajawal', weight: 'bold' },
+                formatter: (value) => value.toFixed(3)
+            }
+        }
+    }
+});
+
+// 4. Reliability Chart
+const reliabilityCtx = document.getElementById('reliabilityChart').getContext('2d');
+new Chart(reliabilityCtx, {
+    type: 'bar',
+    data: {
+        labels: ['المقرر الدراسي', 'الحقيبة التدريبية', 'مكان التدريب', 'المدرب', 'الدعم', 'الإجمالي'],
+        datasets: [{
+            label: 'Cronbach Alpha',
+            data: [0.985, 0.984, 0.992, 0.967, 0.946, 0.990],
+            backgroundColor: ['#00d4ff', '#2ecc71', '#9b59b6', '#f1c40f', '#e74c3c', '#00d4ff'],
+            borderRadius: 10
+        }]
+    },
+    options: {
+        ...commonOptions,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 1,
+                ticks: { color: '#a0a0a0' },
+                grid: { color: 'rgba(255,255,255,0.1)' }
+            },
+            x: {
+                ticks: { color: '#a0a0a0', font: { family: 'Tajawal' } },
+                grid: { display: false }
+            }
+        },
+        plugins: {
+            ...commonOptions.plugins,
+            datalabels: {
+                anchor: 'end',
+                align: 'top',
+                color: '#fff',
+                font: { family: 'Tajawal', weight: 'bold' },
+                formatter: (value) => value.toFixed(3)
+            }
+        }
+    }
+});
+
+// 5. Percentage Chart
+const percentCtx = document.getElementById('percentChart').getContext('2d');
+new Chart(percentCtx, {
+    type: 'radar',
+    data: {
+        labels: ['المقرر الدراسي', 'الحقيبة التدريبية', 'مكان التدريب', 'المدرب', 'الدعم'],
+        datasets: [{
+            label: 'النسبة المئوية',
+            data: [94.8, 92.7, 94.1, 94.2, 93.6],
+            backgroundColor: 'rgba(0, 212, 255, 0.2)',
+            borderColor: '#00d4ff',
+            pointBackgroundColor: '#00d4ff',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#00d4ff'
+        }]
+    },
+    options: {
+        ...commonOptions,
+        scales: {
+            r: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { color: '#a0a0a0', backdropColor: 'transparent' },
+                grid: { color: 'rgba(255,255,255,0.1)' },
+                pointLabels: { color: '#fff', font: { family: 'Tajawal', size: 12 } }
+            }
+        },
+        plugins: {
+            ...commonOptions.plugins,
+            datalabels: {
+                color: '#fff',
+                font: { family: 'Tajawal', weight: 'bold' },
+                formatter: (value) => value + '%'
+            }
+        }
+    }
+});
+
+// Populate Items Table
+const allItems = [
+    { num: 1, name: 'تنوع الوسائل التعليمية المستخدمة', mean: 4.766, pct: 95.7 },
+    { num: 2, name: 'وضوح أهداف المقرر الدراسي', mean: 4.745, pct: 93.6 },
+    { num: 3, name: 'مهارته في إدارة وتنظيم المقرر', mean: 4.745, pct: 95.7 },
+    { num: 4, name: 'مدى الاستفادة من المقرر الدراسي', mean: 4.723, pct: 95.7 },
+    { num: 5, name: 'تسلسل موضوعات المقرر الدراسي', mean: 4.723, pct: 95.7 },
+    { num: 6, name: 'سهولة استخدام المنصة التدريبية', mean: 4.723, pct: 95.7 },
+    { num: 7, name: 'سلامة التجهيزات التقنية وحداثتها', mean: 4.723, pct: 95.7 },
+    { num: 8, name: 'تفاعل المدرب مع الحضور', mean: 4.723, pct: 95.7 },
+    { num: 9, name: 'قدرته على توصيل المعلومات', mean: 4.723, pct: 95.7 },
+    { num: 10, name: 'توفر خدمات مساندة (ضيافة/دعم فني)', mean: 4.702, pct: 95.7 },
+    { num: 11, name: 'استعمل المدرب طرقاً حوارية متنوعة', mean: 4.702, pct: 93.6 },
+    { num: 12, name: 'وضوح التعليمات والمتابعة المستمرة', mean: 4.702, pct: 93.6 },
+    { num: 13, name: 'مهارته في إدارة وتنظيم المقرر', mean: 4.702, pct: 95.7 },
+    { num: 14, name: 'تهيئة القاعة أو المنصة', mean: 4.681, pct: 93.6 },
+    { num: 15, name: 'توفر الدعم الفني على المنصة', mean: 4.681, pct: 95.7 },
+    { num: 16, name: 'توافق الأنشطة مع موضوعات المقرر', mean: 4.660, pct: 91.5 },
+    { num: 17, name: 'قدرة المدرب على الإلقاء والحوار', mean: 4.660, pct: 93.6 },
+    { num: 18, name: 'سرعة استجابة المنسق الأكاديمي', mean: 4.660, pct: 93.6 },
+    { num: 19, name: 'فعالية تواصل فريق الدعم الفني', mean: 4.660, pct: 93.6 },
+    { num: 20, name: 'ملاءمة الموضوعات لمستوى الطلاب', mean: 4.638, pct: 93.6 },
+    { num: 21, name: 'حداثة المادة العلمية', mean: 4.638, pct: 91.5 },
+    { num: 22, name: 'وضوح أهداف المقرر في المادة العلمية', mean: 4.596, pct: 91.5 }
+];
+
+const tableBody = document.getElementById('itemsTableBody');
+allItems.forEach(item => {
+    const row = document.createElement('tr');
+    const color = item.mean >= 4.7 ? '#2ecc71' : item.mean >= 4.6 ? '#00d4ff' : '#f1c40f';
+    row.innerHTML = `
+        <td>${item.num}</td>
+        <td>${item.name}</td>
+        <td><strong style="color: ${color};">${item.mean.toFixed(3)}</strong></td>
+        <td>
+            <div class="score-bar"><div class="score-fill" style="width: ${item.pct}%; background: ${color};"></div></div>
+            <span style="color: ${color};">${item.pct}%</span>
+        </td>
+        <td><span class="kpi-badge ${item.mean >= 4.7 ? 'badge-excellent' : item.mean >= 4.6 ? 'badge-high' : 'badge-warning'}">${item.mean >= 4.7 ? 'ممتاز' : item.mean >= 4.6 ? 'جيد جداً' : 'جيد'}</span></td>
+    `;
+    tableBody.appendChild(row);
+});
+</script>
+</body>
+</html>
