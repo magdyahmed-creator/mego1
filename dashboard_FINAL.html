@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>بيانات الباحثين عن عمل — برنامج الإرشاد السياحي</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#070d18;--panel:#0c1828;--panel2:#10203a;--bd:#1a2f4d;--bd2:#2a4972;
+  --text:#dde7f7;--m:#7088a8;--muted:#7088a8;
+  --green:#10b981;--red:#ef4444;--amber:#f59e0b;--blue:#3b82f6;
+  --purple:#a78bfa;--pink:#ec4899;--cyan:#06b6d4;--teal:#14b8a6;--orange:#f97316;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
+body{padding:14px;min-height:100vh}
+
+/* ─── عنوان رئيسي ─── */
+.title-bar{background:linear-gradient(135deg,var(--panel),rgba(20,184,166,.04));border:1px solid var(--bd);border-radius:12px;padding:18px 22px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:14px}
+.title-l{display:flex;gap:14px;align-items:center}
+.title-ico{width:54px;height:54px;background:linear-gradient(135deg,var(--teal),var(--cyan));border-radius:12px;display:grid;place-items:center;font-size:26px;flex-shrink:0}
+.title-h{font-size:20px;font-weight:900;color:var(--text);line-height:1.25}
+.title-s{font-size:11.5px;color:var(--muted);margin-top:3px;font-weight:500;line-height:1.5}
+.title-r{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.crumb{padding:5px 11px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.2px}
+
+.top-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding:8px 14px;background:var(--panel);border:1px solid var(--bd);border-radius:8px;font-size:10.5px;color:var(--muted)}
+.top-meta b{color:var(--text);font-weight:700}
+
+.tabs{display:flex;gap:4px;margin-bottom:14px;padding:6px;background:var(--panel);border:1px solid var(--bd);border-radius:9px;flex-wrap:wrap}
+.tab{background:transparent;border:none;color:var(--muted);padding:7px 12px;border-radius:6px;cursor:pointer;font-family:'Cairo';font-size:11.5px;font-weight:700;transition:all .15s}
+.tab:hover{background:rgba(59,130,246,.08);color:var(--text)}
+.tab.on{background:rgba(59,130,246,.15);color:#60a5fa}
+.tab.qual.on{background:rgba(167,139,250,.15);color:#c4b5fd}
+
+.pg{display:none}.pg.on{display:block}
+
+.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}
+.m{background:var(--panel);border:1px solid var(--bd);border-radius:8px;padding:11px 13px}
+.m-lbl{font-size:9.5px;color:var(--muted);font-weight:600;letter-spacing:.5px;margin-bottom:4px}
+.m-val{font-size:20px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.m-sub{font-size:10px;color:var(--muted);margin-top:3px;font-weight:500}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+.row-3-2{display:grid;grid-template-columns:3fr 2fr;gap:12px;margin-bottom:14px}
+
+.card{background:var(--panel);border:1px solid var(--bd);border-radius:10px;padding:14px}
+.c-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
+.c-t{font-size:13.5px;font-weight:800;color:var(--text)}
+.c-sub{font-size:10.5px;color:var(--muted);margin-top:1px;font-weight:500}
+.c-meta{font-size:10px;color:var(--muted);direction:ltr}
+
+.tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.tbl th{background:var(--panel2);font-size:10px;font-weight:700;color:var(--muted);padding:8px 9px;text-align:right;border-bottom:1px solid var(--bd2)}
+.tbl td{padding:8px 9px;border-bottom:1px solid var(--bd);color:var(--text);font-variant-numeric:tabular-nums}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(59,130,246,.04)}
+.num{text-align:left;direction:ltr;font-weight:600}
+.muted{color:var(--muted)}
+
+.dev-cell{display:inline-block;padding:2px 7px;border-radius:4px;font-weight:700;font-size:10.5px;font-variant-numeric:tabular-nums;direction:ltr}
+.dev-pos{background:rgba(16,185,129,.12);color:var(--green)}
+.dev-neg{background:rgba(239,68,68,.12);color:var(--red)}
+.dev-neu{background:rgba(112,136,168,.10);color:var(--muted)}
+
+.minib{height:6px;background:var(--panel2);border-radius:3px;overflow:hidden;display:inline-block;width:100%;min-width:60px;vertical-align:middle}
+.minib-f{height:100%;border-radius:3px}
+
+.split{display:flex;height:20px;border-radius:5px;overflow:hidden;background:var(--panel2)}
+.split>div{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.s-f{background:var(--pink)}.s-m{background:var(--blue)}
+
+.cmpbar{position:relative;height:10px;background:var(--panel2);border-radius:5px;overflow:hidden;margin:6px 0}
+.cmpbar-baseline{position:absolute;top:0;height:100%;width:2px;background:var(--amber);z-index:2}
+.cmpbar-actual{position:absolute;top:0;height:100%;border-radius:5px}
+
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9.5px;font-weight:700;letter-spacing:.2px}
+.tag-info{background:rgba(59,130,246,.15);color:#60a5fa}
+.tag-warn{background:rgba(245,158,11,.15);color:var(--amber)}
+.tag-danger{background:rgba(239,68,68,.15);color:var(--red)}
+.tag-good{background:rgba(16,185,129,.15);color:var(--green)}
+.tag-purple{background:rgba(167,139,250,.15);color:#c4b5fd}
+
+#saMap{height:480px;border-radius:9px;border:1px solid var(--bd);background:#050a14}
+.leaflet-popup-content{font-family:'Cairo';direction:rtl;text-align:right;font-size:12px}
+.leaflet-container{background:#050a14}
+
+.signal{background:linear-gradient(135deg,var(--panel),var(--panel2));border-right:3px solid var(--blue);border-radius:6px;padding:11px 14px;margin-bottom:8px;font-size:12px;line-height:1.7}
+.signal.s-warn{border-right-color:var(--amber)}
+.signal.s-danger{border-right-color:var(--red)}
+.signal.s-good{border-right-color:var(--green)}
+.signal b{color:var(--text);font-weight:700}
+.signal-h{font-weight:800;color:var(--text);margin-bottom:4px;font-size:12.5px;display:flex;align-items:center;gap:8px}
+
+/* ─── أنماط التحليل النوعي ─── */
+.persona{background:linear-gradient(135deg,var(--panel),rgba(167,139,250,.04));border:1px solid var(--bd);border-radius:10px;padding:14px;height:100%}
+.persona-head{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.persona-ico{font-size:30px;width:48px;height:48px;display:grid;place-items:center;background:rgba(167,139,250,.12);border-radius:9px;flex-shrink:0}
+.persona-name{font-size:13px;font-weight:800;color:var(--text);line-height:1.3}
+.persona-stats{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.pstat{background:var(--panel2);border-radius:5px;padding:4px 8px;font-size:10.5px}
+.pstat b{font-size:13px;color:var(--text)}
+.persona-desc{font-size:11.5px;color:var(--text);line-height:1.7;margin-bottom:8px}
+.persona-row{display:flex;gap:6px;font-size:10.5px;line-height:1.6;margin-top:6px}
+.persona-row b{flex-shrink:0;color:var(--green);font-weight:700;min-width:55px}
+.persona-row.risk b{color:var(--amber)}
+
+.theme{background:var(--panel);border:1px solid var(--bd);border-right:3px solid var(--purple);border-radius:8px;padding:13px 16px;margin-bottom:10px}
+.theme-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.theme-n{font-size:11px;color:var(--purple);font-weight:800;direction:ltr}
+.theme-name{font-size:13.5px;font-weight:800;color:var(--text)}
+.theme-codes{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.code-pill{background:var(--panel2);border:1px solid var(--bd);padding:2px 7px;border-radius:11px;font-size:10px;color:var(--muted)}
+.theme-row{font-size:11.5px;line-height:1.7;margin-top:6px;padding:6px 10px;background:var(--bg);border-radius:5px}
+.theme-row b{color:var(--text);font-weight:700;margin-left:6px}
+
+.swot-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.swot-q{background:var(--panel);border:1px solid var(--bd);border-radius:8px;padding:14px}
+.swot-q.s{border-top:3px solid var(--green)}
+.swot-q.w{border-top:3px solid var(--red)}
+.swot-q.o{border-top:3px solid var(--blue)}
+.swot-q.t{border-top:3px solid var(--amber)}
+.swot-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.swot-item{margin-bottom:8px;padding:6px 0;border-bottom:1px dashed var(--bd);font-size:11.5px;line-height:1.6}
+.swot-item:last-child{border-bottom:none}
+.swot-item b{color:var(--text);font-weight:700}
+
+.pestle-card{background:var(--panel);border:1px solid var(--bd);border-radius:8px;padding:14px}
+.pestle-head{display:flex;gap:10px;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.pestle-letter{width:32px;height:32px;border-radius:6px;display:grid;place-items:center;font-weight:900;color:#fff;font-size:14px}
+.pestle-dim{font-size:12px;font-weight:800;color:var(--text)}
+.pestle-card ul{list-style:none;font-size:11.5px;line-height:1.7;color:var(--text)}
+.pestle-card ul li{padding:3px 0;padding-right:14px;position:relative}
+.pestle-card ul li:before{content:'▸';position:absolute;right:0;color:var(--muted)}
+
+.pheno{background:linear-gradient(135deg,var(--panel),rgba(20,184,166,.04));border:1px solid var(--bd);border-right:3px solid var(--teal);border-radius:8px;padding:13px 16px;margin-bottom:9px}
+.pheno-h{font-size:12.5px;font-weight:800;color:var(--text);margin-bottom:6px}
+.pheno-d{font-size:11.5px;line-height:1.8;color:var(--text)}
+.pheno-d b{color:var(--teal);font-weight:700}
+
+/* ─── تصنيف الجهات ─── */
+.cat-box{background:var(--panel);border:1px solid var(--bd);border-right:4px solid var(--blue);border-radius:8px;padding:13px 16px;margin-bottom:9px}
+.cat-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.cat-name{font-size:13.5px;font-weight:800;color:var(--text)}
+.cat-stats{display:flex;gap:14px;font-size:10.5px;color:var(--muted)}
+.cat-stats b{color:var(--text);font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+.cat-samples{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.cat-sample{background:var(--panel2);border:1px solid var(--bd);border-radius:5px;padding:4px 9px;font-size:10.5px}
+.cat-sample b{color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
+.cat-sample .muted{font-size:10px}
+
+.intro-banner{background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(20,184,166,.04));border:1px solid rgba(167,139,250,.25);border-radius:9px;padding:14px 18px;margin-bottom:14px;font-size:12px;line-height:1.7}
+.intro-banner b{color:#c4b5fd}
+
+/* ─── التذييل ─── */
+.footer{margin-top:20px;padding:14px 18px;background:var(--panel);border:1px solid var(--bd);border-radius:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:11.5px;color:var(--muted)}
+.footer-l{display:flex;flex-direction:column;gap:2px}
+.footer-org{font-size:12.5px;font-weight:800;color:var(--text)}
+.footer-unit{font-size:10.5px;color:var(--muted)}
+.footer-r{font-size:10.5px;color:var(--muted);font-family:monospace;direction:ltr}
+
+@media (max-width:1100px){
+  .metrics{grid-template-columns:repeat(3,1fr)}
+  .row2,.row3,.row-3-2{grid-template-columns:1fr}
+  .swot-grid{grid-template-columns:1fr}
+  .title-bar{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════ عنوان رئيسي ════════════ -->
+<div class="title-bar">
+  <div class="title-l">
+    <div class="title-ico">🧭</div>
+    <div>
+      <div class="title-h">بيانات الباحثين عن عمل — برنامج الإرشاد السياحي</div>
+      <div class="title-s">تحليل قاعدة المتقدّمين الجدد · رؤية استراتيجية للبرنامج · جدارات يونيو 2026</div>
+    </div>
+  </div>
+  <div class="title-r">
+    <span class="crumb" style="background:rgba(16,185,129,.15);color:var(--green)" id="c-total"></span>
+    <span class="crumb" style="background:rgba(59,130,246,.15);color:#60a5fa" id="c-regions"></span>
+    <span class="crumb" style="background:rgba(167,139,250,.15);color:#c4b5fd" id="c-cov"></span>
+  </div>
+</div>
+
+<!-- ════════════ شريط معلومات ════════════ -->
+<div class="top-meta">
+  <span>📂 المصدر: <b>منصة جدارات</b> · يونيو 2026</span>
+  <span>📊 نطاق التحليل: <b>قاعدة المتقدّمين الجدد على البرنامج</b></span>
+  <span>🗺️ <b id="m-cities"></b> مدينة · <b id="m-inst"></b> جامعة وجهة تعليمية</span>
+</div>
+
+<!-- ════════════ تبويبات ════════════ -->
+<div class="tabs">
+  <button class="tab on" onclick="T('diag',this)">⌗ نظرة عامة</button>
+  <button class="tab" onclick="T('region',this)">⌗ التوزيع على المناطق</button>
+  <button class="tab" onclick="T('gender',this)">⌗ الجنس والمقارنات</button>
+  <button class="tab" onclick="T('age',this)">⌗ الأعمار والمؤهلات</button>
+  <button class="tab" onclick="T('inst',this)">⌗ الجامعات والجهات</button>
+  <button class="tab" onclick="T('map',this)">⌗ الخريطة</button>
+  <button class="tab" onclick="T('signals',this)">⌗ الإشارات الاستراتيجية</button>
+  <button class="tab qual" onclick="T('qual',this)">◈ القراءة العميقة</button>
+</div>
+
+<!-- ════════════ TAB 1: نظرة عامة ════════════ -->
+<div class="pg on" id="pg-diag">
+  <div class="metrics">
+    <div class="m"><div class="m-lbl">إجمالي المتقدّمين</div><div class="m-val" style="color:var(--green)" id="d-total"></div><div class="m-sub" id="d-tot-sub"></div></div>
+    <div class="m"><div class="m-lbl">إناث</div><div class="m-val" style="color:var(--pink)" id="d-female"></div><div class="m-sub" id="d-female-sub"></div></div>
+    <div class="m"><div class="m-lbl">ذكور</div><div class="m-val" style="color:var(--blue)" id="d-male"></div><div class="m-sub" id="d-male-sub"></div></div>
+    <div class="m"><div class="m-lbl">انحراف الإناث vs المعدّل الوطني</div><div class="m-val" id="d-dev"></div><div class="m-sub">vs 36% في سوق العمل</div></div>
+    <div class="m"><div class="m-lbl">متوسط العمر</div><div class="m-val" style="color:var(--amber)" id="d-age"></div><div class="m-sub" id="d-age-sub"></div></div>
+    <div class="m"><div class="m-lbl">دقة التغطية الجغرافية</div><div class="m-val" style="color:var(--cyan)" id="d-cov"></div><div class="m-sub" id="d-cov-sub"></div></div>
+  </div>
+
+  <div class="row3">
+    <div class="card">
+      <div class="c-head"><div><div class="c-t">كيف يتوزّعون على المناطق؟</div><div class="c-sub">حصة المناطق الأكثر تمثيلاً</div></div><span id="hhi-reg-tag"></span></div>
+      <table class="tbl">
+        <tr><td>حصة أعلى 3 مناطق</td><td class="num"><span id="cr3-reg"></span>%</td></tr>
+        <tr><td>حصة أعلى 5 مناطق</td><td class="num"><span id="cr5-reg"></span>%</td></tr>
+        <tr><td>مؤشر التركّز</td><td class="num" id="hhi-reg"></td></tr>
+        <tr><td>مؤشر التفاوت</td><td class="num" id="gini-reg"></td></tr>
+      </table>
+      <div style="font-size:10.5px;color:var(--muted);margin-top:10px;line-height:1.6" id="int-reg"></div>
+    </div>
+    <div class="card">
+      <div class="c-head"><div><div class="c-t">كيف يتوزّعون على المدن؟</div><div class="c-sub">مدى التفاوت بين المدن</div></div><span id="hhi-city-tag"></span></div>
+      <table class="tbl">
+        <tr><td>عدد المدن الفريدة</td><td class="num" id="cities-uniq"></td></tr>
+        <tr><td>مؤشر التركّز</td><td class="num" id="hhi-city"></td></tr>
+        <tr><td>مؤشر التفاوت بين المدن</td><td class="num" id="gini-city"></td></tr>
+      </table>
+      <div style="font-size:10.5px;color:var(--muted);margin-top:10px;line-height:1.6" id="int-city"></div>
+    </div>
+    <div class="card">
+      <div class="c-head"><div><div class="c-t">كيف يتوزّعون على الجهات التعليمية؟</div><div class="c-sub">مدى التنوّع المؤسّسي</div></div><span id="hhi-inst-tag"></span></div>
+      <table class="tbl">
+        <tr><td>حصة أعلى 5 جامعات</td><td class="num"><span id="cr5-inst"></span>%</td></tr>
+        <tr><td>حصة أعلى 10 جامعات</td><td class="num"><span id="cr10-inst"></span>%</td></tr>
+        <tr><td>عدد الجهات الفريدة</td><td class="num" id="inst-uniq"></td></tr>
+        <tr><td>مؤشر التركّز</td><td class="num" id="hhi-inst"></td></tr>
+      </table>
+      <div style="font-size:10.5px;color:var(--muted);margin-top:10px;line-height:1.6" id="int-inst"></div>
+    </div>
+  </div>
+
+  <div class="row-3-2">
+    <div class="card">
+      <div class="c-head"><div><div class="c-t">التوزيع على الفئات العمرية</div></div></div>
+      <div style="height:260px"><canvas id="cAge"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="c-head"><div><div class="c-t">نظرة على الأعمار</div><div class="c-sub">المتوسط، الوسيط، والشرائح</div></div></div>
+      <table class="tbl">
+        <tr><td>متوسط العمر</td><td class="num" id="s-mean"></td></tr>
+        <tr><td>الوسيط (Median)</td><td class="num" id="s-med"></td></tr>
+        <tr><td>الانحراف عن المتوسط</td><td class="num" id="s-std"></td></tr>
+        <tr><td>25% من المتقدّمين أصغر من</td><td class="num" id="s-p25"></td></tr>
+        <tr><td>25% من المتقدّمين أكبر من</td><td class="num" id="s-p75"></td></tr>
+        <tr><td>10% فقط أكبر من</td><td class="num" id="s-p90"></td></tr>
+        <tr><td>نصف المتقدّمين بين</td><td class="num" id="s-iqr"></td></tr>
+        <tr><td>أصغر — أكبر متقدّم</td><td class="num" id="s-range"></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ TAB 2: التوزيع على المناطق ════════════ -->
+<div class="pg" id="pg-region">
+  <div class="card" style="margin-bottom:14px">
+    <div class="c-head">
+      <div><div class="c-t">مقارنة حصة كل منطقة بنسبة سكانها</div><div class="c-sub">مؤشر التمثيل: 100 = توازن مثالي مع التعداد السكاني</div></div>
+      <span class="c-meta">المصدر: قاعدة homaily للمدن السعودية</span>
+    </div>
+    <div style="overflow-x:auto"><table class="tbl" id="tblRegRep"></table></div>
+  </div>
+  <div class="row2">
+    <div class="card"><div class="c-head"><div><div class="c-t">المناطق ذات الإقبال الزائد</div><div class="c-sub">مؤشر التمثيل أكبر من 110</div></div></div><div id="overRepList"></div></div>
+    <div class="card"><div class="c-head"><div><div class="c-t">المناطق ذات الإقبال الناقص</div><div class="c-sub">مؤشر التمثيل أقل من 90 — فرص استقطاب</div></div></div><div id="underRepList"></div></div>
+  </div>
+</div>
+
+<!-- ════════════ TAB 3: الجنس ════════════ -->
+<div class="pg" id="pg-gender">
+  <div class="row3">
+    <div class="card"><div class="c-head"><div><div class="c-t">التوزيع الإجمالي للجنس</div></div></div><div style="height:200px"><canvas id="cGender"></canvas></div></div>
+    <div class="card">
+      <div class="c-head"><div><div class="c-t">مقارنة مع سوق العمل السعودي</div><div class="c-sub">المعدّل الوطني للإناث في سوق العمل</div></div></div>
+      <div style="padding:8px 0">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:5px">عيّنتنا</div>
+        <div class="cmpbar"><div class="cmpbar-actual" id="cmp-actual" style="background:var(--pink)"></div><div class="cmpbar-baseline" id="cmp-baseline"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:14px">
+          <span style="color:var(--pink)" id="cmp-actual-val"></span>
+          <span style="color:var(--amber)">المعدّل الوطني: 36%</span>
+        </div>
+        <div class="signal s-warn" style="margin:0"><div class="signal-h">⚠ انحراف لافت</div><span id="dev-explain"></span></div>
+      </div>
+    </div>
+    <div class="card"><div class="c-head"><div><div class="c-t">المؤهل حسب الجنس</div></div></div><div id="qg-list"></div></div>
+  </div>
+  <div class="card"><div class="c-head"><div><div class="c-t">انحراف نسبة الإناث في كل منطقة عن المعدّل الوطني</div></div></div><div style="height:340px"><canvas id="cGenderDev"></canvas></div></div>
+</div>
+
+<!-- ════════════ TAB 4: العمر والمؤهل ════════════ -->
+<div class="pg" id="pg-age">
+  <div class="row2">
+    <div class="card"><div class="c-head"><div><div class="c-t">هرم الأعمار حسب الجنس</div></div></div><div style="height:340px"><canvas id="cPyramid"></canvas></div></div>
+    <div class="card"><div class="c-head"><div><div class="c-t">سنوات التخرّج 2010-2026</div><div class="c-sub">حسب الجنس</div></div></div><div style="height:340px"><canvas id="cCohort"></canvas></div></div>
+  </div>
+  <div class="card"><div class="c-head"><div><div class="c-t">توزيع المؤهلات</div></div></div><div id="qual-bars"></div></div>
+</div>
+
+<!-- ════════════ TAB 5: الجامعات والجهات (الجديد) ════════════ -->
+<div class="pg" id="pg-inst">
+
+  <!-- بطاقة التصنيف الجديدة -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="c-head">
+      <div><div class="c-t">ما هي طبيعة الـ199 جهة تعليمية؟</div><div class="c-sub">تصنيف الجهات حسب نوعها يكشف القصة الحقيقية</div></div>
+    </div>
+
+    <!-- رسم بياني للتصنيف -->
+    <div style="height:140px;margin-bottom:14px"><canvas id="cInstCat"></canvas></div>
+
+    <!-- تفاصيل كل فئة -->
+    <div id="instCatsList"></div>
+
+    <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.7;padding:10px 12px;background:var(--bg);border-radius:6px;border-right:3px solid var(--cyan)">
+      <b style="color:var(--text)">القراءة:</b>  معظم الـ199 رقم منتفخ: <b style="color:var(--text)">100 جامعة حكومية</b> تستوعب <b style="color:var(--text)">96%</b> من القاعدة، بينما البقية ذيل طويل (32 جامعة دولية للمبتعثين العائدين، 21 خاصة، 7 تقنية، و68 جهة صغيرة مجموع متقدّميها لا يتجاوز 1%). <b style="color:var(--text)">الجامعات الـ25 الأولى تغطّي 92% من القاعدة فعلياً</b>.
+    </div>
+  </div>
+
+  <!-- الجدول التفصيلي -->
+  <div class="card">
+    <div class="c-head"><div><div class="c-t">أعلى 25 جهة في القاعدة</div><div class="c-sub">تغطّي 92% من إجمالي المتقدّمين</div></div></div>
+    <div style="overflow-x:auto"><table class="tbl" id="tblInst"></table></div>
+  </div>
+</div>
+
+<!-- ════════════ TAB 6: الخريطة ════════════ -->
+<div class="pg" id="pg-map">
+  <div class="card" style="margin-bottom:14px">
+    <div class="c-head"><div><div class="c-t">الكثافة الجغرافية ومستوى التمثيل</div><div class="c-sub">حجم الدائرة = عدد المتقدّمين | اللون = مستوى التمثيل مقابل السكان</div></div></div>
+    <div id="saMap"></div>
+    <div style="display:flex;gap:14px;margin-top:10px;font-size:10.5px;color:var(--muted);justify-content:center">
+      <span><span style="display:inline-block;width:10px;height:10px;background:#10b981;border-radius:50%;vertical-align:middle"></span> إقبال زائد</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#7088a8;border-radius:50%;vertical-align:middle"></span> متوازن</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#ef4444;border-radius:50%;vertical-align:middle"></span> إقبال ناقص</span>
+    </div>
+  </div>
+  <div class="card"><div class="c-head"><div><div class="c-t">أعلى 30 مدينة في القاعدة</div></div></div><div style="overflow-x:auto"><table class="tbl" id="tblCity"></table></div></div>
+</div>
+
+<!-- ════════════ TAB 7: الإشارات ════════════ -->
+<div class="pg" id="pg-signals">
+  <div class="row2">
+    <div><div class="card" style="margin-bottom:12px"><div class="c-head"><div><div class="c-t">الإشارات الاستراتيجية الرئيسية</div></div></div><div id="signals"></div></div></div>
+    <div>
+      <div class="card" style="margin-bottom:12px"><div class="c-head"><div><div class="c-t">حالات شاذّة في تركيب الجنس</div><div class="c-sub">مناطق فيها انحراف لافت في النسبة</div></div></div><div id="anomalies"></div></div>
+      <div class="card"><div class="c-head"><div><div class="c-t">قيود البيانات</div></div></div>
+        <div style="font-size:11.5px;line-height:1.9;color:var(--muted)">
+          <div>• <b style="color:var(--text)">الجنس:</b> مُستنتج من الاسم الأول (دقة ~92%)</div>
+          <div>• <b style="color:var(--text)">التغطية الجغرافية:</b> <span id="cov-disclaimer"></span>% من السجلات</div>
+          <div>• <b style="color:var(--text)">المعدّل الوطني:</b> 36% — هيئة الإحصاء العامة</div>
+          <div>• <b style="color:var(--text)">قاعدة المدن:</b> homaily/Saudi-Arabia-Regions (4,581 مدينة)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ TAB 8: القراءة العميقة ════════════ -->
+<div class="pg" id="pg-qual">
+  <div class="intro-banner">
+    <b>هذه القراءة العميقة</b> تجيب عن سؤال: <b>ماذا تعني هذه الأرقام؟</b> — من خلال أربع زوايا: أنماط شخصيات المتقدّمين، الموضوعات المتكرّرة في البيانات، تحليل القوة والضعف، وقراءة البيئة المحيطة بالبرنامج.
+  </div>
+
+  <!-- 1. أنماط المتقدّمين -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="c-head"><div><div class="c-t">▸ أنماط المتقدّمين</div><div class="c-sub">ست شخصيات تمثّل الشرائح الرئيسية في القاعدة</div></div></div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px" id="personasGrid"></div>
+  </div>
+
+  <!-- 2. الموضوعات المتكرّرة -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="c-head"><div><div class="c-t">▸ الموضوعات المتكرّرة في البيانات</div><div class="c-sub">ست ثيمات رئيسية مع الدلائل والتفسيرات</div></div></div>
+    <div id="themesList"></div>
+  </div>
+
+  <!-- 3. نقاط القوة والضعف والفرص والتهديدات -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="c-head"><div><div class="c-t">▸ نقاط القوة والضعف والفرص والتهديدات</div><div class="c-sub">قراءة موسّعة لقاعدة المتقدّمين</div></div></div>
+    <div class="swot-grid">
+      <div class="swot-q s"><div class="swot-title" style="color:var(--green)">⊕ نقاط القوة</div><div id="swot-s"></div></div>
+      <div class="swot-q w"><div class="swot-title" style="color:var(--red)">⊖ نقاط الضعف</div><div id="swot-w"></div></div>
+      <div class="swot-q o"><div class="swot-title" style="color:#60a5fa">⇢ الفرص</div><div id="swot-o"></div></div>
+      <div class="swot-q t"><div class="swot-title" style="color:var(--amber)">⚠ التهديدات</div><div id="swot-t"></div></div>
+    </div>
+  </div>
+
+  <!-- 4. البيئة الخارجية -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="c-head"><div><div class="c-t">▸ البيئة الخارجية المؤثّرة على البرنامج</div><div class="c-sub">العوامل السياسية والاقتصادية والاجتماعية والتقنية والقانونية والبيئية</div></div></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="pestleGrid"></div>
+  </div>
+
+  <!-- 5. القراءة الأعمق -->
+  <div class="card">
+    <div class="c-head"><div><div class="c-t">▸ ما تقوله البيانات في العمق</div><div class="c-sub">دلالات أعمق من الأرقام</div></div></div>
+    <div id="phenoList"></div>
+  </div>
+
+  <!-- ملاحظة منهجية -->
+  <div style="margin-top:12px;padding:10px 14px;background:var(--panel);border:1px solid var(--bd);border-radius:6px;font-size:10.5px;color:var(--muted);line-height:1.8">
+    <b style="color:var(--text)">المنهجية:</b> أنماط المتقدّمين (Personas — Cooper, 1999) · الموضوعات المتكرّرة (Thematic Analysis — Braun & Clarke, 2006) · SWOT (Andrews/Weihrich) · البيئة الخارجية (PESTLE — Aguilar, 1967) · القراءة العميقة (Phenomenological Tradition).
+  </div>
+</div>
+
+<!-- ════════════ التذييل ════════════ -->
+<div class="footer">
+  <div class="footer-l">
+    <span class="footer-org">أكاديمية التدريب النوعي</span>
+    <span class="footer-unit">إدارة التدريب الإلكتروني · وحدة التطوير والجودة</span>
+  </div>
+  <div class="footer-r">
+    Generated · يونيو 2026 · n = <span id="f-n"></span>
+  </div>
+</div>
+
+<script>
+const KPI = {"total": 31264, "mapped_pct": 96.91, "unmapped": 967, "male": 12000, "female": 19264, "male_pct": 38.4, "female_pct": 61.6, "female_deviation_pp": 25.6, "female_baseline": 36.0, "regions_covered": 14, "cities_unique": 991, "qualifications": 8, "institutions": 199, "avg_age": 31.0, "median_age": 29.7, "std_age": 6.3, "p10_age": 24.1, "p25_age": 25.9, "p75_age": 34.7, "p90_age": 40.0, "iqr_age": 8.800000000000004, "min_age": 22.5, "max_age": 60.4, "disability": 422, "disability_pct": 1.35, "eng_scored": 1025, "eng_scored_pct": 3.3, "eng_avg": 4.44, "bachelor_pct": 97.7, "postgrad": 458, "postgrad_pct": 1.46, "hhi_region": 1215, "hhi_city": 427, "hhi_inst": 530, "gini_region": 0.419, "gini_city": 0.901, "gini_inst": 0.903, "cr3_region": 49.0, "cr5_region": 66.3, "cr5_inst": 40.6, "cr10_inst": 65.3};
+const GENDER = {"M": 12000, "F": 19264};
+const AGE_DIST = {"22-25": 5672, "26-30": 8364, "31-35": 5843, "36-40": 3309, "41-45": 1598, "46+": 822};
+const REGION_COUNT = {"الرياض": 7407, "المدينة المنورة": 2490, "المنطقة الشرقية": 2765, "عسير": 3140, "جازان": 1899, "الحدود الشمالية": 379, "تبوك": 2038, "الباحة": 651, "حائل": 882, "مكة المكرمة": 4295, "الجوف": 1013, "نجران": 759, "القصيم": 1755, "الالشرقية": 824, "غير محدد": 967};
+const REGION_DETAILS = [{"region": "الرياض", "total": 7407, "male": 2971, "female": 4436, "male_pct": 40.1, "female_pct": 59.9, "female_deviation": 23.9, "avg_age": 31.7, "disability": 97, "cities": 140, "top_city": "الرياض", "top_city_n": 4959, "sample_pct": 23.69, "pop_pct": 24.97, "pop_total": 6777146, "rep_index": 97.9, "density": 109.3, "lat": 24.7136, "lng": 46.6753}, {"region": "مكة المكرمة", "total": 4295, "male": 1754, "female": 2541, "male_pct": 40.8, "female_pct": 59.2, "female_deviation": 23.2, "avg_age": 32.2, "disability": 59, "cities": 91, "top_city": "جدة", "top_city_n": 2050, "sample_pct": 13.74, "pop_pct": 25.48, "pop_total": 6915006, "rep_index": 55.6, "density": 62.1, "lat": 21.4225, "lng": 39.8262}, {"region": "عسير", "total": 3140, "male": 1176, "female": 1964, "male_pct": 37.5, "female_pct": 62.5, "female_deviation": 26.5, "avg_age": 28.8, "disability": 41, "cities": 152, "top_city": "ابها", "top_city_n": 881, "sample_pct": 10.04, "pop_pct": 7.05, "pop_total": 1913392, "rep_index": 147.0, "density": 164.1, "lat": 18.2164, "lng": 42.5053}, {"region": "المدينة المنورة", "total": 2490, "male": 899, "female": 1591, "male_pct": 36.1, "female_pct": 63.9, "female_deviation": 27.9, "avg_age": 30.8, "disability": 13, "cities": 88, "top_city": "المدينة المنورة", "top_city_n": 1453, "sample_pct": 7.96, "pop_pct": 6.55, "pop_total": 1777933, "rep_index": 125.4, "density": 140.1, "lat": 24.5247, "lng": 39.5692}, {"region": "تبوك", "total": 2038, "male": 798, "female": 1240, "male_pct": 39.2, "female_pct": 60.8, "female_deviation": 24.8, "avg_age": 30.5, "disability": 35, "cities": 27, "top_city": "تبوك", "top_city_n": 1542, "sample_pct": 6.52, "pop_pct": 2.92, "pop_total": 791535, "rep_index": 230.6, "density": 257.5, "lat": 28.3838, "lng": 36.555}, {"region": "جازان", "total": 1899, "male": 595, "female": 1304, "male_pct": 31.3, "female_pct": 68.7, "female_deviation": 32.7, "avg_age": 29.7, "disability": 37, "cities": 143, "top_city": "ابو عريش", "top_city_n": 275, "sample_pct": 6.07, "pop_pct": 5.03, "pop_total": 1365110, "rep_index": 124.6, "density": 139.1, "lat": 16.8892, "lng": 42.5611}, {"region": "القصيم", "total": 1755, "male": 732, "female": 1023, "male_pct": 41.7, "female_pct": 58.3, "female_deviation": 22.3, "avg_age": 30.4, "disability": 14, "cities": 79, "top_city": "بريدة", "top_city_n": 628, "sample_pct": 5.61, "pop_pct": 4.48, "pop_total": 1215858, "rep_index": 129.3, "density": 144.3, "lat": 26.326, "lng": 43.975}, {"region": "الجوف", "total": 1013, "male": 491, "female": 522, "male_pct": 48.5, "female_pct": 51.5, "female_deviation": 15.5, "avg_age": 29.0, "disability": 13, "cities": 22, "top_city": "سكاكا", "top_city_n": 378, "sample_pct": 3.24, "pop_pct": 1.62, "pop_total": 440009, "rep_index": 206.2, "density": 230.2, "lat": 29.7858, "lng": 40.4001}, {"region": "غير محدد", "total": 967, "male": 342, "female": 625, "male_pct": 35.4, "female_pct": 64.6, "female_deviation": 28.6, "avg_age": 30.5, "disability": 8, "cities": 21, "top_city": "جيزان", "top_city_n": 462, "sample_pct": 3.09, "pop_pct": 0, "pop_total": 0, "rep_index": 0, "density": 0, "lat": 24.5, "lng": 45.0}, {"region": "حائل", "total": 882, "male": 369, "female": 513, "male_pct": 41.8, "female_pct": 58.2, "female_deviation": 22.2, "avg_age": 30.1, "disability": 18, "cities": 71, "top_city": "حائل", "top_city_n": 657, "sample_pct": 2.82, "pop_pct": 2.2, "pop_total": 597144, "rep_index": 132.3, "density": 147.7, "lat": 27.5219, "lng": 41.7208}, {"region": "الالشرقية", "total": 824, "male": 287, "female": 537, "male_pct": 34.8, "female_pct": 65.2, "female_deviation": 29.2, "avg_age": 33.0, "disability": 11, "cities": 63, "top_city": "المبرز", "top_city_n": 266, "sample_pct": 2.64, "pop_pct": 15.13, "pop_total": 4105780, "rep_index": 18.0, "density": 20.1, "lat": 24.5, "lng": 45.0}, {"region": "نجران", "total": 759, "male": 237, "female": 522, "male_pct": 31.2, "female_pct": 68.8, "female_deviation": 32.8, "avg_age": 30.0, "disability": 24, "cities": 31, "top_city": "نجران", "top_city_n": 517, "sample_pct": 2.43, "pop_pct": 1.86, "pop_total": 505652, "rep_index": 134.4, "density": 150.1, "lat": 17.4924, "lng": 44.1277}, {"region": "الباحة", "total": 651, "male": 197, "female": 454, "male_pct": 30.3, "female_pct": 69.7, "female_deviation": 33.7, "avg_age": 29.6, "disability": 7, "cities": 94, "top_city": "الباحة", "top_city_n": 190, "sample_pct": 2.08, "pop_pct": 1.52, "pop_total": 411888, "rep_index": 141.6, "density": 158.1, "lat": 20.0129, "lng": 41.4677}, {"region": "الحدود الشمالية", "total": 379, "male": 183, "female": 196, "male_pct": 48.3, "female_pct": 51.7, "female_deviation": 15.7, "avg_age": 30.8, "disability": 3, "cities": 6, "top_city": "عرعر", "top_city_n": 255, "sample_pct": 1.21, "pop_pct": 1.18, "pop_total": 320524, "rep_index": 105.9, "density": 118.2, "lat": 30.9753, "lng": 41.0381}];
+const QUAL_COUNT = {"البكالوريوس": 30543, "الماجستير": 446, "دبلوم سنة بعد الجامعية": 112, "دبلوم سنتين بعد الجامعة": 112, "دكتوراه": 8, "دبلوم سنة وستة أشهر بعد الجامعية": 18, "دبلوم سنتين وستة اشهر بعد الجامعية": 21, "الزماله": 4};
+const QUAL_ORDER = ["دكتوراه", "الزماله", "الماجستير", "دبلوم سنتين وستة اشهر بعد الجامعية", "دبلوم سنتين بعد الجامعة", "دبلوم سنة وستة أشهر بعد الجامعية", "دبلوم سنة بعد الجامعية", "البكالوريوس"];
+const GENDER_X_REGION = {"الرياض": {"M": 2971, "F": 4436}, "المدينة المنورة": {"M": 899, "F": 1591}, "المنطقة الشرقية": {"M": 969, "F": 1796}, "عسير": {"M": 1176, "F": 1964}, "جازان": {"M": 595, "F": 1304}, "الحدود الشمالية": {"M": 183, "F": 196}, "تبوك": {"M": 798, "F": 1240}, "الباحة": {"M": 197, "F": 454}, "حائل": {"M": 369, "F": 513}, "مكة المكرمة": {"M": 1754, "F": 2541}, "الجوف": {"M": 491, "F": 522}, "نجران": {"M": 237, "F": 522}, "القصيم": {"M": 732, "F": 1023}, "الالشرقية": {"M": 287, "F": 537}, "غير محدد": {"M": 342, "F": 625}};
+const GENDER_X_QUAL = {"البكالوريوس": {"M": 11664, "F": 18879}, "الماجستير": {"M": 235, "F": 211}, "دبلوم سنة بعد الجامعية": {"M": 44, "F": 68}, "دبلوم سنتين بعد الجامعة": {"M": 33, "F": 79}, "دكتوراه": {"M": 6, "F": 2}, "دبلوم سنة وستة أشهر بعد الجامعية": {"M": 7, "F": 11}, "دبلوم سنتين وستة اشهر بعد الجامعية": {"M": 8, "F": 13}, "الزماله": {"M": 3, "F": 1}};
+const GENDER_X_AGE = {"26-30": {"M": 3315, "F": 5049}, "36-40": {"M": 1084, "F": 2225}, "31-35": {"M": 1928, "F": 3915}, "22-25": {"M": 2592, "F": 3080}, "41-45": {"M": 551, "F": 1047}, "46+": {"M": 399, "F": 423}};
+const YEAR_GENDER = {"2023": {"M": 1216, "F": 1625}, "2020": {"M": 1217, "F": 2424}, "2016": {"M": 488, "F": 953}, "2018": {"M": 951, "F": 1889}, "2025": {"M": 1667, "F": 1815}, "2024": {"M": 1590, "F": 1955}, "2021": {"M": 928, "F": 1447}, "2019": {"M": 688, "F": 1247}, "2015": {"M": 326, "F": 725}, "2022": {"M": 1263, "F": 1842}, "2013": {"M": 214, "F": 404}, "2017": {"M": 625, "F": 1358}, "2012": {"M": 118, "F": 291}, "2014": {"M": 283, "F": 504}, "2010": {"M": 68, "F": 179}, "2011": {"M": 97, "F": 168}, "2026": {"M": 62, "F": 44}};
+const TOP_CITIES = [{"city": "الرياض", "region": "الرياض", "total": 4959, "male": 2030, "female": 2929, "female_pct": 59.1}, {"city": "جدة", "region": "مكة المكرمة", "total": 2050, "male": 891, "female": 1159, "female_pct": 56.5}, {"city": "تبوك", "region": "تبوك", "total": 1542, "male": 583, "female": 959, "female_pct": 62.2}, {"city": "المدينة المنورة", "region": "المدينة المنورة", "total": 1453, "male": 517, "female": 936, "female_pct": 64.4}, {"city": "الدمام", "region": "المنطقة الشرقية", "total": 1045, "male": 343, "female": 702, "female_pct": 67.2}, {"city": "ابها", "region": "عسير", "total": 881, "male": 367, "female": 514, "female_pct": 58.3}, {"city": "الطائف", "region": "مكة المكرمة", "total": 853, "male": 337, "female": 516, "female_pct": 60.5}, {"city": "خميس مشيط", "region": "عسير", "total": 716, "male": 256, "female": 460, "female_pct": 64.2}, {"city": "حائل", "region": "حائل", "total": 657, "male": 285, "female": 372, "female_pct": 56.6}, {"city": "مكة المكرمة", "region": "مكة المكرمة", "total": 640, "male": 268, "female": 372, "female_pct": 58.1}, {"city": "بريدة", "region": "القصيم", "total": 628, "male": 254, "female": 374, "female_pct": 59.6}, {"city": "الهفوف", "region": "الرياض", "total": 524, "male": 182, "female": 342, "female_pct": 65.3}, {"city": "نجران", "region": "نجران", "total": 517, "male": 155, "female": 362, "female_pct": 70.0}, {"city": "الخبر", "region": "المنطقة الشرقية", "total": 473, "male": 160, "female": 313, "female_pct": 66.2}, {"city": "جيزان", "region": "غير محدد", "total": 466, "male": 148, "female": 318, "female_pct": 68.2}, {"city": "حفر الباطن", "region": "المنطقة الشرقية", "total": 459, "male": 205, "female": 254, "female_pct": 55.3}, {"city": "سكاكا", "region": "الجوف", "total": 378, "male": 194, "female": 184, "female_pct": 48.7}, {"city": "الجبيل", "region": "المنطقة الشرقية", "total": 351, "male": 88, "female": 263, "female_pct": 74.9}, {"city": "الخرج", "region": "الرياض", "total": 314, "male": 117, "female": 197, "female_pct": 62.7}, {"city": "القريات", "region": "الجوف", "total": 311, "male": 142, "female": 169, "female_pct": 54.3}, {"city": "الدوادمي", "region": "الرياض", "total": 304, "male": 131, "female": 173, "female_pct": 56.9}, {"city": "ابو عريش", "region": "جازان", "total": 275, "male": 87, "female": 188, "female_pct": 68.4}, {"city": "محايل", "region": "عسير", "total": 270, "male": 110, "female": 160, "female_pct": 59.3}, {"city": "المبرز", "region": "الالشرقية", "total": 266, "male": 98, "female": 168, "female_pct": 63.2}, {"city": "بيشة (بيشة)", "region": "عسير", "total": 261, "male": 84, "female": 177, "female_pct": 67.8}, {"city": "عرعر", "region": "الحدود الشمالية", "total": 257, "male": 120, "female": 137, "female_pct": 53.3}, {"city": "عنيزة", "region": "القصيم", "total": 239, "male": 116, "female": 123, "female_pct": 51.5}, {"city": "الرس", "region": "القصيم", "total": 223, "male": 89, "female": 134, "female_pct": 60.1}, {"city": "صامطة", "region": "جازان", "total": 212, "male": 70, "female": 142, "female_pct": 67.0}, {"city": "ينبع البحر", "region": "المدينة المنورة", "total": 211, "male": 82, "female": 129, "female_pct": 61.1}, {"city": "تيماء", "region": "تبوك", "total": 191, "male": 82, "female": 109, "female_pct": 57.1}, {"city": "الباحة", "region": "الباحة", "total": 190, "male": 61, "female": 129, "female_pct": 67.9}, {"city": "صبيا", "region": "جازان", "total": 174, "male": 61, "female": 113, "female_pct": 64.9}, {"city": "عفيف", "region": "الرياض", "total": 172, "male": 81, "female": 91, "female_pct": 52.9}, {"city": "طبرجل", "region": "الجوف", "total": 162, "male": 77, "female": 85, "female_pct": 52.5}, {"city": "ينبع", "region": "المدينة المنورة", "total": 162, "male": 64, "female": 98, "female_pct": 60.5}, {"city": "الظهران", "region": "المدينة المنورة", "total": 162, "male": 60, "female": 102, "female_pct": 63.0}, {"city": "احد المسارحة", "region": "جازان", "total": 140, "male": 51, "female": 89, "female_pct": 63.6}, {"city": "القنفذة", "region": "مكة المكرمة", "total": 140, "male": 42, "female": 98, "female_pct": 70.0}, {"city": "القطيف", "region": "المنطقة الشرقية", "total": 122, "male": 52, "female": 70, "female_pct": 57.4}];
+const TOP_INSTITUTIONS = [{"rank": 1, "inst": "جامعة الملك فيصل", "total": 3200, "share": 10.24, "cumulative_share": 10.24, "male": 1037, "female": 2163, "female_pct": 67.6, "top_qual": "البكالوريوس", "top_region": "الرياض", "regions_count": 15}, {"rank": 2, "inst": "جامعة جازان", "total": 2716, "share": 8.69, "cumulative_share": 18.92, "male": 819, "female": 1897, "female_pct": 69.8, "top_qual": "البكالوريوس", "top_region": "جازان", "regions_count": 14}, {"rank": 3, "inst": "جامعة الملك خالد", "total": 2339, "share": 7.48, "cumulative_share": 26.4, "male": 944, "female": 1395, "female_pct": 59.6, "top_qual": "البكالوريوس", "top_region": "عسير", "regions_count": 15}, {"rank": 4, "inst": "جامعة الامام محمد بن سعود الاسلامية", "total": 2289, "share": 7.32, "cumulative_share": 33.73, "male": 930, "female": 1359, "female_pct": 59.4, "top_qual": "البكالوريوس", "top_region": "الرياض", "regions_count": 15}, {"rank": 5, "inst": "جامعة تبوك", "total": 2143, "share": 6.85, "cumulative_share": 40.58, "male": 814, "female": 1329, "female_pct": 62.0, "top_qual": "البكالوريوس", "top_region": "تبوك", "regions_count": 14}, {"rank": 6, "inst": "جامعة طيبة", "total": 2050, "share": 6.56, "cumulative_share": 47.14, "male": 731, "female": 1319, "female_pct": 64.3, "top_qual": "البكالوريوس", "top_region": "المدينة المنورة", "regions_count": 8}, {"rank": 7, "inst": "جامعة شقراء", "total": 1524, "share": 4.87, "cumulative_share": 52.01, "male": 608, "female": 916, "female_pct": 60.1, "top_qual": "البكالوريوس", "top_region": "الرياض", "regions_count": 14}, {"rank": 8, "inst": "جامعة القصيم", "total": 1430, "share": 4.57, "cumulative_share": 56.59, "male": 600, "female": 830, "female_pct": 58.0, "top_qual": "البكالوريوس", "top_region": "القصيم", "regions_count": 14}, {"rank": 9, "inst": "جامعة الملك عبدالعزيز", "total": 1380, "share": 4.41, "cumulative_share": 61.0, "male": 678, "female": 702, "female_pct": 50.9, "top_qual": "البكالوريوس", "top_region": "مكة المكرمة", "regions_count": 14}, {"rank": 10, "inst": "جامعة الطائف", "total": 1332, "share": 4.26, "cumulative_share": 65.26, "male": 504, "female": 828, "female_pct": 62.2, "top_qual": "البكالوريوس", "top_region": "مكة المكرمة", "regions_count": 14}, {"rank": 11, "inst": "جامعة الجوف", "total": 1057, "share": 3.38, "cumulative_share": 68.64, "male": 508, "female": 549, "female_pct": 51.9, "top_qual": "البكالوريوس", "top_region": "الجوف", "regions_count": 12}, {"rank": 12, "inst": "جامعة الباحه", "total": 937, "share": 3.0, "cumulative_share": 71.64, "male": 292, "female": 645, "female_pct": 68.8, "top_qual": "البكالوريوس", "top_region": "الباحة", "regions_count": 11}, {"rank": 13, "inst": "جامعة نجران", "total": 837, "share": 2.68, "cumulative_share": 74.32, "male": 256, "female": 581, "female_pct": 69.4, "top_qual": "البكالوريوس", "top_region": "نجران", "regions_count": 12}, {"rank": 14, "inst": "جامعة بيشة", "total": 821, "share": 2.63, "cumulative_share": 76.94, "male": 301, "female": 520, "female_pct": 63.3, "top_qual": "البكالوريوس", "top_region": "عسير", "regions_count": 13}, {"rank": 15, "inst": "جامعة حائل", "total": 796, "share": 2.55, "cumulative_share": 79.49, "male": 298, "female": 498, "female_pct": 62.6, "top_qual": "البكالوريوس", "top_region": "حائل", "regions_count": 10}, {"rank": 16, "inst": "جامعة أم القرى", "total": 784, "share": 2.51, "cumulative_share": 82.0, "male": 295, "female": 489, "female_pct": 62.4, "top_qual": "البكالوريوس", "top_region": "مكة المكرمة", "regions_count": 12}, {"rank": 17, "inst": "جامعة الامير سطام بن عبدالعزيز", "total": 610, "share": 1.95, "cumulative_share": 83.95, "male": 270, "female": 340, "female_pct": 55.7, "top_qual": "البكالوريوس", "top_region": "الرياض", "regions_count": 10}, {"rank": 18, "inst": "جامعة الملك سعود", "total": 553, "share": 1.77, "cumulative_share": 85.72, "male": 243, "female": 310, "female_pct": 56.1, "top_qual": "البكالوريوس", "top_region": "الرياض", "regions_count": 12}, {"rank": 19, "inst": "جامعة حفر الباطن", "total": 529, "share": 1.69, "cumulative_share": 87.41, "male": 217, "female": 312, "female_pct": 59.0, "top_qual": "البكالوريوس", "top_region": "المنطقة الشرقية", "regions_count": 12}, {"rank": 20, "inst": "جامعة المجمعة", "total": 485, "share": 1.55, "cumulative_share": 88.96, "male": 209, "female": 276, "female_pct": 56.9, "top_qual": "البكالوريوس", "top_region": "الرياض", "regions_count": 10}, {"rank": 21, "inst": "جامعه الإمام عبدالرحمن بن فيصل", "total": 479, "share": 1.53, "cumulative_share": 90.49, "male": 135, "female": 344, "female_pct": 71.8, "top_qual": "البكالوريوس", "top_region": "المنطقة الشرقية", "regions_count": 13}, {"rank": 22, "inst": "جامعة الاميرة نورة بنت عبدالرحمن", "total": 424, "share": 1.36, "cumulative_share": 91.85, "male": 112, "female": 312, "female_pct": 73.6, "top_qual": "البكالوريوس", "top_region": "الرياض", "regions_count": 13}, {"rank": 23, "inst": "جامعة الحدود الشمالية", "total": 379, "share": 1.21, "cumulative_share": 93.06, "male": 167, "female": 212, "female_pct": 55.9, "top_qual": "البكالوريوس", "top_region": "الحدود الشمالية", "regions_count": 11}, {"rank": 24, "inst": "مؤسسة تعليمية خارجية", "total": 353, "share": 1.13, "cumulative_share": 94.19, "male": 226, "female": 127, "female_pct": 36.0, "top_qual": "البكالوريوس", "top_region": "الرياض", "regions_count": 15}, {"rank": 25, "inst": "الجامعة السعودية الإلكترونية", "total": 238, "share": 0.76, "cumulative_share": 94.95, "male": 76, "female": 162, "female_pct": 68.1, "top_qual": "البكالوريوس", "top_region": "المنطقة الشرقية", "regions_count": 11}];
+const GRAD_YEARS = [{"year": 2010, "count": 247}, {"year": 2011, "count": 265}, {"year": 2012, "count": 409}, {"year": 2013, "count": 618}, {"year": 2014, "count": 787}, {"year": 2015, "count": 1051}, {"year": 2016, "count": 1441}, {"year": 2017, "count": 1983}, {"year": 2018, "count": 2840}, {"year": 2019, "count": 1935}, {"year": 2020, "count": 3641}, {"year": 2021, "count": 2375}, {"year": 2022, "count": 3105}, {"year": 2023, "count": 2841}, {"year": 2024, "count": 3545}, {"year": 2025, "count": 3482}, {"year": 2026, "count": 106}];
+const ANOMALIES_GENDER = [{"region": "الباحة", "female_pct": 69.7, "deviation": 33.7, "total": 651}, {"region": "نجران", "female_pct": 68.8, "deviation": 32.8, "total": 759}, {"region": "جازان", "female_pct": 68.7, "deviation": 32.7, "total": 1899}, {"region": "الالشرقية", "female_pct": 65.2, "deviation": 29.2, "total": 824}, {"region": "المدينة المنورة", "female_pct": 63.9, "deviation": 27.9, "total": 2490}, {"region": "عسير", "female_pct": 62.5, "deviation": 26.5, "total": 3140}, {"region": "تبوك", "female_pct": 60.8, "deviation": 24.8, "total": 2038}, {"region": "الرياض", "female_pct": 59.9, "deviation": 23.9, "total": 7407}, {"region": "مكة المكرمة", "female_pct": 59.2, "deviation": 23.2, "total": 4295}, {"region": "القصيم", "female_pct": 58.3, "deviation": 22.3, "total": 1755}, {"region": "حائل", "female_pct": 58.2, "deviation": 22.2, "total": 882}, {"region": "الحدود الشمالية", "female_pct": 51.7, "deviation": 15.7, "total": 379}, {"region": "الجوف", "female_pct": 51.5, "deviation": 15.5, "total": 1013}];
+const PENETRATION = {"الرياض": {"count": 7407, "sample_pct": 24.45, "pop_pct": 24.97, "pop_total": 6777146, "rep_index": 97.9, "density_per_100k": 109.3}, "مكة المكرمة": {"count": 4295, "sample_pct": 14.18, "pop_pct": 25.48, "pop_total": 6915006, "rep_index": 55.6, "density_per_100k": 62.1}, "المدينة المنورة": {"count": 2490, "sample_pct": 8.22, "pop_pct": 6.55, "pop_total": 1777933, "rep_index": 125.4, "density_per_100k": 140.1}, "القصيم": {"count": 1755, "sample_pct": 5.79, "pop_pct": 4.48, "pop_total": 1215858, "rep_index": 129.3, "density_per_100k": 144.3}, "الالشرقية": {"count": 824, "sample_pct": 2.72, "pop_pct": 15.13, "pop_total": 4105780, "rep_index": 18.0, "density_per_100k": 20.1}, "عسير": {"count": 3140, "sample_pct": 10.36, "pop_pct": 7.05, "pop_total": 1913392, "rep_index": 147.0, "density_per_100k": 164.1}, "تبوك": {"count": 2038, "sample_pct": 6.73, "pop_pct": 2.92, "pop_total": 791535, "rep_index": 230.6, "density_per_100k": 257.5}, "حائل": {"count": 882, "sample_pct": 2.91, "pop_pct": 2.2, "pop_total": 597144, "rep_index": 132.3, "density_per_100k": 147.7}, "الحدود الشمالية": {"count": 379, "sample_pct": 1.25, "pop_pct": 1.18, "pop_total": 320524, "rep_index": 105.9, "density_per_100k": 118.2}, "جازان": {"count": 1899, "sample_pct": 6.27, "pop_pct": 5.03, "pop_total": 1365110, "rep_index": 124.6, "density_per_100k": 139.1}, "نجران": {"count": 759, "sample_pct": 2.51, "pop_pct": 1.86, "pop_total": 505652, "rep_index": 134.4, "density_per_100k": 150.1}, "الباحة": {"count": 651, "sample_pct": 2.15, "pop_pct": 1.52, "pop_total": 411888, "rep_index": 141.6, "density_per_100k": 158.1}, "الجوف": {"count": 1013, "sample_pct": 3.34, "pop_pct": 1.62, "pop_total": 440009, "rep_index": 206.2, "density_per_100k": 230.2}};
+const REGION_POP = {"الرياض": 6777146, "مكة المكرمة": 6915006, "المدينة المنورة": 1777933, "القصيم": 1215858, "الالشرقية": 4105780, "عسير": 1913392, "تبوك": 791535, "حائل": 597144, "الحدود الشمالية": 320524, "جازان": 1365110, "نجران": 505652, "الباحة": 411888, "الجوف": 440009};
+const ENG_BUCKETS = {"1-2": 266, "3-4": 190, "5-6": 431, "7-8": 88, "9": 50};
+const PERSONAS = [{"id": "P1", "name": "المرشَّحة الشابة في المركز الحضري", "icon": "👩‍🎓", "desc": "خريجة بكالوريوس حديثة من إحدى المدن الكبرى (الرياض، جدة، الدمام). تمثّل النواة الأكاديمية الأكثر استعداداً للبرنامج.", "value": "القلب التشغيلي للقاعدة — الأسهل في التواصل والمتابعة، الأعلى احتمالاً للإلتزام.", "risk": "تركّز ديموغرافي قد يخلق ثقافة برنامج مغلقة جغرافياً.", "count": 3633, "pct": 11.6, "male": 0, "female": 3633, "female_pct": 100.0, "avg_age": 26.4, "top_region": "الرياض", "top_qual": "البكالوريوس"}, {"id": "P2", "name": "المرشَّح الشاب في المركز", "icon": "👨‍🎓", "desc": "خريج بكالوريوس شاب من المدن الكبرى. الذكر النموذجي في القاعدة لكن بحجم أقل من نظيرته الأنثى.", "value": "يوازن التركيب الجنسي في الدورات ويضمن تمثيلاً متعدداً.", "risk": "احتمال أقل للالتزام طويل المدى مقارنة بالإناث (تجارب البرامج الشبيهة).", "count": 2874, "pct": 9.2, "male": 2874, "female": 0, "female_pct": 0.0, "avg_age": 26.1, "top_region": "الرياض", "top_qual": "البكالوريوس"}, {"id": "P3", "name": "خريج المناطق الطرفية", "icon": "🗺️", "desc": "من المناطق الأقل سكاناً (الحدود الشمالية، نجران، الباحة، الجوف، حائل). فرصة استراتيجية لتوزيع المنفعة جغرافياً.", "value": "يحقق العدالة المكانية — أولوية اختيار لأهداف رؤية 2030 في تنمية المناطق.", "risk": "تحدّيات لوجستية في التدريب والمتابعة.", "count": 3076, "pct": 9.8, "male": 1229, "female": 1847, "female_pct": 60.0, "avg_age": 27.9, "top_region": "الجوف", "top_qual": "البكالوريوس"}, {"id": "P4", "name": "المتقدّم المتقدّم أكاديمياً", "icon": "🎓", "desc": "حامل ماجستير أو دكتوراه أو زمالة. عيّنة صغيرة لكن نوعية، تشكّل احتياطياً لقيادات البرنامج.", "value": "مصدر مدربين/مشرفين مستقبليين، أو حالات خاصة بمسار متقدّم.", "risk": "توقعات عالية، قد لا تناسب البرنامج التشغيلي العام.", "count": 458, "pct": 1.5, "male": 244, "female": 214, "female_pct": 46.7, "avg_age": 36.6, "top_region": "الرياض", "top_qual": "الماجستير"}, {"id": "P5", "name": "العائد إلى السوق", "icon": "🔄", "desc": "أعمار 40+ — خريجون قدامى يبحثون عن إعادة دخول سوق العمل أو تغيير مسار. شريحة منسية في برامج التدريب التقليدية.", "value": "خبرة حياتية أعلى — مناسبون لأدوار الإرشاد السياحي التي تتطلب نضجاً اجتماعياً.", "risk": "احتياج تكييف خاص في المنهج (تعلّم الكبار).", "count": 3143, "pct": 10.1, "male": 1198, "female": 1945, "female_pct": 61.9, "avg_age": 44.3, "top_region": "الرياض", "top_qual": "البكالوريوس"}, {"id": "P6", "name": "المرشَّح ذو الإعاقة", "icon": "♿", "desc": "مسجَّل بصفة \"ذي إعاقة\" في القاعدة. شريحة صغيرة عددياً لكن استراتيجية للالتزام بأهداف الدمج.", "value": "مؤشر تنوع وشمول — التزام تنظيمي وأخلاقي.", "risk": "احتياج بيئة تدريب مهيّأة وأدوات تكيّفية.", "count": 422, "pct": 1.3, "male": 207, "female": 215, "female_pct": 50.9, "avg_age": 32.3, "top_region": "الرياض", "top_qual": "البكالوريوس"}];
+const THEMES = [{"id": "T1", "name": "تأنيث الإقبال على المهنة", "codes": ["نسبة الإناث المرتفعة", "الانحراف عن المرجع الوطني", "تجاوز سقف سوق العمل"], "evidence": "36.0% (مرجع وطني) → 61.6% (القاعدة)، انحراف +25.6 نقطة مئوية. 19,264 متقدّمة مقابل 12,000 متقدّم.", "interpretation": "مهنة الإرشاد السياحي تحظى بإقبال نسائي استثنائي يتجاوز معدّل مشاركة المرأة في سوق العمل بنسبة 1.7×. يعكس هذا تحوّلاً ثقافياً في النظرة للقطاع السياحي كمجال مناسب للمرأة السعودية.", "implication": "البرنامج بحاجة لبيئة تدريب وعمل مهيّأة للجنسين، مع تخطيط لمسارات وظيفية تستوعب هذه الكتلة النسائية.", "tag": "cultural-shift"}, {"id": "T2", "name": "فجوة المركز والأطراف", "codes": ["تركّز جغرافي", "HHI متوسط", "تفاوت مكاني"], "evidence": "CR3 = 49.0% (الرياض + مكة + الشرقية)، Gini المدن = 0.901 (تفاوت شديد). HHI المناطق = 1215.", "interpretation": "القاعدة تعكس البنية السكانية لكن مع تركّز أعلى في المراكز الحضرية الكبرى. الأطراف (نجران، الباحة، الحدود الشمالية، الجوف) ممثَّلة بشكل محدود رغم احتوائها على مقومات سياحية حقيقية.", "implication": "فرصة لحملات استقطاب مستهدفة بالأطراف، خصوصاً المناطق ذات الإمكانات السياحية الأكبر.", "tag": "spatial-gap"}, {"id": "T3", "name": "الجاهزية الأكاديمية المرتفعة", "codes": ["البكالوريوس المسيطر", "تنوّع جامعي", "تجانس مؤهل"], "evidence": "97.7% بكالوريوس. 199 جهة تعليمية. CR10 الجامعات = 65.3%.", "interpretation": "القاعدة متجانسة أكاديمياً عند مستوى البكالوريوس، مع تنوّع مؤسسي يدل على شمولية الاستقطاب عبر منظومة الجامعات السعودية. لا يوجد اعتماد على جامعات قليلة.", "implication": "إمكانية تصميم منهج موحّد دون تكييف كبير لاختلافات المؤهل، مع الاستفادة من التنوّع المؤسسي للتشبيك.", "tag": "academic-uniformity"}, {"id": "T4", "name": "الفجوة اللغوية المُقنَّعة", "codes": ["بيانات إنجليزية شحيحة", "اختبار غير إجباري", "مخاطر مهنية"], "evidence": "3.3% فقط لديهم درجة إنجليزية (1,025 من 31,264). متوسط 4.44/9.", "interpretation": "لمهنة تتعامل مباشرة مع زوار دوليين، غياب بيانات اللغة عن 96.7% من المتقدّمين يُخفي ما قد يكون فجوة جوهرية. هذا ليس \"بيانات مفقودة\" بل \"إشارة منهجية\" — اللغة ليست في صلب الاختيار حالياً.", "implication": "إدراج اختبار إنجليزي إجباري في مرحلة التقديم لا الاختيار. بدون ذلك، اختيار \"أعمى\" لمتطلب جوهري للوظيفة.", "tag": "methodological-gap"}, {"id": "T5", "name": "التركيز الجيلي على الشباب", "codes": ["متوسط منخفض", "IQR ضيق", "هيمنة 22-30"], "evidence": "متوسط 31.0 سنة، وسيط 29.7، IQR = 8.800000000000004. 57.5% بين 22-30.", "interpretation": "القاعدة شابة ومتجانسة عمرياً. هذا اختيار طبيعي للبرنامج (وظيفة ميدانية تتطلب نشاطاً) لكنه يستبعد فعلياً شرائح ذوي الخبرة والعائدين للسوق.", "implication": "تأكيد على أن البرنامج تأهيلي ميداني وليس برنامج تأهيل مهني عام. توجيه التوقعات في المواد التسويقية.", "tag": "demographic-focus"}, {"id": "T6", "name": "التنوّع المؤسسي المرن", "codes": ["غياب احتكار", "شبكة جامعات", "استقطاب موزّع"], "evidence": "199 جهة. أعلى 5 جامعات = 40.6% فقط من القاعدة. HHI = 530 (تنوّع عالٍ).", "interpretation": "لا توجد \"جامعة مهيمنة\" على القاعدة. هذا يدل على أن البرنامج وصل إلى منظومة التعليم العالي السعودي ككل، ولم يعتمد على شراكات حصرية مع جامعة أو جامعتين.", "implication": "فرصة لتعميق العلاقات مع جامعات بعينها لإنشاء مسارات أكاديمية متخصصة في الإرشاد السياحي بدلاً من الاستقطاب العام.", "tag": "institutional-diversity"}];
+const SWOT = {"strengths": [{"h": "حجم استقطاب كبير", "d": "31,264 متقدّم — قاعدة وفيرة تمنح مرونة في معايير الاختيار."}, {"h": "تجانس أكاديمي", "d": "97.7% بكالوريوس — سهولة تصميم منهج موحّد."}, {"h": "فئة عمرية مناسبة", "d": "31.0 سنة متوسط، 57.5% بين 22-30 — جاهزون مهنياً."}, {"h": "تنوّع جامعي عالٍ", "d": "199 جهة، HHI = 530 — لا اعتماد على شريك أكاديمي وحيد."}, {"h": "إقبال نسائي استثنائي", "d": "+25.6 نقطة فوق المرجع — يتسق مع توجهات رؤية 2030 لتمكين المرأة."}], "weaknesses": [{"h": "انحدار تمثيل الأطراف", "d": "3,684 متقدّم فقط من 5 مناطق طرفية — أقل من 10% من القاعدة."}, {"h": "فقر بيانات اللغة", "d": "96.7% بدون اختبار إنجليزي — معطّل لمعيار جوهري."}, {"h": "بيانات الجنس مُستنتجة", "d": "لا يوجد عمود مباشر للجنس في القاعدة — اعتماد على استنتاج من الاسم بدقة ~92%."}, {"h": "تركّز مديني شديد", "d": "Gini المدن = 0.901 — تفاوت حاد بين المدن."}, {"h": "فجوة تصنيف جغرافي", "d": "967 سجل (3.09%) غير مُصنَّف رغم استخدام قاعدة 4,581 مدينة."}], "opportunities": [{"h": "استقطاب المناطق السياحية المنخفضة", "d": "الأطراف الجنوبية الغربية (الباحة، عسير، نجران) ذات مقومات سياحية لكنها أقل تمثيلاً نسبياً."}, {"h": "مسار متقدّم للدراسات العليا", "d": "458 حامل دراسات عليا — احتياطي للقيادة والإرشاد التخصصي."}, {"h": "برامج تكميلية للنساء", "d": "حجم القاعدة النسائية يبرّر مساراً مهنياً متكاملاً بعد التدريب الأساسي."}, {"h": "شراكات أكاديمية مع جامعات الأطراف", "d": "إنشاء تخصصات فرعية في الإرشاد السياحي بجامعات الأطراف لزيادة الاستقطاب."}, {"h": "بنك بيانات لاتخاذ القرار", "d": "تطوير القاعدة لتشمل اللغات، المهارات، التفضيلات — لاختيار قائم على بيانات."}], "threats": [{"h": "إرهاق المتقدّمين", "d": "قاعدة تتجاوز 31 ألف — توقع زمن استجابة وانتظار قد يؤدي لتسرّب جزء منهم."}, {"h": "فجوة التوقعات", "d": "تباين بين توقعات حملة الدراسات العليا (446 ماجستير + 8 دكتوراه) وطبيعة البرنامج التشغيلي."}, {"h": "منافسة سوق العمل", "d": "القاعدة جذابة لقطاعات أخرى — قد تخسر القمم لصالح وظائف خارج السياحة."}, {"h": "تحدّي البنية التحتية في الأطراف", "d": "أي محاولة لجذب الأطراف تواجه قيود لوجستية حقيقية في التدريب."}, {"h": "عدم اكتمال بيانات الجنس", "d": "الاعتماد على الاستنتاج قد يُسبّب تحيّزاً في التصميم لو لم يُصحَّح بعمود رسمي."}]};
+const PESTLE = [{"dim": "السياسي / Political", "icon": "P", "color": "#3b82f6", "points": ["رؤية 2030: السياحة قطاع استراتيجي (هدف 100 مليون زائر).", "الإستراتيجية الوطنية للسياحة: 1.6 مليون وظيفة بحلول 2030.", "التوطين (السعودة): دفع لتوظيف السعوديين في الوظائف السياحية.", "الانفتاح السياسي والاجتماعي: تحوّل في النظرة للقطاع."]}, {"dim": "الاقتصادي / Economic", "icon": "E", "color": "#10b981", "points": ["البطالة بين الشباب السعودي: تفسّر حجم الإقبال (31,264).", "صعود السياحة بعد جائحة كوفيد-19.", "دعم حكومي للقطاع: استثمارات نيوم، البحر الأحمر، القدية.", "تحوّل الاقتصاد عن الاعتماد الكلي على النفط."]}, {"dim": "الاجتماعي / Social", "icon": "S", "color": "#ec4899", "points": ["تمكين المرأة: نسبة الإناث 61.6% — انعكاس مباشر للتحوّل الاجتماعي.", "الشباب: 65% من السكان تحت 35 — قاعدة استقطاب طبيعية.", "تغيّر النظرة للقطاع السياحي كمهنة \"محترمة\".", "صعود \"السياحة الداخلية\" بين السعوديين أنفسهم."]}, {"dim": "التقني / Technological", "icon": "T", "color": "#a78bfa", "points": ["منصة جدارات الرقمية: تسريع تقديم الطلبات.", "التحوّل الرقمي في القطاع السياحي (تطبيقات، VR، AR).", "حاجة المرشد السياحي لمهارات رقمية (وسائل تواصل، خرائط ذكية).", "بيانات ضخمة عن السائحين تتطلب مرشدين قادرين على فهمها."]}, {"dim": "القانوني / Legal", "icon": "L", "color": "#f59e0b", "points": ["الترخيص المهني: اشتراط رخصة إرشاد سياحي معتمدة.", "قانون العمل السعودي: حماية المتدربات والعاملات في القطاع.", "الاعتماد الأكاديمي للبرامج التدريبية.", "حقوق ذوي الإعاقة في الالتحاق ببرامج التدريب."]}, {"dim": "البيئي / Environmental", "icon": "V", "color": "#14b8a6", "points": ["تنوّع البيئات السعودية: بحرية (البحر الأحمر)، جبلية (عسير)، صحراوية، تراثية.", "استدامة السياحة: حاجة لمرشدين واعين بيئياً.", "مواقع التراث العالمي (الدرعية، الحجر، جدة التاريخية) — تتطلب تخصص.", "الموسمية: تأثير الطقس على توزيع العمل جغرافياً."]}];
+const PHENOMENOLOGY = [{"h": "البيانات بوصفها مرآة لتحوّل اجتماعي", "d": "حين تتقدّم 61.6% من القاعدة من الإناث لمهنة كانت تقليدياً ذكورية، فالبيانات تحكي قصة تجاوز ثقافي. هذا ليس \"إحصاء\" بل \"علامة على تحوّل\"."}, {"h": "القاعدة بوصفها أيقونة لجيل ما بعد 2016", "d": "متوسط العمر 31.0 سنة، أي أن المتقدّم النموذجي وُلِد ~1996. هؤلاء هم الجيل الذي شهد رؤية 2030 وهم في عمر التشكّل المهني. اختيارهم للسياحة قرار ثقافي قبل أن يكون مهنياً."}, {"h": "الجغرافيا بوصفها حدّ معرفي", "d": "الفجوة بين المركز (49.0% من ثلاث مناطق) والأطراف (10% من خمس مناطق) ليست فقط فجوة استقطاب — بل فجوة في \"الوصول إلى المعرفة بالبرنامج\". الأطراف لا تعرف، لا تتقدّم."}, {"h": "البكالوريوس بوصفه ثقافة لا مجرد شهادة", "d": "97.7% بكالوريوس يعكس تحوّل المجتمع السعودي إلى مجتمع \"بكالوريوسي\" بامتياز. التحدي ليس في عدد المؤهلين بل في خلق فرص تناسبهم."}, {"h": "الصمت اللغوي صوتٌ منهجي", "d": "غياب 96.7% من بيانات اللغة في قاعدة لبرنامج إرشاد سياحي ليس صدفة — إنه يكشف أن \"اختبار الإنجليزية\" ليس بعد جزءاً من معايير الاختيار. ما تخفيه البيانات أحياناً أهم مما تظهره."}, {"h": "التنوّع الجامعي بوصفه ديمقراطية وصول", "d": "199 جهة تعليمية بـHHI = 530 (تنوّع عالٍ). يعني هذا أن \"كل شخص\" بإمكانه التقديم بغض النظر عن جامعته. هذا قيمة في حد ذاتها — العدالة المؤسسية."}, {"h": "الفئة الغائبة: الشريحة المتخصصة", "d": "454 حامل ماجستير ودكتوراه فقط (1.5%). هؤلاء \"غير مرئيين\" في تصميم البرنامج العام. ماذا لو كانت السياحة بحاجة لمسار أكاديمي عميق وليس فقط تأهيل تشغيلي؟"}];
+const INST_CATEGORIES = [{"category": "حكومية كبرى", "inst_count": 100, "people_count": 30006, "people_pct": 95.99, "top_samples": [{"name": "جامعة الملك فيصل", "count": 3200}, {"name": "جامعة جازان", "count": 2716}, {"name": "جامعة تبوك", "count": 2143}, {"name": "جامعة طيبة", "count": 2050}, {"name": "جامعة الملك عبدالعزيز", "count": 1380}, {"name": "جامعة الباحه", "count": 937}, {"name": "جامعة الحدود الشمالية", "count": 379}, {"name": "جامعة المستقبل", "count": 16}]}, {"category": "خاصة وأهلية", "inst_count": 21, "people_count": 332, "people_pct": 1.06, "top_samples": [{"name": "الجامعة العربية المفتوحة", "count": 82}, {"name": "جامعة الفيصل", "count": 48}, {"name": "كلية الأصالة الأهلية", "count": 34}, {"name": "كلية بريدة الأهلية", "count": 32}, {"name": "جامعة دار العلوم", "count": 13}, {"name": "كلية الأمير سلطان للسياحة والإدارة", "count": 4}, {"name": "جامعة نايف العربية الامنية", "count": 2}, {"name": "كلية جدة العالمية الأهلية", "count": 2}]}, {"category": "تقنية ومعاهد", "inst_count": 7, "people_count": 275, "people_pct": 0.88, "top_samples": [{"name": "الكليات التقنية", "count": 171}, {"name": "كليات البنات", "count": 82}, {"name": "المعاهد الاهلية للتدريب الفني والمهني", "count": 15}, {"name": "المعهد العالي للتقنية للنساء", "count": 2}, {"name": "المعهد المصرفي", "count": 2}, {"name": "الكلية الصناعية بالجبيل وينبع", "count": 2}, {"name": "المعهد العربي للعلوم الصحية", "count": 1}]}, {"category": "دولية", "inst_count": 32, "people_count": 56, "people_pct": 0.18, "top_samples": [{"name": "جامعة ولاية مورهيد", "count": 2}, {"name": "جامعة مينيسوتا", "count": 2}, {"name": "جامعة ديكين", "count": 2}, {"name": "جامعة كوينزلاند للتكنولوجيا", "count": 2}, {"name": "جامعة لندن الامبرياليه", "count": 1}, {"name": "جامعة ولاية كاليفورنيا – لونج بيتش", "count": 1}, {"name": "كوين ماري، جامعة لندن", "count": 1}, {"name": "جامعة مؤتة", "count": 1}]}, {"category": "تجميعات", "inst_count": 2, "people_count": 355, "people_pct": 1.14, "top_samples": [{"name": "مؤسسة تعليمية خارجية", "count": 353}, {"name": "جهات حكومية", "count": 2}]}, {"category": "ثانوية ومدرسية", "inst_count": 3, "people_count": 6, "people_pct": 0.02, "top_samples": [{"name": "المعهد الثانوي للمعلمين", "count": 3}, {"name": "الثانويه المهنيه والصناعيه", "count": 2}, {"name": "ثانوية تجارية", "count": 1}]}, {"category": "غير مصنّفة", "inst_count": 33, "people_count": 229, "people_pct": 0.73, "top_samples": [{"name": "كلية الجبيل الجامعية", "count": 47}, {"name": "كلية الجبيل الصناعية", "count": 30}, {"name": "كليات الشرق العربي", "count": 13}, {"name": "مراكزالتدريب المهني", "count": 11}, {"name": "الكليات المتوسطة", "count": 11}, {"name": "كلية الأمير فهد بن سلطان", "count": 9}, {"name": "كلية ينبع الجامعية", "count": 6}, {"name": "كلية الملك فهد الأمنية", "count": 1}]}];
+</script>
+<script>
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const C = {green:'#10b981',red:'#ef4444',amber:'#f59e0b',blue:'#3b82f6',
+  purple:'#a78bfa',pink:'#ec4899',cyan:'#06b6d4',teal:'#14b8a6',orange:'#f97316',
+  muted:'#7088a8',text:'#dde7f7',bd:'#1a2f4d'};
+
+function T(name, btn){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('pg-'+name).classList.add('on');
+  btn.classList.add('on');
+  if(name==='map' && window._map) setTimeout(()=>window._map.invalidateSize(),100);
+}
+
+Chart.defaults.font.family = 'Cairo';
+Chart.defaults.font.size = 11;
+Chart.defaults.color = C.muted;
+Chart.defaults.borderColor = C.bd;
+
+// ═══ عنوان وشريط معلومات ═══
+document.getElementById('c-total').textContent = fmt(KPI.total) + ' متقدّم';
+document.getElementById('c-regions').textContent = KPI.regions_covered + ' منطقة';
+document.getElementById('c-cov').textContent = KPI.mapped_pct + '% تغطية';
+document.getElementById('m-cities').textContent = fmt(KPI.cities_unique);
+document.getElementById('m-inst').textContent = KPI.institutions;
+document.getElementById('f-n').textContent = fmt(KPI.total);
+
+// ═══ TAB 1 — نظرة عامة ═══
+document.getElementById('d-total').textContent = fmt(KPI.total);
+document.getElementById('d-tot-sub').textContent = `${KPI.regions_covered} منطقة · ${KPI.institutions} جهة تعليمية`;
+document.getElementById('d-female').textContent = fmt(KPI.female);
+document.getElementById('d-female-sub').textContent = KPI.female_pct + '% من الإجمالي';
+document.getElementById('d-male').textContent = fmt(KPI.male);
+document.getElementById('d-male-sub').textContent = KPI.male_pct + '% من الإجمالي';
+document.getElementById('d-dev').innerHTML = (KPI.female_deviation_pp>=0?'<span style="color:var(--green)">+':'<span style="color:var(--red)">') + KPI.female_deviation_pp + 'pp</span>';
+document.getElementById('d-age').textContent = KPI.avg_age + ' سنة';
+document.getElementById('d-age-sub').textContent = `الوسيط ${KPI.median_age}`;
+document.getElementById('d-cov').textContent = KPI.mapped_pct + '%';
+document.getElementById('d-cov-sub').textContent = `${fmt(KPI.cities_unique)} مدينة فريدة`;
+
+document.getElementById('hhi-reg').textContent = fmt(KPI.hhi_region);
+document.getElementById('cr3-reg').textContent = KPI.cr3_region;
+document.getElementById('cr5-reg').textContent = KPI.cr5_region;
+document.getElementById('gini-reg').textContent = KPI.gini_region;
+const hhiR = KPI.hhi_region;
+document.getElementById('hhi-reg-tag').innerHTML = hhiR<1500?'<span class="tag tag-good">توزيع جيد</span>':(hhiR<2500?'<span class="tag tag-warn">تركّز متوسط</span>':'<span class="tag tag-danger">تركّز عالٍ</span>');
+document.getElementById('int-reg').innerHTML = `أعلى 3 مناطق (الرياض، مكة، الشرقية) تستحوذ على <b>${KPI.cr3_region}%</b> من القاعدة. ${hhiR<1500?'التوزيع متنوّع جغرافياً.':'تركّز معتدل.'}`;
+
+document.getElementById('hhi-city').textContent = fmt(KPI.hhi_city);
+document.getElementById('cities-uniq').textContent = fmt(KPI.cities_unique);
+document.getElementById('gini-city').textContent = KPI.gini_city;
+document.getElementById('hhi-city-tag').innerHTML = `<span class="tag tag-info">تفاوت ${KPI.gini_city}</span>`;
+document.getElementById('int-city').innerHTML = `معظم المتقدّمين من قلّة من المدن، مع ذيل طويل من ${fmt(KPI.cities_unique)} مدينة صغيرة. التفاوت شديد.`;
+
+document.getElementById('hhi-inst').textContent = fmt(KPI.hhi_inst);
+document.getElementById('cr5-inst').textContent = KPI.cr5_inst;
+document.getElementById('cr10-inst').textContent = KPI.cr10_inst;
+document.getElementById('inst-uniq').textContent = fmt(KPI.institutions);
+document.getElementById('hhi-inst-tag').innerHTML = KPI.hhi_inst<1000?'<span class="tag tag-good">تنوّع عالٍ</span>':'<span class="tag tag-warn">تركّز</span>';
+document.getElementById('int-inst').innerHTML = `أعلى 10 جامعات = <b>${KPI.cr10_inst}%</b>. تنوّع كبير في الجهات، لا اعتماد على جامعة واحدة.`;
+
+document.getElementById('s-mean').textContent = KPI.avg_age;
+document.getElementById('s-med').textContent = KPI.median_age;
+document.getElementById('s-std').textContent = KPI.std_age;
+document.getElementById('s-p25').textContent = KPI.p25_age;
+document.getElementById('s-p75').textContent = KPI.p75_age;
+document.getElementById('s-p90').textContent = KPI.p90_age;
+document.getElementById('s-iqr').textContent = `${KPI.p25_age} و ${KPI.p75_age}`;
+document.getElementById('s-range').textContent = `${KPI.min_age} — ${KPI.max_age}`;
+
+new Chart(document.getElementById('cAge'),{type:'bar',
+  data:{labels:Object.keys(AGE_DIST),datasets:[{data:Object.values(AGE_DIST),
+    backgroundColor:[C.green,C.teal,C.cyan,C.blue,C.purple,C.muted],borderRadius:4}]},
+  options:{plugins:{legend:{display:false}},
+    scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.04)'}},x:{grid:{display:false}}}}});
+
+// TAB 2
+const visRegs = REGION_DETAILS.filter(r=>r.region!=='غير محدد');
+let regHtml = `<thead><tr><th>المنطقة</th><th class="num">المتقدّمون</th><th class="num">% القاعدة</th><th class="num">% السكان</th><th class="num">مؤشر التمثيل</th><th>التقييم</th><th class="num">كثافة/100ألف</th><th class="num">مدن</th></tr></thead><tbody>`;
+visRegs.forEach(r=>{
+  const idx=r.rep_index;let cls='dev-neu',lbl='متوازن',ic='—';
+  if(idx>110){cls='dev-pos';lbl='إقبال زائد';ic='↑'}
+  else if(idx<90){cls='dev-neg';lbl='إقبال ناقص';ic='↓'}
+  regHtml+=`<tr><td><b>${r.region}</b></td><td class="num">${fmt(r.total)}</td><td class="num">${r.sample_pct}%</td><td class="num muted">${r.pop_pct}%</td><td class="num"><span class="dev-cell ${cls}">${idx}</span></td><td><span class="tag ${idx>110?'tag-good':(idx<90?'tag-danger':'tag-info')}">${ic} ${lbl}</span></td><td class="num">${r.density}</td><td class="num muted">${r.cities}</td></tr>`;
+});
+document.getElementById('tblRegRep').innerHTML = regHtml+'</tbody>';
+
+const overEl = document.getElementById('overRepList');
+const underEl = document.getElementById('underRepList');
+const sortedByIdx = [...visRegs].sort((a,b)=>b.rep_index-a.rep_index);
+sortedByIdx.filter(r=>r.rep_index>110).forEach(r=>{
+  overEl.insertAdjacentHTML('beforeend',`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bd)"><div><b>${r.region}</b><div style="font-size:10.5px;color:var(--muted);margin-top:1px">${fmt(r.total)} متقدّم · ${r.sample_pct}% من القاعدة vs ${r.pop_pct}% من السكان</div></div><div style="text-align:left"><span class="dev-cell dev-pos" style="font-size:13px;font-weight:800">${r.rep_index}</span></div></div>`);
+});
+sortedByIdx.filter(r=>r.rep_index<90).reverse().forEach(r=>{
+  underEl.insertAdjacentHTML('beforeend',`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bd)"><div><b>${r.region}</b><div style="font-size:10.5px;color:var(--muted);margin-top:1px">${fmt(r.total)} متقدّم · ${r.sample_pct}% من القاعدة vs ${r.pop_pct}% من السكان</div></div><div style="text-align:left"><span class="dev-cell dev-neg" style="font-size:13px;font-weight:800">${r.rep_index}</span></div></div>`);
+});
+
+// TAB 3
+new Chart(document.getElementById('cGender'),{type:'doughnut',
+  data:{labels:['إناث','ذكور'],datasets:[{data:[GENDER.F,GENDER.M],backgroundColor:[C.pink,C.blue],borderWidth:0}]},
+  options:{plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11}}}},cutout:'62%'}});
+
+document.getElementById('cmp-actual').style.width = KPI.female_pct+'%';
+document.getElementById('cmp-baseline').style.left = '36%';
+document.getElementById('cmp-actual-val').textContent = `عيّنتنا: ${KPI.female_pct}%`;
+document.getElementById('dev-explain').innerHTML = `الإناث <b>${KPI.female_pct}%</b> مقابل <b>36%</b> في سوق العمل (+${KPI.female_deviation_pp} نقطة). إقبال نسائي يفوق المعدّل بـ <b>${(KPI.female_pct/36).toFixed(1)}×</b>.`;
+
+const qgEl = document.getElementById('qg-list');
+QUAL_ORDER.filter(q=>GENDER_X_QUAL[q]).forEach(q=>{
+  const g=GENDER_X_QUAL[q];const tot=(g.M||0)+(g.F||0);if(tot<10)return;
+  const fp=(g.F||0)/tot*100;const mp=(g.M||0)/tot*100;
+  qgEl.insertAdjacentHTML('beforeend',`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><b style="font-size:11.5px">${q.length>30?q.substring(0,30)+'…':q}</b><span class="muted">${fmt(tot)}</span></div><div class="split">${fp>10?`<div class="s-f" style="width:${fp}%">${fp.toFixed(0)}%</div>`:''}${mp>10?`<div class="s-m" style="width:${mp}%">${mp.toFixed(0)}%</div>`:''}</div></div>`);
+});
+
+new Chart(document.getElementById('cGenderDev'),{type:'bar',
+  data:{labels:visRegs.map(r=>r.region),datasets:[{label:'انحراف نسبة الإناث',data:visRegs.map(r=>r.female_pct-36),backgroundColor:visRegs.map(r=>(r.female_pct-36)>0?C.pink:C.blue),borderRadius:3}]},
+  options:{plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,.04)'},title:{display:true,text:'نقطة مئوية مقابل 36%',color:C.muted}},x:{grid:{display:false}}}}});
+
+// TAB 4
+const pyLabels = Object.keys(GENDER_X_AGE);
+new Chart(document.getElementById('cPyramid'),{type:'bar',
+  data:{labels:pyLabels,datasets:[
+    {label:'إناث',data:pyLabels.map(a=>-(GENDER_X_AGE[a].F||0)),backgroundColor:C.pink,borderRadius:3},
+    {label:'ذكور',data:pyLabels.map(a=>(GENDER_X_AGE[a].M||0)),backgroundColor:C.blue,borderRadius:3}]},
+  options:{indexAxis:'y',plugins:{legend:{position:'top'},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmt(Math.abs(c.parsed.x))}`}}},scales:{x:{ticks:{callback:v=>fmt(Math.abs(v))},grid:{color:'rgba(255,255,255,.04)'}},y:{stacked:true,grid:{display:false}}}}});
+
+const years = Object.keys(YEAR_GENDER).map(Number).sort((a,b)=>a-b);
+new Chart(document.getElementById('cCohort'),{type:'bar',
+  data:{labels:years,datasets:[
+    {label:'إناث',data:years.map(y=>YEAR_GENDER[y].F||0),backgroundColor:C.pink,borderRadius:2},
+    {label:'ذكور',data:years.map(y=>YEAR_GENDER[y].M||0),backgroundColor:C.blue,borderRadius:2}]},
+  options:{plugins:{legend:{position:'top'}},scales:{y:{stacked:true,beginAtZero:true,grid:{color:'rgba(255,255,255,.04)'}},x:{stacked:true,grid:{display:false}}}}});
+
+const qbEl = document.getElementById('qual-bars');
+const qualMax = Math.max(...Object.values(QUAL_COUNT));
+QUAL_ORDER.filter(q=>QUAL_COUNT[q]).forEach(q=>{
+  const v=QUAL_COUNT[q];const w=v/qualMax*100;const pct=v/KPI.total*100;
+  qbEl.insertAdjacentHTML('beforeend',`<div style="display:grid;grid-template-columns:260px 1fr 100px;gap:12px;align-items:center;padding:7px 0;font-size:11.5px"><div><b>${q}</b></div><div class="minib"><div class="minib-f" style="width:${w}%;background:${C.purple}"></div></div><div class="num"><b>${fmt(v)}</b> <span class="muted">(${pct.toFixed(2)}%)</span></div></div>`);
+});
+
+// ═══ TAB 5: تصنيف الجهات + الجدول ═══
+const catColors = {
+  'حكومية كبرى':C.green,
+  'خاصة وأهلية':C.purple,
+  'تقنية ومعاهد':C.cyan,
+  'دولية':C.orange,
+  'تجميعات':C.muted,
+  'ثانوية ومدرسية':C.amber,
+  'غير مصنّفة':C.red,
+};
+
+// مخطط شريطي أفقي للتصنيف
+new Chart(document.getElementById('cInstCat'),{type:'bar',
+  data:{labels:INST_CATEGORIES.map(c=>c.category),datasets:[{
+    label:'عدد المتقدّمين',
+    data:INST_CATEGORIES.map(c=>c.people_count),
+    backgroundColor:INST_CATEGORIES.map(c=>catColors[c.category]||C.muted),
+    borderRadius:4,
+  }]},
+  options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{
+    const cat = INST_CATEGORIES[c.dataIndex];
+    return `${fmt(cat.people_count)} متقدّم (${cat.people_pct}%) — ${cat.inst_count} جهة`;
+  }}}},
+    scales:{x:{type:'logarithmic',beginAtZero:false,grid:{color:'rgba(255,255,255,.04)'}},y:{grid:{display:false}}}}});
+
+// قائمة التفاصيل
+const icl = document.getElementById('instCatsList');
+INST_CATEGORIES.forEach(ic=>{
+  const col = catColors[ic.category]||C.muted;
+  const samples = ic.top_samples.slice(0,6).map(s=>`<div class="cat-sample">${s.name.length>32?s.name.substring(0,32)+'…':s.name} <b>${fmt(s.count)}</b></div>`).join('');
+  icl.insertAdjacentHTML('beforeend',`
+    <div class="cat-box" style="border-right-color:${col}">
+      <div class="cat-head">
+        <div class="cat-name">${ic.category}</div>
+        <div class="cat-stats">
+          <span>عدد الجهات <b>${ic.inst_count}</b></span>
+          <span>عدد المتقدّمين <b>${fmt(ic.people_count)}</b></span>
+          <span>% من القاعدة <b style="color:${col}">${ic.people_pct}%</b></span>
+        </div>
+      </div>
+      <div class="cat-samples">${samples}</div>
+    </div>`);
+});
+
+let instHtml = `<thead><tr><th>#</th><th>الجهة</th><th class="num">العدد</th><th class="num">% من القاعدة</th><th class="num">تراكمي</th><th class="num">% إناث</th><th>المنطقة الغالبة</th><th class="num">المناطق</th><th>المؤهل الغالب</th></tr></thead><tbody>`;
+TOP_INSTITUTIONS.forEach(it=>{
+  const fc = it.female_pct>70?'dev-pos':(it.female_pct<30?'dev-neg':'dev-neu');
+  instHtml += `<tr><td class="num muted">${it.rank}</td><td><b>${it.inst}</b></td><td class="num">${fmt(it.total)}</td><td class="num">${it.share}%</td><td class="num muted">${it.cumulative_share}%</td><td class="num"><span class="dev-cell ${fc}">${it.female_pct}%</span></td><td style="font-size:11px">${it.top_region}</td><td class="num muted">${it.regions_count}</td><td class="muted" style="font-size:10.5px">${it.top_qual}</td></tr>`;
+});
+document.getElementById('tblInst').innerHTML = instHtml + '</tbody>';
+
+// TAB 6
+setTimeout(()=>{
+  const map = L.map('saMap',{center:[24,45],zoom:5,zoomControl:true,attributionControl:false});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd'}).addTo(map);
+  window._map = map;
+  const maxTotal = Math.max(...visRegs.map(r=>r.total));
+  visRegs.forEach(r=>{
+    const radius = 10 + (r.total/maxTotal)*40;
+    const color = r.rep_index>110?C.green:(r.rep_index<90?C.red:C.muted);
+    L.circleMarker([r.lat,r.lng],{radius,fillColor:color,color:'#fff',weight:1.5,fillOpacity:.75})
+      .bindPopup(`<div style="min-width:200px"><b style="font-size:13px">${r.region}</b><hr style="margin:6px 0;border:none;border-top:1px solid #ccc"><div style="font-size:11px;line-height:1.7">المتقدّمون: <b>${fmt(r.total)}</b><br>% من القاعدة: <b>${r.sample_pct}%</b><br>% من السكان: <b>${r.pop_pct}%</b><br>مؤشر التمثيل: <b style="color:${color}">${r.rep_index}</b><br>إناث: ${r.female_pct}% | ذكور: ${r.male_pct}%</div></div>`).addTo(map);
+  });
+},200);
+
+let cityHtml = `<thead><tr><th>#</th><th>المدينة</th><th>المنطقة</th><th class="num">العدد</th><th class="num">% إناث</th></tr></thead><tbody>`;
+TOP_CITIES.slice(0,30).forEach((c,i)=>{
+  cityHtml += `<tr><td class="num muted">${i+1}</td><td><b>${c.city}</b></td><td style="font-size:11px;color:var(--muted)">${c.region}</td><td class="num">${fmt(c.total)}</td><td class="num"><span class="dev-cell ${c.female_pct>70?'dev-pos':(c.female_pct<30?'dev-neg':'dev-neu')}">${c.female_pct}%</span></td></tr>`;
+});
+document.getElementById('tblCity').innerHTML = cityHtml + '</tbody>';
+
+// TAB 7
+const signals = [
+  {cls:'',ico:'⊕',h:'إقبال نسائي استثنائي',body:`الإناث <b>${KPI.female_pct}%</b> من القاعدة مقابل <b>36%</b> في سوق العمل (+${KPI.female_deviation_pp} نقطة). الإقبال النسائي على البرنامج يفوق المعدّل الوطني بـ <b>1.7×</b>.`},
+  {cls:'s-good',ico:'⊕',h:'تنوّع جامعي عالٍ',body:`<b>${KPI.institutions}</b> جهة تعليمية، أعلى 10 جامعات تستوعب <b>${KPI.cr10_inst}%</b> فقط من القاعدة. البرنامج وصل إلى منظومة الجامعات السعودية بأكملها.`},
+  {cls:'s-warn',ico:'⚠',h:'تركّز شديد في المدن',body:`معظم المتقدّمين من قلّة من المدن الكبرى، مع ذيل طويل من <b>${fmt(KPI.cities_unique)}</b> مدينة صغيرة. فرصة لحملات مستهدفة للمدن متوسطة الحجم.`},
+  {cls:'',ico:'⊕',h:'هيمنة البكالوريوس',body:`<b>${KPI.bachelor_pct}%</b> من القاعدة حملة بكالوريوس. الدراسات العليا = <b>${fmt(KPI.postgrad)}</b> متقدّم (${KPI.postgrad_pct}%). تجانس مؤهل يسهّل تصميم منهج موحّد.`},
+  {cls:'s-danger',ico:'⊖',h:'فقر في بيانات الإنجليزية',body:`<b>${KPI.eng_scored_pct}%</b> فقط لديهم درجة إنجليزية مسجّلة (${fmt(KPI.eng_scored)} متقدّم). متوسط الدرجات ${KPI.eng_avg}/9. <b>قيد حرج لمهنة إرشاد سياحي</b> — يُنصح بإضافة اختبار إنجليزي إجباري.`},
+  {cls:'',ico:'⊕',h:'فئة عمرية متجانسة',body:`نصف المتقدّمين بين <b>${KPI.p25_age}</b> و <b>${KPI.p75_age}</b> سنة. المتوسط ${KPI.avg_age}، الانحراف ${KPI.std_age}. فئة شابّة مناسبة لبرنامج تأهيلي ميداني.`},
+];
+const sBox = document.getElementById('signals');
+signals.forEach(s=>sBox.insertAdjacentHTML('beforeend',`<div class="signal ${s.cls}"><div class="signal-h">${s.ico} ${s.h}</div>${s.body}</div>`));
+
+const anBox = document.getElementById('anomalies');
+if(ANOMALIES_GENDER.length===0){anBox.innerHTML='<div class="muted" style="text-align:center;padding:20px">لا توجد انحرافات لافتة</div>';}
+else{ANOMALIES_GENDER.forEach(a=>{const dir=a.deviation>0?'إناث':'ذكور';anBox.insertAdjacentHTML('beforeend',`<div style="padding:9px 0;border-bottom:1px solid var(--bd)"><div style="display:flex;justify-content:space-between;align-items:baseline"><b>${a.region}</b><span class="dev-cell ${a.deviation>0?'dev-pos':'dev-neg'}">${a.deviation>=0?'+':''}${a.deviation}pp</span></div><div style="font-size:10.5px;color:var(--muted);margin-top:3px">${a.female_pct}% إناث · انحراف نحو ${dir} · العدد ${fmt(a.total)}</div></div>`);});}
+document.getElementById('cov-disclaimer').textContent = KPI.mapped_pct;
+
+// ═══ TAB 8: القراءة العميقة ═══
+const pg = document.getElementById('personasGrid');
+PERSONAS.forEach(p=>{
+  pg.insertAdjacentHTML('beforeend',`
+    <div class="persona">
+      <div class="persona-head">
+        <div class="persona-ico">${p.icon}</div>
+        <div>
+          <div class="persona-name">${p.name}</div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:2px">${fmt(p.count)} متقدّم — ${p.pct}% من القاعدة</div>
+        </div>
+      </div>
+      <div class="persona-stats">
+        <div class="pstat">نسبة الإناث <b>${p.female_pct}%</b></div>
+        <div class="pstat">متوسط العمر <b>${p.avg_age}</b></div>
+        <div class="pstat">المنطقة الغالبة <b>${p.top_region}</b></div>
+      </div>
+      <div class="persona-desc">${p.desc}</div>
+      <div class="persona-row"><b>القيمة:</b><span>${p.value}</span></div>
+      <div class="persona-row risk"><b>التحدّيات:</b><span>${p.risk}</span></div>
+    </div>`);
+});
+
+const tl = document.getElementById('themesList');
+THEMES.forEach(t=>{
+  tl.insertAdjacentHTML('beforeend',`
+    <div class="theme">
+      <div class="theme-head"><div class="theme-name">${t.name}</div><div class="theme-n">${t.id}</div></div>
+      <div class="theme-codes">${t.codes.map(c=>`<span class="code-pill">${c}</span>`).join('')}</div>
+      <div class="theme-row"><b>الدليل من الأرقام:</b>${t.evidence}</div>
+      <div class="theme-row"><b>التفسير:</b>${t.interpretation}</div>
+      <div class="theme-row" style="background:rgba(20,184,166,.06);border-right:2px solid var(--teal)"><b style="color:var(--teal)">القرار المقترح:</b>${t.implication}</div>
+    </div>`);
+});
+
+['s','w','o','t'].forEach((q,i)=>{
+  const arr = i===0?SWOT.strengths:(i===1?SWOT.weaknesses:(i===2?SWOT.opportunities:SWOT.threats));
+  const el = document.getElementById('swot-'+q);
+  arr.forEach(item=>el.insertAdjacentHTML('beforeend',`<div class="swot-item"><b>${item.h}:</b> ${item.d}</div>`));
+});
+
+const pg2 = document.getElementById('pestleGrid');
+PESTLE.forEach(p=>{
+  pg2.insertAdjacentHTML('beforeend',`
+    <div class="pestle-card">
+      <div class="pestle-head"><div class="pestle-letter" style="background:${p.color}">${p.icon}</div><div class="pestle-dim">${p.dim}</div></div>
+      <ul>${p.points.map(pt=>`<li>${pt}</li>`).join('')}</ul>
+    </div>`);
+});
+
+const pl = document.getElementById('phenoList');
+PHENOMENOLOGY.forEach(p=>{
+  pl.insertAdjacentHTML('beforeend',`<div class="pheno"><div class="pheno-h">▸ ${p.h}</div><div class="pheno-d">${p.d}</div></div>`);
+});
+
+</script>
+</body>
+</html>
