@@ -2,7 +2,7 @@
   "meta": {
     "title": "تقرير تحليلات التعلم – برنامج المهارات الشاملة للعاملة المنزلية",
     "subtitle": "شركة تكامل (مساند) · المقدَّم للشركاء من شركات الاستقدام",
-    "updated": "٧ يونيو ٢٠٢٦ — تحديث تلقائي",
+    "updated": "١٦ يونيو ٢٠٢٦ — تحديث تلقائي",
     "footer": "تقرير تحليلات التعلم · برنامج المهارات الشاملة للعاملة المنزلية · منصة تكامل (مساند) · يونيو 2026\nإعداد: إدارة التدريب — التدريب الإلكتروني | أكاديمية التدريب النوعي"
   },
   "units": [
@@ -97,14 +97,14 @@
           "count": 10
         }
       ],
-      "activated": 20,
-      "not_started": 12,
+      "activated": 17,
+      "not_started": 15,
       "languages": [
         "🇬🇧 إنجليزية",
         "🇧🇩 بنغالية",
         "🇪🇹 أرومو/أمهرية"
       ],
-      "highlight": "✅ الأعلى تفعيلاً · 6 شهادات · NAMATOVU HAMIDA (656.2 / 800)",
+      "highlight": "✅ 6 شهادات · 11 نشطات جديدة · NAMATOVU HAMIDA (656.2 / 800)",
       "highlight_type": "success"
     },
     {
@@ -124,14 +124,14 @@
           "count": 19
         }
       ],
-      "activated": 2,
-      "not_started": 54,
+      "activated": 15,
+      "not_started": 39,
       "languages": [
         "🇧🇩 بنغالي",
         "🇱🇰 سنهالية"
       ],
-      "highlight": "⚠️ 54 متدربة — 0 نشطة · بنجلاديش (35) لم تُفعّل بعد — تدخل عاجل",
-      "highlight_type": "danger"
+      "highlight": "📈 بداية التفعيل · 15 متدربة نشطة من أصل 54 (بنجلاديش 7/35 · سيريلانكا 8/19) — متابعة مستمرة",
+      "highlight_type": "warning"
     },
     {
       "id": "sigma",
@@ -1048,7 +1048,7 @@
       "co_ar": "المعتمد",
       "nat": "أوغندا",
       "flag": "🇺🇬",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -1069,7 +1069,7 @@
       "co_ar": "المعتمد",
       "nat": "أوغندا",
       "flag": "🇺🇬",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -1279,7 +1279,7 @@
       "co_ar": "المعتمد",
       "nat": "أثيوبيا",
       "flag": "🇪🇹",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -1300,7 +1300,7 @@
       "co_ar": "المعتمد",
       "nat": "أثيوبيا",
       "flag": "🇪🇹",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -1447,7 +1447,7 @@
       "co_ar": "المعتمد",
       "nat": "بنجلاديش",
       "flag": "🇧🇩",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -1489,7 +1489,7 @@
       "co_ar": "المعتمد",
       "nat": "بنجلاديش",
       "flag": "🇧🇩",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -1531,7 +1531,7 @@
       "co_ar": "المعتمد",
       "nat": "بنجلاديش",
       "flag": "🇧🇩",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -1573,7 +1573,7 @@
       "co_ar": "ركن أديم",
       "nat": "بنجلاديش",
       "flag": "🇧🇩",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -1615,7 +1615,7 @@
       "co_ar": "ركن أديم",
       "nat": "بنجلاديش",
       "flag": "🇧🇩",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -1783,7 +1783,7 @@
       "co_ar": "ركن أديم",
       "nat": "بنجلاديش",
       "flag": "🇧🇩",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -1804,7 +1804,7 @@
       "co_ar": "ركن أديم",
       "nat": "بنجلاديش",
       "flag": "🇧🇩",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -2119,7 +2119,7 @@
       "co_ar": "ركن أديم",
       "nat": "بنجلاديش",
       "flag": "🇧🇩",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -2140,7 +2140,7 @@
       "co_ar": "ركن أديم",
       "nat": "بنجلاديش",
       "flag": "🇧🇩",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -2161,7 +2161,7 @@
       "co_ar": "ركن أديم",
       "nat": "بنجلاديش",
       "flag": "🇧🇩",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -2350,7 +2350,7 @@
       "co_ar": "ركن أديم",
       "nat": "سيريلانكا",
       "flag": "🇱🇰",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -2392,7 +2392,7 @@
       "co_ar": "ركن أديم",
       "nat": "سيريلانكا",
       "flag": "🇱🇰",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -2413,7 +2413,7 @@
       "co_ar": "ركن أديم",
       "nat": "سيريلانكا",
       "flag": "🇱🇰",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -2476,7 +2476,7 @@
       "co_ar": "ركن أديم",
       "nat": "سيريلانكا",
       "flag": "🇱🇰",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -2497,7 +2497,7 @@
       "co_ar": "ركن أديم",
       "nat": "سيريلانكا",
       "flag": "🇱🇰",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -2539,7 +2539,7 @@
       "co_ar": "ركن أديم",
       "nat": "سيريلانكا",
       "flag": "🇱🇰",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -2581,7 +2581,7 @@
       "co_ar": "ركن أديم",
       "nat": "سيريلانكا",
       "flag": "🇱🇰",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
@@ -2644,7 +2644,7 @@
       "co_ar": "ركن أديم",
       "nat": "سيريلانكا",
       "flag": "🇱🇰",
-      "status": "notstarted",
+      "status": "active",
       "cert": false,
       "u": [
         null,
