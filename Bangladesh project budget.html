@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة الموازنة — المرحلة التجريبية بنجلاديش</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F5F1; --card:#fff; --ink:#0F2338; --ink2:#3A4C60; --mute:#77869A; --line:#E3E1DB;
+  --qta:#12695C; --qta-s:#DEEEEA;
+  --mus:#1F6FA8; --mus-s:#DEEBF5;
+  --bmet:#B07A22; --bmet-s:#F5EAD4;
+  --cap:#4A3F8F; --cap-s:#E7E4F6;
+  --var:#1F6FA8; --var-s:#DEEBF5;
+  --per:#8A6A1F; --per-s:#F3EAD5;
+  --con:#8895A6; --con-s:#EDEFF2;
+  --red:#C25B4E; --warn:#9B3232; --warn-s:#F8E7E5;
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;overflow-x:hidden;max-width:100%}
+body{background:var(--paper);color:var(--ink);
+  font-family:"IBM Plex Sans Arabic",-apple-system,"Segoe UI",Tahoma,sans-serif;
+  font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+.wrap{max-width:1260px;margin:0 auto;padding:0 22px 70px}
+h1,h2,h3,.disp{font-family:"Readex Pro","IBM Plex Sans Arabic",sans-serif;font-weight:600;letter-spacing:-.2px}
+.num{font-family:"IBM Plex Sans Arabic",monospace;direction:ltr;unicode-bidi:embed;display:inline-block}
+
+header{background:var(--ink);color:#fff;padding-bottom:28px}
+.hgrid{max-width:1260px;margin:0 auto;padding:28px 22px 0;display:flex;
+  justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.eyebrow{font-size:12px;letter-spacing:2.4px;color:#7FC3B8;font-weight:600;margin:0 0 9px}
+header h1{font-size:30px;margin:0 0 6px;line-height:1.25;color:#fff}
+header .sub{color:#A9BCCD;font-size:14px;margin:0;max-width:620px}
+.stamp{border:1px solid #2E4459;border-radius:10px;padding:12px 18px;min-width:200px;background:#132A41}
+.stamp .k{font-size:11.5px;color:#7F94A9;letter-spacing:.5px}
+.stamp .v{font-size:14.5px;font-weight:600;color:#fff;margin-top:2px}
+.toggle{display:inline-flex;background:#132A41;border:1px solid #2E4459;border-radius:999px;padding:3px;margin-top:14px}
+.toggle button{background:none;border:0;color:#A9BCCD;font:inherit;font-size:13px;font-weight:600;
+  padding:6px 18px;border-radius:999px;cursor:pointer;transition:.18s}
+.toggle button[aria-pressed="true"]{background:#fff;color:var(--ink)}
+.toggle button:focus-visible{outline:2px solid #7FC3B8;outline-offset:2px}
+
+.thesis{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:24px 26px 20px;margin:26px 0;box-shadow:0 1px 2px rgba(15,35,56,.05)}
+.cap-l{font-size:12px;letter-spacing:1.6px;color:var(--mute);font-weight:600;margin-bottom:3px}
+.thesis h2{font-size:20px;margin:0 0 18px}
+.band{display:flex;height:70px;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+.seg{display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;
+  min-width:0;transition:filter .18s}
+.seg:hover{filter:brightness(1.12)}
+.seg .sv{font-size:15px;font-weight:700;white-space:nowrap}
+.seg .sl{font-size:11px;opacity:.85;white-space:nowrap;margin-top:1px}
+.seg.tiny .sv,.seg.tiny .sl{display:none}
+.legend{display:flex;flex-wrap:wrap;gap:5px 22px;margin-top:15px;font-size:13px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block;margin-left:7px;vertical-align:-1px}
+.legend b{font-weight:600} .legend span{color:var(--mute)}
+.read{margin:16px 0 0;padding-top:15px;border-top:1px solid var(--line);font-size:14.5px;color:var(--ink2)}
+.read b{color:var(--qta)}
+
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:17px 18px 15px;border-top:3px solid var(--qta)}
+.kpi.k-cap{border-top-color:var(--cap)} .kpi.k-warn{border-top-color:var(--warn)}
+.kpi .v{font-size:25px;font-weight:700;font-family:"Readex Pro",sans-serif;line-height:1.15}
+.kpi .l{font-size:12.5px;color:var(--mute);margin-top:4px}
+.kpi .n{font-size:11.5px;color:var(--ink2);margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+
+section{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:24px 26px;margin-bottom:22px}
+section>h2{font-size:18px;margin:0 0 4px}
+section>.lead{color:var(--mute);font-size:13.5px;margin:0 0 20px}
+.cols{display:grid;grid-template-columns:1.3fr 1fr;gap:26px}
+.cols-2{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.cols-d{display:grid;grid-template-columns:250px 1fr;gap:28px;align-items:center}
+
+.rows{display:flex;flex-direction:column;gap:10px}
+.row{display:grid;grid-template-columns:180px 1fr 100px;align-items:center;gap:12px}
+.row .rl{font-size:13px;color:var(--ink2)}
+.track{background:#F0EFEA;border-radius:5px;height:20px;overflow:hidden}
+.fill{height:100%;border-radius:5px;transition:width .7s cubic-bezier(.22,1,.36,1)}
+.row .rv{font-size:13px;font-weight:600;text-align:left}
+.row:hover .fill{filter:brightness(1.1)}
+
+.shares{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.share{border:1px solid var(--line);border-radius:11px;padding:16px 18px;position:relative;overflow:hidden}
+.share:before{content:"";position:absolute;top:0;bottom:0;right:0;width:4px}
+.share.s-qta{background:var(--qta-s)} .share.s-qta:before{background:var(--qta)}
+.share.s-mus{background:var(--mus-s)} .share.s-mus:before{background:var(--mus)}
+.share.s-bmet{background:var(--bmet-s)} .share.s-bmet:before{background:var(--bmet)}
+.share .who{font-size:13px;font-weight:600}
+.share .per{font-size:25px;font-weight:700;font-family:"Readex Pro",sans-serif;line-height:1.2;margin-top:2px}
+.share .tot{font-size:12px;color:var(--ink2);margin-top:4px}
+.share .pc{position:absolute;top:14px;left:16px;font-size:14px;font-weight:700;opacity:.5}
+
+.fee{display:flex;height:46px;border-radius:8px;overflow:hidden;border:1px solid var(--line);margin-bottom:7px}
+.fee div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600}
+.ticks{display:flex;font-size:11.5px;color:var(--mute);margin-bottom:22px}
+.ticks span{text-align:center}
+
+.chart{width:100%;height:auto;display:block}
+.mnames{display:grid;grid-template-columns:repeat(5,1fr);font-size:12px;color:var(--mute);text-align:center}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{background:#F4F3EF;font-weight:600;text-align:right;padding:9px 12px;
+  border-bottom:1px solid var(--line);font-size:12.5px}
+th.c,td.c{text-align:center} th.l,td.l{text-align:left}
+td{padding:8px 12px;border-bottom:1px solid #EFEEE9}
+tbody tr:hover{background:#FAFAF7}
+tr.hi td{background:var(--qta-s);font-weight:600}
+tr.rk td{background:var(--warn-s)}
+tr.zz td{color:#9EA5AD}
+.tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:999px;font-weight:600}
+.t-cap{background:var(--cap-s);color:var(--cap)} .t-var{background:var(--var-s);color:var(--var)}
+.t-per{background:var(--per-s);color:var(--per)} .t-con{background:var(--con-s);color:#5A6875}
+.t-rk{background:var(--warn-s);color:var(--warn)}
+
+.alert{border-right:4px solid var(--bmet);background:#FBF7EE;border-radius:8px;
+  padding:13px 17px;font-size:13.5px;color:#3D3220;margin-top:18px}
+.alert.red{border-right-color:var(--warn);background:var(--warn-s);color:#5A2020}
+.alert b{font-weight:700}
+
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.stat{background:#FAFAF7;border:1px solid var(--line);border-radius:10px;padding:13px 14px;text-align:center}
+.stat .sv{font-size:20px;font-weight:700;font-family:"Readex Pro",sans-serif}
+.stat .sl{font-size:11.5px;color:var(--mute);margin-top:2px}
+
+.checks{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.chk{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:9px;
+  padding:10px 14px;font-size:13px}
+.chk .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.chk .cv{margin-right:auto;font-weight:600;font-size:12.5px;color:var(--ink2)}
+
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tw table{min-width:560px}
+footer{text-align:center;color:var(--mute);font-size:12.5px;padding-top:6px}
+
+@media (max-width:1000px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .cols,.cols-2,.cols-d{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .row{grid-template-columns:140px 1fr 88px}
+  header h1{font-size:25px}
+}
+@media (max-width:620px){
+  .wrap{padding:0 14px 50px} .hgrid{padding:24px 14px 0}
+  header h1{font-size:21px} header .sub{font-size:13px}
+  .stamp{min-width:0;width:100%}
+  section{padding:20px 16px} .thesis{padding:20px 16px 18px}
+  .kpis{grid-template-columns:1fr 1fr;gap:10px} .kpi{padding:14px} .kpi .v{font-size:20px}
+  .band{height:54px} .seg .sl{display:none} .seg .sv{font-size:12px}
+  .row{grid-template-columns:112px 1fr 76px;gap:8px} .row .rl{font-size:12px}
+  .shares{grid-template-columns:1fr} .stats{grid-template-columns:1fr 1fr}
+  .checks{grid-template-columns:1fr} .legend{gap:4px 14px;font-size:12px}
+  .ticks{font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{body{background:#fff}.toggle{display:none}
+  section,.thesis,.kpi{break-inside:avoid;box-shadow:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hgrid">
+    <div>
+      <p class="eyebrow">أكاديمية التدريب النوعي · لوحة الموازنة</p>
+      <h1>المرحلة التجريبية — تدريب العاملات المنزليات في بنجلاديش</h1>
+      <p class="sub">١٣٬٠٠٠ متدربة · سبتمبر – ديسمبر ٢٠٢٦ · برنامج مدمج: تعلّم إلكتروني ذاتي وتدريب حضوري</p>
+      <div class="toggle" role="group" aria-label="عملة العرض">
+        <button id="btn-sar" aria-pressed="true">ريال سعودي</button>
+        <button id="btn-usd" aria-pressed="false">دولار أمريكي</button>
+      </div>
+    </div>
+    <div class="stamp">
+      <div class="k">الشركاء</div><div class="v">منصة مساند · BMET</div>
+      <div class="k" style="margin-top:11px">سعر الصرف المعتمد</div>
+      <div class="v"><span class="num">3.75</span> ريال للدولار</div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="thesis">
+    <p class="cap-l">مسار الريال الواحد</p>
+    <h2>من أين يأتي إيراد الأكاديمية وإلى أين يذهب</h2>
+    <div class="band" id="band"></div>
+    <div class="legend" id="legend"></div>
+    <p class="read">من كل <b><span data-v="3412500"></span></b> تدخل حساب الأكاديمية،
+      يُصرف <b><span data-v="801513"></span></b> على التشغيل والاستثمار،
+      وتبقى <b><span data-v="2610987"></span></b> نتيجةً نهائية — بعد تحميل الاستثمار الرأسمالي
+      كاملاً على المرحلة التجريبية رغم أنه يخدم مدة العقد الخمسية.</p>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v"><span data-v="2610987"></span></div>
+      <div class="l">النتيجة النهائية</div><div class="n">بعد تحميل الاستثمار الرأسمالي</div></div>
+    <div class="kpi"><div class="v"><span class="num">86.1%</span></div>
+      <div class="l">هامش التشغيل</div><div class="n">من حصة الأكاديمية</div></div>
+    <div class="kpi"><div class="v"><span data-v="200.8"></span></div>
+      <div class="l">الربح لكل متدربة</div><div class="n">مقابل إيراد <span data-v="262.5"></span></div></div>
+    <div class="kpi k-cap"><div class="v"><span class="num">2,966</span></div>
+      <div class="l">نقطة التعادل</div><div class="n"><span class="num">23%</span> من المستهدف التعاقدي</div></div>
+    <div class="kpi k-warn"><div class="v"><span data-v="532899"></span></div>
+      <div class="l">أقصى احتياج تمويلي</div><div class="n">ذروة العجز النقدي في أكتوبر</div></div>
+  </div>
+
+  <section>
+    <h2>رسوم البرنامج وتوزيعها على الأطراف</h2>
+    <p class="lead">سعر البرنامج ثابت طوال مدة العقد. التوزيع أدناه هو جدول الفترة التجريبية في المادة السابعة.</p>
+    <div class="fee" id="fee"></div>
+    <div class="ticks" id="ticks"></div>
+    <div class="shares" id="shares"></div>
+    <div class="cols-d">
+      <svg id="donut" class="chart" viewBox="0 0 220 220" role="img" aria-label="توزيع الإيراد على الأطراف"></svg>
+      <div>
+        <table>
+          <thead><tr><th>الطرف</th><th class="c">للمتدربة</th><th class="l">إجمالي الفترة</th><th class="c">الحصة</th></tr></thead>
+          <tbody id="revtab"></tbody>
+        </table>
+        <div class="alert">حصة الأكاديمية <b>٧٠ دولاراً</b> للمتدربة، أي <b>٧٨٪</b> من صافي الإيراد
+          بعد استبعاد حصة BMET — وهي المعتمدة أساساً لهذه الموازنة.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>الإيراد الشهري وتوزيعه</h2>
+    <p class="lead">أعمدة مكدّسة تبيّن نصيب كل طرف من إيراد كل شهر. الارتفاع يتبع عدد المتدربات المكتملات.</p>
+    <svg id="revchart" class="chart" viewBox="0 0 900 300" role="img" aria-label="الإيراد الشهري موزعاً على الأطراف"></svg>
+    <div class="mnames" style="margin:6px 86px 0 18px">
+      <span>أغسطس</span><span>سبتمبر</span><span>أكتوبر</span><span>نوفمبر</span><span>ديسمبر</span></div>
+    <div class="legend" style="margin-top:14px">
+      <span><i style="background:#12695C"></i><b>أكاديمية التدريب النوعي</b></span>
+      <span><i style="background:#1F6FA8"></i><b>منصة مساند</b></span>
+      <span><i style="background:#B07A22"></i><b>BMET</b></span>
+    </div>
+    <table style="margin-top:20px">
+      <thead><tr><th>البند</th><th class="c">أغسطس</th><th class="c">سبتمبر</th><th class="c">أكتوبر</th>
+        <th class="c">نوفمبر</th><th class="c">ديسمبر</th><th class="l">الإجمالي</th></tr></thead>
+      <tbody id="revmonth"></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>الطاقة التشغيلية</h2>
+    <p class="lead">الأرقام الحاكمة للتشغيل، ونسبة استغلال الطاقة شهرياً محسوبةً على دفعتين لكل مركز.</p>
+    <div class="stats" id="stats"></div>
+    <div style="margin-top:22px" class="rows" id="util"></div>
+    <div class="alert red">نسبة الاستغلال تتجاوز <b>المئة بالمئة</b> في نوفمبر وديسمبر عند دفعتين لكل مركز.
+      بلوغ المستهدف في هذين الشهرين مشروط بتشغيل ثلاث دفعات — يُثبَّت كتابةً مع الجانب البنغلاديشي.</div>
+  </section>
+
+  <section>
+    <h2>بنود الصرف</h2>
+    <p class="lead">البنود المصروفة مرتبة تنازلياً واللون يدل على الفئة. الجدول أسفلها يعرض النموذج كاملاً بما فيه البنود المصفَّرة بقرار.</p>
+    <div class="cols">
+      <div class="rows" id="items"></div>
+      <div>
+        <svg id="catdonut" class="chart" viewBox="0 0 220 220" style="max-width:206px;margin:0 auto 18px"
+             role="img" aria-label="توزيع المصروف على الفئات"></svg>
+        <table>
+          <thead><tr><th>الفئة</th><th class="l">القيمة</th><th class="c">٪</th></tr></thead>
+          <tbody id="cattab"></tbody></table>
+      </div>
+    </div>
+    <div class="alert">عقد أتمتة وحده <b>٢١٪</b> من المصروف وهو ملتزم به بعقد موقّع فلا يقبل التخفيض،
+      والرحلتان معاً <b>١٥٪</b> — ثاني أكبر بند رأسمالي.</div>
+    <h3 style="font-size:15px;margin:24px 0 10px">النموذج التفصيلي — ستة وعشرون بنداً</h3>
+    <table>
+      <thead><tr><th style="width:34px" class="c">م</th><th>البند</th><th class="c">الفئة</th>
+        <th class="l">القيمة</th><th>الأساس</th></tr></thead>
+      <tbody id="fulltab"></tbody></table>
+  </section>
+
+  <section>
+    <h2>التدفق النقدي الشهري</h2>
+    <p class="lead">الإيراد يُستحق شهرياً ويُحصَّل بعد شهرين. الخط يبيّن الرصيد التراكمي.</p>
+    <svg id="cf" class="chart" viewBox="0 0 900 285" role="img" aria-label="التدفق النقدي الشهري"></svg>
+    <div class="mnames" style="margin:6px 86px 0 18px">
+      <span>أغسطس</span><span>سبتمبر</span><span>أكتوبر</span><span>نوفمبر</span><span>ديسمبر</span></div>
+    <div class="legend" style="margin-top:14px">
+      <span><i style="background:#C25B4E"></i><b>المصروف النقدي</b></span>
+      <span><i style="background:#12695C"></i><b>الإيراد المحصَّل</b></span>
+      <span><i style="background:#0F2338;height:3px;width:16px;border-radius:1px"></i><b>الرصيد التراكمي</b></span>
+    </div>
+    <table style="margin-top:20px">
+      <thead><tr><th>البند</th><th class="c">أغسطس</th><th class="c">سبتمبر</th><th class="c">أكتوبر</th>
+        <th class="c">نوفمبر</th><th class="c">ديسمبر</th><th class="l">الإجمالي</th></tr></thead>
+      <tbody id="cftab"></tbody></table>
+    <div class="alert">الرصيد يبلغ أدنى نقطة في <b>أكتوبر</b>. دفعة مقدمة عند التوقيع تخفض
+      الاحتياج التمويلي إلى أقل من النصف.</div>
+  </section>
+
+  <section>
+    <h2>عقد أتمتة — جدول الدفعات</h2>
+    <p class="lead">أكبر بند رأسمالي منفرد، ملتزم به بعقد موقّع في السادس عشر من أغسطس. القيم شاملة ضريبة القيمة المضافة.</p>
+    <div class="cols-2">
+      <div class="rows" id="atm"></div>
+      <table>
+        <thead><tr><th>الدفعة</th><th class="c">الشهر</th><th class="l">القيمة</th><th class="c">٪</th></tr></thead>
+        <tbody id="atmtab"></tbody></table>
+    </div>
+  </section>
+
+  <section>
+    <h2>ماذا لو لم يتحقق العدد المستهدف</h2>
+    <p class="lead">هامش التشغيل عند نسب تحقق مختلفة. الهيكل متغيّر في معظمه فالهامش يصمد.</p>
+    <div class="cols">
+      <div class="rows" id="sens"></div>
+      <div>
+        <table>
+          <thead><tr><th>نسبة التحقق</th><th class="c">المتدربات</th><th class="c">الإيراد</th><th class="l">هامش التشغيل</th></tr></thead>
+          <tbody id="senstab"></tbody></table>
+        <div class="alert">المشروع يبقى مربحاً حتى عند تحقق <b>٦٠٪</b> فقط. وبند الحد الأدنى المضمون
+          للإيراد يلزم الطرف الأول بسداد الفرق إذا كان النقص لسبب لا يعود إلى الأكاديمية.</div>
+      </div>
+    </div>
+    <h3 style="font-size:15px;margin:26px 0 12px">رافعتان أخريان قيسناهما</h3>
+    <div class="cols-2">
+      <div>
+        <p class="cap-l" style="margin-bottom:10px">أثر سعر الحقيبة المطبوعة على هامش التشغيل</p>
+        <div class="rows" id="pack"></div>
+      </div>
+      <div>
+        <p class="cap-l" style="margin-bottom:10px">كلفة فريق المتابعة مقابل عبء الفرد</p>
+        <div class="rows" id="team"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>نقاط يجب حسمها قبل الاعتماد</h2>
+    <p class="lead">مرتبة بالأثر. الثلاث الأولى تمسّ الجدوى أو سلامة القياس مباشرة.</p>
+    <table>
+      <thead><tr><th style="width:34px" class="c">م</th><th>النقطة</th><th class="c" style="width:118px">الأثر</th>
+        <th>ما يجب حسمه</th><th class="c" style="width:128px">الجهة</th></tr></thead>
+      <tbody id="dec"></tbody></table>
+  </section>
+
+  <section>
+    <h2>لوحة التحقق</h2>
+    <p class="lead">فحوص داخلية على اتساق النموذج المالي.</p>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <footer>أُعدَّت بواسطة إدارة التعلم الإلكتروني — أكاديمية التدريب النوعي · الإصدار الثاني عشر</footer>
+</div>
+
+<script>
+const FX=3.75; let cur="sar";
+const conv=v=>cur==="sar"?v:v/FX;
+const fmt=v=>{const n=conv(v);return n.toLocaleString("en-US",{maximumFractionDigits:Math.abs(n)<1000?1:0});};
+const unit=()=>cur==="sar"?"ر.س":"$";
+const M=["أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+
+const PRICE=375, SH={bmet:37.5,mus:75,qta:262.5};
+const REV={gross:4875000,bmet:487500,mus:975000,qta:3412500};
+const REVM={
+  trainees:[0,1950,3250,3900,3900], batches:[0,49,82,98,98],
+  gross:[0,731250,1218750,1462500,1462500],
+  bmet:[0,73125,121875,146250,146250],
+  mus:[0,146250,243750,292500,292500],
+  qta:[0,511875,853125,1023750,1023750]};
+const CAPM=3360, UTIL=REVM.trainees.map(t=>t/CAPM);
+
+const CATS=[
+  {k:"cap",n:"استثمار رأسمالي",v:327825,c:"#4A3F8F",t:"t-cap"},
+  {k:"var",n:"تشغيل متغير",    v:318688,c:"#1F6FA8",t:"t-var"},
+  {k:"per",n:"تشغيل دوري",     v:80000, c:"#8A6A1F",t:"t-per"},
+  {k:"con",n:"احتياطي المخاطر",v:75000, c:"#8895A6",t:"t-con"}];
+const SPEND=CATS.reduce((a,b)=>a+b.v,0), RESULT=REV.qta-SPEND;
+
+const FULL=[
+ {n:"تحليل الاحتياج ومواءمة التصميم وتأليف الحقيبة",v:5000,k:"cap",b:"قبل التشغيل"},
+ {n:"ترجمة وتوطين الوحدات العملية",v:0,k:"cap",b:"مدمجة في ترجمة الجزء العملي"},
+ {n:"إنتاج المحتوى الإلكتروني بالبنغالية",v:0,k:"cap",b:"المحتوى قائم"},
+ {n:"إنتاج الوحدات الرقمية الناقصة",v:0,k:"cap",b:"مؤجَّل لمراحل التوسع"},
+ {n:"ترجمة الجزء العملي إلى البنغالية",v:5625,k:"cap",b:"٥٠٠ صفحة × ٣ دولارات"},
+ {n:"عقد أتمتة — النقل والاستضافة والتطوير",v:170200,k:"cap",b:"شامل الضريبة · عقد موقّع"},
+ {n:"تطوير إضافي على المنصة",v:15000,k:"cap",b:"خارج نطاق أتمتة"},
+ {n:"تدريب المدربين واعتمادهم",v:12000,k:"cap",b:"مكافآت ثلاثة رئيسين + ٣ أيام قاعة"},
+ {n:"إنتاج مقاطع المعايرة والسجل المرجعي",v:0,k:"cap",b:"يُعوَّض بالمعايرة المباشرة"},
+ {n:"الرحلة التمهيدية لقيادات الأكاديمية",v:60000,k:"cap",b:"٣ أفراد × ٢٠٬٠٠٠ · منفَّذة"},
+ {n:"رحلة الترتيب التشغيلي",v:60000,k:"cap",b:"تقدير مبدئي يُعاد حسابه"},
+ {n:"مواد ومستهلكات التدريب العملي",v:163500,k:"var",b:"٥٠٠ ريال للدورة"},
+ {n:"حقيبة المتدربة المطبوعة",v:104000,k:"var",b:"٨ ريالات للمتدربة"},
+ {n:"التقييم العملي ومعالجة الأدلة",v:0,k:"var",b:"يؤديه مدربو المراكز"},
+ {n:"الشهادات الرقمية والتحقق",v:0,k:"var",b:"إصدار آلي عبر المنصة"},
+ {n:"مكتب المساعدة أثناء الدراسة",v:0,k:"var",b:"ضمن مهام المشرف الإداري"},
+ {n:"بدل مدربي المراكز",v:0,k:"var",b:"تابعون لـ BMET"},
+ {n:"الرسوم المالية والتحويلات",v:51188,k:"var",b:"١٫٥٪ من الإيراد"},
+ {n:"إدارة المشروع من المقر",v:0,k:"per",b:"ضمن الأعمال القائمة"},
+ {n:"مدير المشروع المقيم في بنجلاديش",v:28000,k:"per",b:"٧٬٠٠٠ ريال شهرياً"},
+ {n:"الدعم التشغيلي: الرخص وفتح الحسابات",v:12000,k:"per",b:"٣٬٠٠٠ ريال شهرياً"},
+ {n:"الإشراف من الأكاديمية وضبط الجودة",v:0,k:"per",b:"يتولاه فريق المتابعة"},
+ {n:"أجور فريق المتابعة البنغلاديشي",v:40000,k:"per",b:"٤ × ٢٬٥٠٠ ريال شهرياً"},
+ {n:"التشغيل التقني بعد التسليم",v:0,k:"per",b:"مكرر مع الدعم التشغيلي"},
+ {n:"الأمن السيبراني والنسخ الاحتياطي",v:0,k:"per",b:"ضمن عقد أتمتة"},
+ {n:"احتياطي المخاطر",v:75000,k:"con",b:"مبلغ مقطوع"}];
+
+const CF={spend:[131400,190328,211171,134307,134307],
+          cash:[0,0,0,511875,853125],
+          cum:[-131400,-321728,-532899,-155331,563487]};
+
+const ATM=[{n:"الأولى — التوقيع وبدء التأسيس",m:"أغسطس",v:56350},
+           {n:"الثانية — اكتمال النقل وضبط الأداء",m:"سبتمبر",v:28750},
+           {n:"الثالثة — الإطلاق الحي",m:"أكتوبر",v:85100}];
+
+const SENS=[{p:"٦٠٪",t:7800,r:2047500,v:1701889},
+            {p:"٧٠٪",t:9100,r:2388750,v:2011369},
+            {p:"٨٥٪",t:11050,r:2900625,v:2475593},
+            {p:"١٠٠٪",t:13000,r:3412500,v:2939813,hi:1},
+            {p:"١١٠٪",t:14300,r:3753750,v:3249293}];
+
+const PACK=[{n:"٨ ريالات — المعتمد",v:2939813,hi:1},{n:"١٢ ريالاً",v:2887813},{n:"٢٠ ريالاً",v:2783813}];
+const TEAM=[{n:"٤ أفراد · ١٠٫٥ مركز للفرد",v:150000,hi:1},
+            {n:"٦ أفراد · ٧٫٠ مراكز للفرد",v:225000},
+            {n:"٨ أفراد · ٥٫٣ مركز للفرد",v:300000}];
+
+const DEC=[
+ ["الرحلة التمهيدية نُفِّذت قبل توقيع اتفاقية الشراكة","٦٠٬٠٠٠ ر.س","تُدرَج ضمن التكاليف المستردة نصاً في العقد","المالية + قانوني",1],
+ ["مدرب معتمد واحد لكل مركز يقابل أربعين متدربة","سلامة القياس","التصميم يفرض مدرباً لكل خمس — يُوثَّق التتالي بعتبة اتفاق","الأكاديمية",1],
+ ["ثلاثة أيام تأهيل مقابل حقيبة معتمدة من أربعين ساعة","اعتماد المقيّم","تُوثَّق المكونات المحذوفة رسمياً","الأكاديمية",1],
+ ["نسبة الاستغلال تتجاوز المئة بالمئة في نوفمبر وديسمبر","الهدف التعاقدي","تثبيت ثلاث دفعات كتابةً أو خفض المستهدف","مساند + BMET",0],
+ ["كلفة رحلة الترتيب في سبتمبر تقدير مبدئي","٦٠٬٠٠٠ ر.س","يُعاد حسابها فور تحديد المدة وعدد الأفراد","الأكاديمية",0],
+ ["إسقاط بند الأمن السيبراني اعتماداً على عقد أتمتة","امتثال نظامي","العقد يغطي البنية لا امتثال الأكاديمية","قانوني",0],
+ ["إسقاط بند الجودة وضبط القياس","البند الحادي عشر","المؤشرات التشغيلية اللحظية التزام تعاقدي","الأكاديمية",0],
+ ["فجوة بدء التدريب أول سبتمبر مقابل الإطلاق الحي في أكتوبر","مخاطرة تشغيلية","خطة تشغيل مؤقتة للدفعات الأولى","أتمتة + الأكاديمية",0],
+ ["غياب المُراجِع المستقل على مستوى المركز","سلامة الشهادة","يُسند لمدير المركز أو يُعوَّض بإعادة ملاحظة بالعيّنة","الأكاديمية",0],
+ ["تأخر التحصيل شهرين","السيولة","دفعة مقدمة تخفض الاحتياج إلى أقل من النصف","المالية",0],
+ ["الضرائب والزكاة على الإيراد الأجنبي","غير مقدَّر","مراجعة مع مختص ضريبي","المالية",0]];
+
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const CHECKS=[
+ ["مجموع حصص الأطراف = سعر البرنامج", SH.bmet+SH.mus+SH.qta===PRICE, PRICE],
+ ["مجموع بنود الصرف = إجمالي المصروف", sum(FULL.map(f=>f.v))===SPEND, SPEND],
+ ["مجموع المتدربات = المستهدف التعاقدي", sum(REVM.trainees)===13000, 13000],
+ ["دفعات عقد أتمتة = قيمة العقد", sum(ATM.map(a=>a.v))===170200, 170200],
+ ["حصة الأكاديمية = مجموع الأشهر", sum(REVM.qta)===REV.qta, REV.qta],
+ ["النتيجة النهائية موجبة", RESULT>0, RESULT]];
+
+const el=id=>document.getElementById(id);
+const catOf=k=>CATS.find(c=>c.k===k);
+const T=(x,y,t,o={})=>`<text x="${x}" y="${y}" direction="ltr" font-size="${o.s||10.5}"
+  font-weight="${o.w||400}" fill="${o.f||'#77869A'}" text-anchor="${o.a||'start'}"
+  font-family="IBM Plex Sans Arabic">${t}</text>`;
+
+function bars(id,rows,max,dfl){
+  el(id).innerHTML=rows.map(r=>`<div class="row">
+    <div class="rl">${r.n}</div>
+    <div class="track"><div class="fill" style="width:${Math.max(r.v/max*100,.8)}%;background:${r.c||dfl}"></div></div>
+    <div class="rv"><span class="num">${r.txt!==undefined?r.txt:fmt(r.v)}</span></div></div>`).join("");
+}
+
+function donut(id,segs,center){
+  const R=95,r0=57,cx=110,cy=110,tot=sum(segs.map(s=>s.v));
+  let ang=-Math.PI/2,g="";
+  segs.forEach(s=>{
+    const a2=ang+s.v/tot*Math.PI*2, big=(a2-ang)>Math.PI?1:0;
+    const P=(rr,a)=>[(cx+rr*Math.cos(a)).toFixed(2),(cy+rr*Math.sin(a)).toFixed(2)];
+    const [x1,y1]=P(R,ang),[x2,y2]=P(R,a2),[x3,y3]=P(r0,a2),[x4,y4]=P(r0,ang);
+    g+=`<path d="M${x1},${y1} A${R},${R} 0 ${big},1 ${x2},${y2} L${x3},${y3} A${r0},${r0} 0 ${big},0 ${x4},${y4} Z"
+        fill="${s.c}" stroke="#fff" stroke-width="1.6">
+        <title>${s.n}: ${fmt(s.v)} ${unit()} · ${(s.v/tot*100).toFixed(1)}٪</title></path>`;
+    ang=a2;
+  });
+  g+=T(cx,cy-3,center.a,{a:"middle",w:700,f:"#0F2338",s:13});
+  g+=`<text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="10.5" fill="#77869A"
+      font-family="IBM Plex Sans Arabic">${center.b}</text>`;
+  el(id).innerHTML=g;
+}
+
+function stackedRev(){
+  const W=900,H=300,PR=88,PL=18,PT=22,PB=22;
+  const iw=W-PL-PR,ih=H-PT-PB,n=5,step=iw/n;
+  const top=Math.max(...REVM.gross)*1.16;
+  const y=v=>PT+ih-(v/top)*ih, xc=i=>W-PR-step*i-step/2, bw=step*0.46;
+  let g="";
+  for(let k=0;k<=4;k++){const val=top*k/4,yy=y(val);
+    g+=`<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="#EDECE7"/>`+T(W-PR+10,yy+4,fmt(val));}
+  const layers=[["qta","#12695C","الأكاديمية"],["mus","#1F6FA8","منصة مساند"],["bmet","#B07A22","BMET"]];
+  for(let i=0;i<n;i++){
+    const x=xc(i)-bw/2; let acc=0;
+    layers.forEach(([k,col,nm])=>{
+      const v=REVM[k][i]; if(!v)return;
+      const y1=y(acc),y2=y(acc+v); acc+=v;
+      g+=`<rect x="${x}" y="${y2}" width="${bw}" height="${y1-y2}" fill="${col}">
+          <title>${nm}: ${fmt(v)} ${unit()}</title></rect>`;});
+    if(REVM.gross[i]) g+=T(xc(i),y(REVM.gross[i])-7,fmt(REVM.gross[i]),{a:"middle",w:600,f:"#3A4C60",s:11});
+    g+=T(xc(i),H-5,REVM.trainees[i]?REVM.trainees[i].toLocaleString("en-US")+" متدربة":"—",{a:"middle",s:10});
+  }
+  el("revchart").innerHTML=g;
+}
+
+function cashflow(){
+  const W=900,H=285,PR=88,PL=18,PT=16,PB=26;
+  const iw=W-PL-PR,ih=H-PT-PB,n=5,step=iw/n;
+  const vals=[...CF.spend.map(v=>-v),...CF.cash,...CF.cum];
+  const hi=Math.max(...vals),lo=Math.min(...vals),pad=(hi-lo)*.14;
+  const top=hi+pad,bot=lo-pad;
+  const y=v=>PT+ih-((v-bot)/(top-bot))*ih, xc=i=>W-PR-step*i-step/2, bw=step*.24;
+  let g="";
+  for(let k=0;k<=4;k++){const val=bot+(top-bot)*k/4,yy=y(val);
+    g+=`<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="#EDECE7"/>`+T(W-PR+10,yy+4,fmt(val));}
+  g+=`<line x1="${PL}" y1="${y(0)}" x2="${W-PR}" y2="${y(0)}" stroke="#C9C7C0" stroke-width="1.4"/>`;
+  for(let i=0;i<n;i++){
+    const cx=xc(i),y1=y(0),y2=y(-CF.spend[i]);
+    g+=`<rect x="${cx+3}" y="${Math.min(y1,y2)}" width="${bw}" height="${Math.abs(y2-y1)}" rx="3"
+        fill="#C25B4E"><title>المصروف: ${fmt(CF.spend[i])} ${unit()}</title></rect>`;
+    if(CF.cash[i]>0){const y3=y(CF.cash[i]);
+      g+=`<rect x="${cx-bw-3}" y="${y3}" width="${bw}" height="${y1-y3}" rx="3" fill="#12695C">
+          <title>المحصَّل: ${fmt(CF.cash[i])} ${unit()}</title></rect>`;}}
+  g+=`<polyline points="${CF.cum.map((v,i)=>`${xc(i)},${y(v)}`).join(" ")}" fill="none"
+      stroke="#0F2338" stroke-width="2.4" stroke-linejoin="round"/>`;
+  const mn=Math.min(...CF.cum);
+  CF.cum.forEach((v,i)=>{
+    g+=`<circle cx="${xc(i)}" cy="${y(v)}" r="4.5" fill="#fff" stroke="#0F2338" stroke-width="2.2">
+        <title>الرصيد التراكمي: ${fmt(v)} ${unit()}</title></circle>`;
+    if(v===mn) g+=T(xc(i),y(v)+21,fmt(v),{a:"middle",w:700,f:"#9B3232",s:11});});
+  el("cf").innerHTML=g;
+}
+
+const mrow=(label,arr,tot,cls)=>`<tr class="${cls||''}"><td>${label}</td>`+
+  arr.map(v=>`<td class="c"><span class="num">${v?fmt(v):"—"}</span></td>`).join("")+
+  `<td class="l"><span class="num">${fmt(tot)}</span></td></tr>`;
+
+function render(){
+  const segs=[...CATS.map(c=>({n:c.n,v:c.v,bg:c.c})),{n:"النتيجة النهائية",v:RESULT,bg:"#0F2338"}];
+  const minW=window.innerWidth<620?24:7;
+  el("band").innerHTML=segs.map(s=>{const w=s.v/REV.qta*100;
+    return `<div class="seg${w<minW?" tiny":""}" style="width:${w}%;background:${s.bg}"
+      title="${s.n}: ${fmt(s.v)} ${unit()}"><span class="sv">${fmt(s.v)}</span>
+      <span class="sl">${s.n}</span></div>`;}).join("");
+  el("legend").innerHTML=segs.map(s=>`<span><i style="background:${s.bg}"></i><b>${s.n}</b>
+    <span>${fmt(s.v)} ${unit()} · ${(s.v/REV.qta*100).toFixed(1)}٪</span></span>`).join("");
+
+  const fee=[{n:"أكاديمية التدريب النوعي",v:SH.qta,c:"#12695C"},
+             {n:"منصة مساند",v:SH.mus,c:"#1F6FA8"},{n:"BMET",v:SH.bmet,c:"#B07A22"}];
+  el("fee").innerHTML=fee.map(f=>`<div style="width:${f.v/PRICE*100}%;background:${f.c}"
+    title="${f.n}: ${fmt(f.v)} ${unit()} للمتدربة">${fmt(f.v)}</div>`).join("");
+  el("ticks").innerHTML=fee.map(f=>`<span style="width:${f.v/PRICE*100}%">${f.n}</span>`).join("");
+  el("shares").innerHTML=[
+    {cl:"s-qta",n:"أكاديمية التدريب النوعي",p:"٧٠٪",per:SH.qta,tot:REV.qta},
+    {cl:"s-mus",n:"منصة مساند",p:"٢٠٪",per:SH.mus,tot:REV.mus},
+    {cl:"s-bmet",n:"BMET والأطراف ذات العلاقة",p:"١٠٪",per:SH.bmet,tot:REV.bmet}
+  ].map(s=>`<div class="share ${s.cl}"><div class="pc">${s.p}</div><div class="who">${s.n}</div>
+    <div class="per">${fmt(s.per)}</div>
+    <div class="tot">للمتدربة · الإجمالي ${fmt(s.tot)} ${unit()}</div></div>`).join("");
+  donut("donut",[{n:"أكاديمية التدريب النوعي",v:REV.qta,c:"#12695C"},
+                 {n:"منصة مساند",v:REV.mus,c:"#1F6FA8"},
+                 {n:"BMET",v:REV.bmet,c:"#B07A22"}],
+        {a:fmt(REV.gross),b:"إجمالي إيراد البرنامج"});
+  el("revtab").innerHTML=[
+    ["أكاديمية التدريب النوعي",SH.qta,REV.qta,"٧٠٪","hi"],
+    ["منصة مساند",SH.mus,REV.mus,"٢٠٪",""],
+    ["BMET والأطراف ذات العلاقة",SH.bmet,REV.bmet,"١٠٪",""],
+    ["إجمالي إيراد البرنامج",PRICE,REV.gross,"١٠٠٪",""]
+  ].map(r=>`<tr class="${r[4]}"><td>${r[0]}</td><td class="c"><span class="num">${fmt(r[1])}</span></td>
+    <td class="l"><span class="num">${fmt(r[2])}</span></td><td class="c">${r[3]}</td></tr>`).join("");
+
+  stackedRev();
+  el("revmonth").innerHTML=
+    `<tr><td>عدد المتدربات المكتملات</td>`+REVM.trainees.map(v=>
+      `<td class="c"><span class="num">${v?v.toLocaleString("en-US"):"—"}</span></td>`).join("")+
+    `<td class="l"><span class="num">13,000</span></td></tr>`+
+    `<tr><td>عدد الدفعات</td>`+REVM.batches.map(v=>
+      `<td class="c"><span class="num">${v||"—"}</span></td>`).join("")+
+    `<td class="l"><span class="num">327</span></td></tr>`+
+    mrow("إجمالي الإيراد",REVM.gross,REV.gross)+
+    mrow("حصة BMET",REVM.bmet,REV.bmet)+
+    mrow("حصة منصة مساند",REVM.mus,REV.mus)+
+    mrow("حصة أكاديمية التدريب النوعي",REVM.qta,REV.qta,"hi");
+
+  el("stats").innerHTML=[["42","مركزاً فرعياً"],["2 – 3","دفعات لكل مركز شهرياً"],["40","متدربة لكل دفعة"],
+    ["327","دفعة في الفترة"],["13,000","متدربة مستهدفة"],["3,360","الطاقة الشهرية"]]
+    .map(s=>`<div class="stat"><div class="sv"><span class="num">${s[0]}</span></div>
+      <div class="sl">${s[1]}</div></div>`).join("");
+  bars("util",UTIL.map((u,i)=>({n:M[i],v:u,txt:(u*100).toFixed(0)+"%",
+    c:u>1?"#9B3232":u>.9?"#B07A22":"#12695C"})),1.2);
+
+  const items=FULL.filter(f=>f.v>0).slice().sort((a,b)=>b.v-a.v);
+  bars("items",items.map(i=>({n:i.n,v:i.v,c:catOf(i.k).c})),items[0].v);
+  donut("catdonut",CATS.map(c=>({n:c.n,v:c.v,c:c.c})),{a:fmt(SPEND),b:"إجمالي المصروف"});
+  el("cattab").innerHTML=CATS.map(c=>`<tr><td><span class="tag ${c.t}">${c.n}</span></td>
+    <td class="l"><span class="num">${fmt(c.v)}</span></td>
+    <td class="c">${(c.v/SPEND*100).toFixed(1)}٪</td></tr>`).join("")+
+    `<tr class="hi"><td>إجمالي المصروف</td><td class="l"><span class="num">${fmt(SPEND)}</span></td>
+     <td class="c">١٠٠٪</td></tr>`;
+  el("fulltab").innerHTML=FULL.map((f,i)=>`<tr class="${f.v?'':'zz'}"><td class="c">${i+1}</td>
+    <td>${f.n}</td><td class="c"><span class="tag ${catOf(f.k).t}">${catOf(f.k).n}</span></td>
+    <td class="l"><span class="num">${f.v?fmt(f.v):"—"}</span></td><td>${f.b}</td></tr>`).join("")+
+    `<tr class="hi"><td></td><td>إجمالي المصروف النقدي</td><td></td>
+     <td class="l"><span class="num">${fmt(SPEND)}</span></td><td></td></tr>`;
+
+  cashflow();
+  el("cftab").innerHTML=
+    mrow("الإيراد المستحق",REVM.qta,REV.qta)+
+    mrow("الإيراد المحصَّل نقداً",CF.cash,sum(CF.cash))+
+    `<tr><td>المصروف النقدي</td>`+CF.spend.map(v=>
+      `<td class="c"><span class="num">${fmt(-v)}</span></td>`).join("")+
+    `<td class="l"><span class="num">${fmt(-SPEND)}</span></td></tr>`+
+    `<tr class="hi"><td>الرصيد التراكمي</td>`+CF.cum.map(v=>
+      `<td class="c"><span class="num">${fmt(v)}</span></td>`).join("")+`<td class="l">—</td></tr>`;
+
+  bars("atm",ATM.map(a=>({n:a.n,v:a.v,c:"#4A3F8F"})),Math.max(...ATM.map(a=>a.v)));
+  el("atmtab").innerHTML=ATM.map(a=>`<tr><td>${a.n}</td><td class="c">${a.m}</td>
+    <td class="l"><span class="num">${fmt(a.v)}</span></td>
+    <td class="c">${(a.v/170200*100).toFixed(0)}٪</td></tr>`).join("")+
+    `<tr class="hi"><td>إجمالي قيمة العقد</td><td class="c">—</td>
+     <td class="l"><span class="num">${fmt(170200)}</span></td><td class="c">١٠٠٪</td></tr>`;
+
+  bars("sens",SENS.map(s=>({n:s.p+" — "+s.t.toLocaleString("en-US")+" متدربة",v:s.v,
+    c:s.hi?"#12695C":"#8FB8B0"})),Math.max(...SENS.map(s=>s.v)));
+  el("senstab").innerHTML=SENS.map(s=>`<tr class="${s.hi?'hi':''}"><td>${s.p}</td>
+    <td class="c"><span class="num">${s.t.toLocaleString("en-US")}</span></td>
+    <td class="c"><span class="num">${fmt(s.r)}</span></td>
+    <td class="l"><span class="num">${fmt(s.v)}</span></td></tr>`).join("");
+  bars("pack",PACK.map(p=>({n:p.n,v:p.v,c:p.hi?"#12695C":"#9CBFB8"})),Math.max(...PACK.map(p=>p.v)));
+  bars("team",TEAM.map(t=>({n:t.n,v:t.v,c:t.hi?"#8A6A1F":"#C6B587"})),Math.max(...TEAM.map(t=>t.v)));
+
+  el("dec").innerHTML=DEC.map((d,i)=>`<tr class="${d[4]?'rk':''}"><td class="c">${i+1}</td>
+    <td>${d[0]}</td><td class="c"><span class="tag ${d[4]?'t-rk':'t-cap'}">${d[1]}</span></td>
+    <td>${d[2]}</td><td class="c">${d[3]}</td></tr>`).join("");
+
+  el("checks").innerHTML=CHECKS.map(c=>`<div class="chk">
+    <span class="dot" style="background:${c[1]?'#12695C':'#9B3232'}"></span><span>${c[0]}</span>
+    <span class="cv" style="color:${c[1]?'#12695C':'#9B3232'}">${c[1]?"سليم":"خلل"}</span></div>`).join("");
+
+  document.querySelectorAll("[data-v]").forEach(e=>{
+    e.innerHTML=`<span class="num">${fmt(parseFloat(e.dataset.v))}</span>`;});
+}
+render();
+
+document.querySelectorAll("section table").forEach(t=>{
+  if(t.parentNode.classList.contains("tw"))return;
+  const w=document.createElement("div");w.className="tw";
+  t.parentNode.insertBefore(w,t);w.appendChild(t);});
+
+const bs=el("btn-sar"),bu=el("btn-usd");
+function setCur(c){cur=c;bs.setAttribute("aria-pressed",c==="sar");
+  bu.setAttribute("aria-pressed",c==="usd");render();}
+bs.onclick=()=>setCur("sar"); bu.onclick=()=>setCur("usd");
+let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,180)});
+</script>
+</body>
+</html>
